@@ -36,6 +36,8 @@ static func build(room: CombatRoom) -> void:
 	var anchor := RiftConstruct.new()
 	anchor.kind = &"anchor"
 	anchor.permanent = true
+	anchor.grapple_exit_speed = 18.0
+	anchor.grapple_exit_lift = 3.5
 	room.geometry.add_child(anchor)
 	anchor.position = Vector3(-3,18,-132)
 	room.static_anchors.append(anchor)

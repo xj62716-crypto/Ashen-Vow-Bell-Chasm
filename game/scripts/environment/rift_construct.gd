@@ -10,7 +10,8 @@ var _title: Label3D
 var _surface: ShaderMaterial
 var _pulse: float=0
 var _launch_lock: float=0
-# Optional authored traction exit caps. Defaults preserve long-gap through-flight.
+# Optional authored traction exit caps. Defaults retain forward continuation
+# while leaving braking room on the receiving platform.
 @export_range(8.0,24.0,.5) var grapple_exit_speed: float = 24.0
 @export_range(0.0,6.0,.5) var grapple_exit_lift: float = 6.0
 var permanent: bool=false

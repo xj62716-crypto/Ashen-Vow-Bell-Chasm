@@ -7,8 +7,6 @@ signal released
 signal state_changed(phase: StringName, reason: StringName)
 const RANGE: float = 34.0
 const LAUNCH_TIME: float = .06
-const PULL_SPEED: float = 36.0
-const PULL_ACCELERATION: float = 150.0
 const RELEASE_DISTANCE: float = 1.65
 const MAX_DURATION: float = 1.6
 const REGRAB_DELAY: float = .35
@@ -97,7 +95,7 @@ func begin(target: Node3D) -> bool:
 	active = true
 	age = 0.0
 	progress = 0.0
-	speed = maxf(10.0,minf(PULL_SPEED,player.velocity.length()))
+	speed = maxf(10.0,minf(player.parkour_profile.grapple_pull_speed,player.velocity.length()))
 	_initial_distance = target.global_position.distance_to(player.global_position+Vector3.UP*1.1)
 	rope_length = _initial_distance
 	peak_speed = player.velocity.length()
@@ -132,7 +130,7 @@ func _set_phase(value: StringName, reason: StringName = &"") -> void:
 	state_changed.emit(phase,reason)
 
 func status() -> Dictionary:
-	return {"phase":phase,"reason":exit_reason,"progress":progress,"elapsed":age,"active":active,"speed":speed}
+	return {"phase":phase,"reason":exit_reason,"progress":progress,"elapsed":age,"active":active,"speed":speed,"peak_speed":peak_speed}
 
 func cancel() -> void:
 	var changed := active or phase != &"idle"
@@ -157,19 +155,23 @@ func _finish(reason: StringName) -> void:
 	if not active: return
 	var target := anchor
 	var useful := reason in [&"arrived",&"manual",&"jump",&"dash"] and player.global_position.distance_to(_start_position) >= 6 and progress*_initial_distance >= 4
+	# Every exit is bounded. Manual release keeps the player's chosen timing and
+	# tangent, while automatic arrival guarantees enough forward speed to reach
+	# the authored landing without retaining the old 36 m/s pull velocity.
+	var flat := Vector3(player.velocity.x,0,player.velocity.z)
+	var direction := flat.normalized() if flat.length() > 2 else _exit_forward
+	var speed_cap := player.parkour_profile.grapple_exit_speed
+	var lift_cap := player.parkour_profile.grapple_exit_lift
+	if target is RiftConstruct:
+		speed_cap = minf(speed_cap,target.grapple_exit_speed)
+		lift_cap = minf(lift_cap,target.grapple_exit_lift)
+	var exit_speed := minf(flat.length(),speed_cap)
 	if reason == &"arrived":
-		# Magic traction releases before the capsule reaches the anchor. Keep a
-		# bounded through-flight, including directly overhead hooks; looking around
-		# never rotates the trajectory or steals camera control.
-		var flat := Vector3(player.velocity.x,0,player.velocity.z)
-		var direction := flat.normalized() if flat.length() > 2 else _exit_forward
-		var speed_cap := clampf(target.grapple_exit_speed,8,24) if target is RiftConstruct else 24.0
-		var lift_cap := clampf(target.grapple_exit_lift,0,6) if target is RiftConstruct else 6.0
-		var exit_speed := clampf(flat.length(),minf(12,speed_cap),speed_cap)
-		player.velocity = direction*exit_speed+Vector3.UP*clampf(player.velocity.y,-8.0,lift_cap)
+		exit_speed = maxf(minf(10.0,speed_cap),exit_speed)
 		progress = 1.0
+	player.velocity = direction*exit_speed+Vector3.UP*clampf(player.velocity.y,-8.0,lift_cap)
 	speed = player.velocity.length()
-	player._momentum_left = 1.2
+	player._momentum_left = player.parkour_profile.grapple_exit_momentum_seconds
 	player._coyote_left = 0.0
 	player._jump_buffer_left = 0.0
 	player._jump_held = Input.is_action_pressed("jump")
@@ -225,10 +227,24 @@ func advance(delta: float) -> void:
 		if offset.length() <= RELEASE_DISTANCE:
 			_finish(&"arrived")
 			return
-		speed = move_toward(speed,PULL_SPEED,PULL_ACCELERATION*delta)
+		speed = move_toward(speed,player.parkour_profile.grapple_pull_speed,player.parkour_profile.grapple_pull_acceleration*delta)
 		# Capping this step at the release shell prevents low-FPS overshoot and
-		# repeated reversals around a moving target. CharacterBody sweeps the capsule.
-		player.velocity = offset.normalized()*minf(speed,maxf(0,offset.length()-RELEASE_DISTANCE+.02)/delta)
+		# repeated reversals around a moving target. A limited tangent preserves
+		# controllable swing input without letting it overwhelm forward traction.
+		var tether_direction := offset.normalized()
+		var pull_step := minf(speed,maxf(0,offset.length()-RELEASE_DISTANCE+.02)/delta)
+		var pull_velocity := tether_direction*pull_step
+		pull_velocity.y = clampf(pull_velocity.y*player.parkour_profile.grapple_vertical_scale,-player.parkour_profile.grapple_vertical_speed,player.parkour_profile.grapple_vertical_speed)
+		var tangent_velocity := player.velocity-tether_direction*player.velocity.dot(tether_direction)
+		var stick := Input.get_vector("move_left","move_right","move_forward","move_backward")
+		var steer_world := player.global_basis*Vector3(stick.x,0,stick.y)
+		var steer_tangent := steer_world-tether_direction*steer_world.dot(tether_direction)
+		var target_tangent := Vector3.ZERO
+		if steer_tangent.length_squared()>.001:
+			target_tangent=steer_tangent.normalized()*player.parkour_profile.grapple_steer_speed
+		tangent_velocity=tangent_velocity.move_toward(target_tangent,player.parkour_profile.grapple_steer_acceleration*delta).limit_length(player.parkour_profile.grapple_steer_speed)
+		player.velocity=(pull_velocity+tangent_velocity).limit_length(player.parkour_profile.grapple_max_speed)
+		player.velocity.y=clampf(player.velocity.y,-player.parkour_profile.grapple_vertical_speed,player.parkour_profile.grapple_vertical_speed)
 	else:
 		player.velocity.y -= player.gravity*delta
 	var before := player.global_position
