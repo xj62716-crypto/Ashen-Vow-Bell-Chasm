@@ -1,0 +1,64 @@
+[gd_resource type="AudioBusLayout" format=3 uid="uid://b22hlbtnepb4d"]
+
+[sub_resource type="AudioEffectLimiter" id="Limiter"]
+resource_name = "Output ceiling"
+ceiling_db = -1.0
+threshold_db = -2.0
+
+[sub_resource type="AudioEffectLowPassFilter" id="FocusLowPass"]
+resource_name = "World focus filter (local weapons and danger bypass)"
+cutoff_hz = 20000.0
+
+[resource]
+bus/0/effect/0/effect = SubResource("Limiter")
+bus/0/effect/0/enabled = true
+bus/1/name = &"Music"
+bus/1/solo = false
+bus/1/mute = false
+bus/1/bypass_fx = false
+bus/1/volume_db = -7.0
+bus/1/send = &"Master"
+bus/2/name = &"SFX"
+bus/2/solo = false
+bus/2/mute = false
+bus/2/bypass_fx = false
+bus/2/volume_db = -3.0
+bus/2/send = &"Master"
+bus/3/name = &"WorldSFX"
+bus/3/solo = false
+bus/3/mute = false
+bus/3/bypass_fx = false
+bus/3/volume_db = 0.0
+bus/3/send = &"SFX"
+bus/3/effect/0/effect = SubResource("FocusLowPass")
+bus/3/effect/0/enabled = true
+bus/4/name = &"PlayerSFX"
+bus/4/solo = false
+bus/4/mute = false
+bus/4/bypass_fx = false
+bus/4/volume_db = 0.0
+bus/4/send = &"SFX"
+bus/5/name = &"Foley"
+bus/5/solo = false
+bus/5/mute = false
+bus/5/bypass_fx = false
+bus/5/volume_db = 0.0
+bus/5/send = &"WorldSFX"
+bus/6/name = &"Magic"
+bus/6/solo = false
+bus/6/mute = false
+bus/6/bypass_fx = false
+bus/6/volume_db = 0.0
+bus/6/send = &"WorldSFX"
+bus/7/name = &"Danger"
+bus/7/solo = false
+bus/7/mute = false
+bus/7/bypass_fx = false
+bus/7/volume_db = 0.0
+bus/7/send = &"SFX"
+bus/8/name = &"UI"
+bus/8/solo = false
+bus/8/mute = false
+bus/8/bypass_fx = false
+bus/8/volume_db = 0.0
+bus/8/send = &"SFX"

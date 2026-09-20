@@ -1,0 +1,1191 @@
+{
+  "visual_source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\weapon-detail-r3\\staff\\staff-detail-r3.blend",
+  "visual_source_sha256": "dd6281281f9d41867cfe554a37e75e6095ec58d5a6b170f49953e1217748e676",
+  "motion_source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\staff-motion-r12\\arms-staff-r12.blend",
+  "blend": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\integration\\deliverables\\art\\staff-r3-adapted\\staff-r3-on-r12.blend",
+  "runtime_sha256": "e23b2d5c1621efe7f44066a2c9c7738231cc1c43a1140bc524b5277e0b634557",
+  "original_meshes": [
+    {
+      "name": "staff",
+      "vertices": 55570,
+      "polygons": 55568,
+      "materials": [
+        "aged-dark-wood"
+      ],
+      "uv_layers": [
+        "UVMap"
+      ]
+    },
+    {
+      "name": "glow_jem",
+      "vertices": 58,
+      "polygons": 96,
+      "materials": [
+        "crystal-inner-core"
+      ],
+      "uv_layers": [
+        "UVMap"
+      ]
+    },
+    {
+      "name": "crystal",
+      "vertices": 50,
+      "polygons": 52,
+      "materials": [
+        "smoky-amethyst"
+      ],
+      "uv_layers": [
+        "UVMap"
+      ]
+    },
+    {
+      "name": "Fitted bronze ferrule",
+      "vertices": 520,
+      "polygons": 514,
+      "materials": [
+        "staff-antique-bronze"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.001",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.002",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.003",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.004",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.005",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.006",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.007",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.008",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.009",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Fitted bronze ferrule.001",
+      "vertices": 520,
+      "polygons": 514,
+      "materials": [
+        "staff-antique-bronze"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.010",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.011",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.012",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.013",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.014",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.015",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.016",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.017",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.018",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.019",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Fitted bronze ferrule.002",
+      "vertices": 520,
+      "polygons": 514,
+      "materials": [
+        "staff-antique-bronze"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.020",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.021",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.022",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.023",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.024",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.025",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.026",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.027",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.028",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.029",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Fitted bronze ferrule.003",
+      "vertices": 520,
+      "polygons": 514,
+      "materials": [
+        "staff-antique-bronze"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.030",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.031",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.032",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.033",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.034",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.035",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.036",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.037",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.038",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.039",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Fitted bronze ferrule.004",
+      "vertices": 520,
+      "polygons": 514,
+      "materials": [
+        "staff-antique-bronze"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.040",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.041",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.042",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.043",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.044",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.045",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.046",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.047",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.048",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.049",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Fitted bronze ferrule.005",
+      "vertices": 520,
+      "polygons": 514,
+      "materials": [
+        "staff-antique-bronze"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.050",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.051",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.052",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.053",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.054",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.055",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.056",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.057",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.058",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ferrule chasing.059",
+      "vertices": 18,
+      "polygons": 14,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Leather spiral binding",
+      "vertices": 624,
+      "polygons": 620,
+      "materials": [
+        "staff-grip-leather"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Crown supporting rib",
+      "vertices": 250,
+      "polygons": 242,
+      "materials": [
+        "staff-antique-bronze"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Crown rib chase",
+      "vertices": 126,
+      "polygons": 122,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Rib rivet",
+      "vertices": 42,
+      "polygons": 80,
+      "materials": [
+        "staff-antique-bronze"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Crown supporting rib.001",
+      "vertices": 250,
+      "polygons": 242,
+      "materials": [
+        "staff-antique-bronze"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Crown rib chase.001",
+      "vertices": 126,
+      "polygons": 122,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Rib rivet.001",
+      "vertices": 42,
+      "polygons": 80,
+      "materials": [
+        "staff-antique-bronze"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Crown supporting rib.002",
+      "vertices": 250,
+      "polygons": 242,
+      "materials": [
+        "staff-antique-bronze"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Crown rib chase.002",
+      "vertices": 126,
+      "polygons": 122,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Rib rivet.002",
+      "vertices": 42,
+      "polygons": 80,
+      "materials": [
+        "staff-antique-bronze"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Crown supporting rib.003",
+      "vertices": 250,
+      "polygons": 242,
+      "materials": [
+        "staff-antique-bronze"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Crown rib chase.003",
+      "vertices": 126,
+      "polygons": 122,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Rib rivet.003",
+      "vertices": 42,
+      "polygons": 80,
+      "materials": [
+        "staff-antique-bronze"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Crown oath medallion",
+      "vertices": 144,
+      "polygons": 146,
+      "materials": [
+        "staff-antique-bronze"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Medallion diamond",
+      "vertices": 40,
+      "polygons": 34,
+      "materials": [
+        "staff-inlay"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Medallion support",
+      "vertices": 24,
+      "polygons": 18,
+      "materials": [
+        "staff-antique-bronze"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Bound vellum ward",
+      "vertices": 56,
+      "polygons": 54,
+      "materials": [
+        "smoked-vellum"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ward handwriting",
+      "vertices": 15,
+      "polygons": 12,
+      "materials": [
+        "Iron gall ward ink"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ward handwriting.001",
+      "vertices": 15,
+      "polygons": 12,
+      "materials": [
+        "Iron gall ward ink"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ward handwriting.002",
+      "vertices": 15,
+      "polygons": 12,
+      "materials": [
+        "Iron gall ward ink"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ward handwriting.003",
+      "vertices": 15,
+      "polygons": 12,
+      "materials": [
+        "Iron gall ward ink"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ward handwriting.004",
+      "vertices": 15,
+      "polygons": 12,
+      "materials": [
+        "Iron gall ward ink"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Medallion support.001",
+      "vertices": 24,
+      "polygons": 18,
+      "materials": [
+        "staff-antique-bronze"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Bound vellum ward.001",
+      "vertices": 56,
+      "polygons": 54,
+      "materials": [
+        "smoked-vellum.001"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ward handwriting.005",
+      "vertices": 15,
+      "polygons": 12,
+      "materials": [
+        "Iron gall ward ink.001"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ward handwriting.006",
+      "vertices": 15,
+      "polygons": 12,
+      "materials": [
+        "Iron gall ward ink.001"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ward handwriting.007",
+      "vertices": 15,
+      "polygons": 12,
+      "materials": [
+        "Iron gall ward ink.001"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ward handwriting.008",
+      "vertices": 15,
+      "polygons": 12,
+      "materials": [
+        "Iron gall ward ink.001"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    },
+    {
+      "name": "Ward handwriting.009",
+      "vertices": 15,
+      "polygons": 12,
+      "materials": [
+        "Iron gall ward ink.001"
+      ],
+      "uv_layers": [
+        "Detail UV"
+      ]
+    }
+  ],
+  "original_mesh_count": 98,
+  "original_preserved_all_tiers": true,
+  "original_pbr_preserved": true,
+  "fit_matrix": [
+    [
+      0.0,
+      0.0,
+      0.8199999928474426,
+      0.004999999888241291
+    ],
+    [
+      -0.8199999928474426,
+      0.0,
+      0.0,
+      0.09300000220537186
+    ],
+    [
+      0.0,
+      -0.8199999928474426,
+      0.0,
+      0.014999999664723873
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "removed_previous_weapon_meshes": [
+    "Base__tapered_black_ash",
+    "Base__solid_Refit_forged_black_iron",
+    "Base__solid_Refit_dark_gilded_bronze",
+    "Base__solid_Refit_oxblood_bound_leather",
+    "Base__Rune_Inlay_oath",
+    "Crown_base__solid_Refit_dark_gilded_bronze",
+    "Crown_base__solid_Refit_forged_black_iron",
+    "Crown_base__Rune_Inlay_oath",
+    "Crown_base__seated_focus",
+    "Crown_arcane_storm_1__crown_seat",
+    "Crown_arcane_storm_1__solid_Refit_forged_black_iron",
+    "Crown_arcane_storm_1__solid_Refit_worn_ritual_silver",
+    "Crown_arcane_storm_1__Rune_Inlay_storm",
+    "Crown_arcane_storm_1__seated_focus",
+    "Crown_arcane_storm_2__ascended_reliquary_collar",
+    "Crown_arcane_storm_2__solid_Refit_forged_black_iron",
+    "Crown_arcane_storm_2__Rune_Inlay_storm",
+    "Crown_arcane_storm_2__linked_focus_heart",
+    "Crown_arcane_shape_1__crown_seat",
+    "Crown_arcane_shape_1__solid_Refit_layered_basalt",
+    "Crown_arcane_shape_1__solid_Refit_forged_black_iron",
+    "Crown_arcane_shape_1__Rune_Inlay_shape",
+    "Crown_arcane_shape_1__rift_focus",
+    "Crown_arcane_shape_1__foundation_capital",
+    "Crown_arcane_shape_2__ascended_reliquary_collar",
+    "Crown_arcane_shape_2__solid_Refit_forged_black_iron",
+    "Crown_arcane_shape_2__linked_focus_heart",
+    "Crown_arcane_seal_1__solid_Refit_dark_gilded_bronze",
+    "Crown_arcane_seal_1__solid_Refit_forged_black_iron",
+    "Crown_arcane_seal_1__solid_Refit_worn_ritual_silver",
+    "Crown_arcane_seal_1__sealed_blackglass",
+    "Crown_arcane_seal_1__Rune_contract_seal",
+    "Crown_arcane_seal_2__ascended_reliquary_collar",
+    "Crown_arcane_seal_2__solid_Refit_old_carved_horn",
+    "Crown_arcane_seal_2__solid_Refit_forged_black_iron",
+    "Crown_arcane_seal_2__Rune_Inlay_seal",
+    "Crown_arcane_seal_2__linked_focus_heart",
+    "Crown_arcane_element_fire_1__solid_Refit_dark_gilded_bronze",
+    "Crown_arcane_element_fire_1__solid_Refit_forged_black_iron",
+    "Crown_arcane_element_fire_1__Rune_Inlay_fire",
+    "Crown_arcane_element_fire_1__seated_focus",
+    "Crown_arcane_element_fire_2__ascended_reliquary_collar",
+    "Crown_arcane_element_fire_2__solid_Refit_forged_black_iron",
+    "Crown_arcane_element_fire_2__Rune_Inlay_fire",
+    "Crown_arcane_element_fire_2__linked_focus_heart",
+    "Crown_arcane_element_ice_1__solid_Refit_worn_ritual_silver",
+    "Crown_arcane_element_ice_1__focus_Inlay_ice",
+    "Crown_arcane_element_ice_1__quartz_root_cup",
+    "Crown_arcane_element_ice_2__solid_Refit_worn_ritual_silver",
+    "Crown_arcane_element_ice_2__solid_Refit_forged_black_iron",
+    "Crown_arcane_element_ice_2__Rune_Inlay_ice",
+    "Crown_arcane_element_ice_2__linked_focus_heart",
+    "Crown_arcane_element_wind_1__solid_Refit_dark_gilded_bronze",
+    "Crown_arcane_element_wind_1__solid_Refit_forged_black_iron",
+    "Crown_arcane_element_wind_1__Rune_Inlay_wind",
+    "Crown_arcane_element_wind_1__seated_focus",
+    "Crown_arcane_element_wind_2__ascended_reliquary_collar",
+    "Crown_arcane_element_wind_2__solid_Refit_forged_black_iron",
+    "Crown_arcane_element_wind_2__Rune_Inlay_wind",
+    "Crown_arcane_element_wind_2__linked_focus_heart",
+    "Crown_arcane_element_lightning_1__crown_seat",
+    "Crown_arcane_element_lightning_1__solid_Refit_forged_black_iron",
+    "Crown_arcane_element_lightning_1__solid_Refit_worn_ritual_silver",
+    "Crown_arcane_element_lightning_1__Rune_Inlay_lightning",
+    "Crown_arcane_element_lightning_1__seated_focus",
+    "Crown_arcane_element_lightning_2__ascended_reliquary_collar",
+    "Crown_arcane_element_lightning_2__solid_Refit_forged_black_iron",
+    "Crown_arcane_element_lightning_2__Rune_Inlay_lightning",
+    "Crown_arcane_element_lightning_2__linked_focus_heart",
+    "Base__solid_crystal_keeper"
+  ],
+  "additive_mesh_count": 48,
+  "status": "Complete R3 base restored and same-camera preservation verified. Additive build silhouettes remain quality-pending. Current motion/stills at art-correction/r3-current.json.",
+  "preservation_evidence": "docs/workstreams/results/integration/art-correction/r3-baseline/preservation-audit.json"
+}

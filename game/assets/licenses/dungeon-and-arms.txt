@@ -1,0 +1,22 @@
+First-person arms (v0.3)
+"fps arms (rigged only)" by para; mesh/texture originally based on MakeHuman.
+Source: https://opengameart.org/content/fps-arms-rigged-only
+Download: https://opengameart.org/sites/default/files/fps%20arms.7z
+License: CC0 1.0, https://creativecommons.org/publicdomain/zero/1.0/
+Changes: trimmed shoulder/upper-arm geometry, replaced skin with leather glove material,
+added metal bracers and rivets, procedural finger/arm movement and first-person placement.
+
+PBR materials and scanned boulder (v0.3)
+Poly Haven, https://polyhaven.com/
+Asset pages:
+https://polyhaven.com/a/castle_wall_slates
+https://polyhaven.com/a/stone_floor
+https://polyhaven.com/a/brown_leather
+https://polyhaven.com/a/metal_plate
+https://polyhaven.com/a/rock_face
+https://polyhaven.com/a/boulder_01
+License: CC0 1.0, https://polyhaven.com/license
+https://creativecommons.org/publicdomain/zero/1.0/
+Changes: material tint/roughness/texture scale and model placement/scale.
+Original files verified against checksums from the Poly Haven API.
+Retrieved and verified 2026-09-12.

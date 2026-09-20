@@ -1,0 +1,278 @@
+[gd_resource type="Resource" script_class="LevelRunConfiguration" format=3]
+
+[ext_resource type="Script" path="res://scenes/levels/config/encounter_entry.gd" id="1_ejugi"]
+[ext_resource type="Script" path="res://scenes/levels/config/mechanism_tuning.gd" id="2_6sral"]
+[ext_resource type="Script" path="res://scenes/levels/config/run_configuration.gd" id="3_ap24r"]
+
+[sub_resource type="Resource" id="Resource_qp0u2"]
+script = ExtResource("1_ejugi")
+id = &"stage_1_spawn_01"
+position_m = Vector3(-8, 2.04, -77)
+role = "caster"
+initial_delay_seconds = 2.4
+attack_range_m = 24.0
+
+[sub_resource type="Resource" id="Resource_qig2n"]
+script = ExtResource("1_ejugi")
+id = &"stage_1_spawn_02"
+position_m = Vector3(2, 2.04, -83)
+archetype = "shield"
+role = "heavy"
+initial_delay_seconds = 1.45
+
+[sub_resource type="Resource" id="Resource_7h7f1"]
+script = ExtResource("1_ejugi")
+id = &"stage_1_spawn_03"
+position_m = Vector3(-9, 4.04, -182)
+role = "caster"
+initial_delay_seconds = 1.8
+
+[sub_resource type="Resource" id="Resource_k5oyl"]
+script = ExtResource("1_ejugi")
+id = &"stage_1_spawn_04"
+position_m = Vector3(3, 4.04, -187)
+archetype = "elite"
+role = "pursuer"
+required_guardian = true
+initial_delay_seconds = 2.15
+
+[sub_resource type="Resource" id="Resource_jg3f5"]
+script = ExtResource("1_ejugi")
+id = &"stage_1_spawn_05"
+position_m = Vector3(15, 7.04, -79)
+role = "bell"
+initial_delay_seconds = 2.5
+
+[sub_resource type="Resource" id="Resource_kwj1h"]
+script = ExtResource("1_ejugi")
+id = &"stage_2_spawn_01"
+stage = 2
+position_m = Vector3(0, 0.04, -10)
+
+[sub_resource type="Resource" id="Resource_5iud5"]
+script = ExtResource("1_ejugi")
+id = &"stage_2_spawn_02"
+stage = 2
+position_m = Vector3(4, 0.04, -18)
+archetype = "shield"
+role = "heavy"
+initial_delay_seconds = 1.45
+
+[sub_resource type="Resource" id="Resource_alsu3"]
+script = ExtResource("1_ejugi")
+id = &"stage_2_spawn_03"
+stage = 2
+position_m = Vector3(4, 3.04, -36)
+role = "caster"
+initial_delay_seconds = 1.8
+
+[sub_resource type="Resource" id="Resource_ym2tj"]
+script = ExtResource("1_ejugi")
+id = &"stage_2_spawn_04"
+stage = 2
+position_m = Vector3(18, 4.04, -91)
+archetype = "shield"
+role = "heavy"
+initial_delay_seconds = 2.15
+
+[sub_resource type="Resource" id="Resource_2ywa6"]
+script = ExtResource("1_ejugi")
+id = &"stage_2_spawn_05"
+stage = 2
+position_m = Vector3(24, 8.04, -126)
+initial_delay_seconds = 2.5
+
+[sub_resource type="Resource" id="Resource_mxrf2"]
+script = ExtResource("1_ejugi")
+id = &"stage_2_spawn_06"
+stage = 2
+position_m = Vector3(32, 8.04, -134)
+archetype = "elite"
+role = "pursuer"
+required_guardian = true
+initial_delay_seconds = 2.85
+
+[sub_resource type="Resource" id="Resource_sfuri"]
+script = ExtResource("1_ejugi")
+id = &"stage_2_spawn_07"
+stage = 2
+position_m = Vector3(-7, 11.04, -162)
+role = "caster"
+initial_delay_seconds = 3.2
+
+[sub_resource type="Resource" id="Resource_hof7p"]
+script = ExtResource("1_ejugi")
+id = &"stage_2_spawn_08"
+stage = 2
+position_m = Vector3(-23, 14.04, -200)
+role = "sentinel"
+initial_delay_seconds = 3.55
+
+[sub_resource type="Resource" id="Resource_o7rcb"]
+script = ExtResource("1_ejugi")
+id = &"stage_2_spawn_09"
+stage = 2
+position_m = Vector3(-15, 14.04, -208)
+archetype = "elite"
+role = "bell"
+initial_delay_seconds = 3.9
+
+[sub_resource type="Resource" id="Resource_gxses"]
+script = ExtResource("1_ejugi")
+id = &"stage_2_spawn_10"
+stage = 2
+position_m = Vector3(-39, 12.04, -172)
+archetype = "elite"
+role = "sentinel"
+initial_delay_seconds = 4.25
+
+[sub_resource type="Resource" id="Resource_vf1r7"]
+script = ExtResource("1_ejugi")
+id = &"stage_2_spawn_11"
+stage = 2
+position_m = Vector3(49, 12.04, -135)
+archetype = "shield"
+role = "heavy"
+initial_delay_seconds = 4.6
+
+[sub_resource type="Resource" id="Resource_kavm3"]
+script = ExtResource("1_ejugi")
+id = &"stage_2_spawn_12"
+stage = 2
+position_m = Vector3(0, 11.04, -247)
+archetype = "miniboss"
+role = "caster"
+required_guardian = true
+initial_delay_seconds = 4.95
+
+[sub_resource type="Resource" id="Resource_mt3da"]
+script = ExtResource("1_ejugi")
+id = &"stage_3_spawn_01"
+stage = 3
+position_m = Vector3(-5, 1.04, -11)
+archetype = "elite"
+role = "pursuer"
+
+[sub_resource type="Resource" id="Resource_1vbpr"]
+script = ExtResource("1_ejugi")
+id = &"stage_3_spawn_02"
+stage = 3
+position_m = Vector3(-4, 1.04, -24)
+initial_delay_seconds = 1.45
+
+[sub_resource type="Resource" id="Resource_nfyan"]
+script = ExtResource("1_ejugi")
+id = &"stage_3_spawn_03"
+stage = 3
+position_m = Vector3(4, 1.04, -24)
+role = "sentinel"
+initial_delay_seconds = 1.8
+
+[sub_resource type="Resource" id="Resource_3ec00"]
+script = ExtResource("1_ejugi")
+id = &"stage_3_spawn_04"
+stage = 3
+position_m = Vector3(-27, 4.04, -95)
+archetype = "shield"
+role = "heavy"
+initial_delay_seconds = 2.15
+
+[sub_resource type="Resource" id="Resource_htbsn"]
+script = ExtResource("1_ejugi")
+id = &"stage_3_spawn_05"
+stage = 3
+position_m = Vector3(-30, 7.04, -131)
+initial_delay_seconds = 2.5
+
+[sub_resource type="Resource" id="Resource_mdgkn"]
+script = ExtResource("1_ejugi")
+id = &"stage_3_spawn_06"
+stage = 3
+position_m = Vector3(-22, 7.04, -139)
+archetype = "elite"
+role = "pursuer"
+required_guardian = true
+initial_delay_seconds = 2.85
+
+[sub_resource type="Resource" id="Resource_jbgjh"]
+script = ExtResource("1_ejugi")
+id = &"stage_3_spawn_07"
+stage = 3
+position_m = Vector3(-4, 11.04, -166)
+role = "caster"
+initial_delay_seconds = 3.2
+
+[sub_resource type="Resource" id="Resource_8pxj1"]
+script = ExtResource("1_ejugi")
+id = &"stage_3_spawn_08"
+stage = 3
+position_m = Vector3(22, 14.04, -204)
+role = "sentinel"
+initial_delay_seconds = 3.55
+
+[sub_resource type="Resource" id="Resource_dlmvo"]
+script = ExtResource("1_ejugi")
+id = &"stage_3_spawn_09"
+stage = 3
+position_m = Vector3(30, 14.04, -212)
+archetype = "elite"
+role = "bell"
+initial_delay_seconds = 3.9
+
+[sub_resource type="Resource" id="Resource_idhh7"]
+script = ExtResource("1_ejugi")
+id = &"stage_3_spawn_10"
+stage = 3
+position_m = Vector3(9, 12.04, -240)
+initial_delay_seconds = 4.25
+
+[sub_resource type="Resource" id="Resource_jpkvl"]
+script = ExtResource("1_ejugi")
+id = &"stage_3_spawn_11"
+stage = 3
+position_m = Vector3(49, 10.04, -175)
+archetype = "elite"
+role = "sentinel"
+initial_delay_seconds = 4.6
+
+[sub_resource type="Resource" id="Resource_6vsil"]
+script = ExtResource("1_ejugi")
+id = &"stage_3_spawn_12"
+stage = 3
+position_m = Vector3(-47, 11.04, -140)
+archetype = "shield"
+role = "heavy"
+initial_delay_seconds = 4.95
+
+[sub_resource type="Resource" id="Resource_eg0j8"]
+script = ExtResource("1_ejugi")
+id = &"stage_3_spawn_13"
+stage = 3
+position_m = Vector3(0, 10.04, -281)
+archetype = "boss"
+role = "caster"
+required_guardian = true
+initial_delay_seconds = 5.3
+
+[sub_resource type="Resource" id="Resource_ilwxn"]
+script = ExtResource("1_ejugi")
+id = &"stage_1_trial_caster"
+position_m = Vector3(-8, 2.04, -83)
+role = "caster"
+initial_delay_seconds = 3.2
+attack_range_m = 20.0
+
+[sub_resource type="Resource" id="Resource_2si3c"]
+script = ExtResource("2_6sral")
+lift_travel_seconds = 1.25
+pulse_interval_seconds = 1.0
+pulse_activation_radius_m = 8.0
+launch_velocity_local_mps = Vector3(-2, 17, -10)
+launch_cooldown_seconds = 0.65
+seal_exposure_seconds = 4.0
+
+[resource]
+script = ExtResource("3_ap24r")
+id = &"ritual_variant"
+mechanisms = SubResource("Resource_2si3c")
+encounters = Array[ExtResource("1_ejugi")]([SubResource("Resource_qp0u2"), SubResource("Resource_qig2n"), SubResource("Resource_7h7f1"), SubResource("Resource_k5oyl"), SubResource("Resource_jg3f5"), SubResource("Resource_kwj1h"), SubResource("Resource_5iud5"), SubResource("Resource_alsu3"), SubResource("Resource_ym2tj"), SubResource("Resource_2ywa6"), SubResource("Resource_mxrf2"), SubResource("Resource_sfuri"), SubResource("Resource_hof7p"), SubResource("Resource_o7rcb"), SubResource("Resource_gxses"), SubResource("Resource_vf1r7"), SubResource("Resource_kavm3"), SubResource("Resource_mt3da"), SubResource("Resource_1vbpr"), SubResource("Resource_nfyan"), SubResource("Resource_3ec00"), SubResource("Resource_htbsn"), SubResource("Resource_mdgkn"), SubResource("Resource_jbgjh"), SubResource("Resource_8pxj1"), SubResource("Resource_dlmvo"), SubResource("Resource_idhh7"), SubResource("Resource_jpkvl"), SubResource("Resource_6vsil"), SubResource("Resource_eg0j8"), SubResource("Resource_ilwxn")])

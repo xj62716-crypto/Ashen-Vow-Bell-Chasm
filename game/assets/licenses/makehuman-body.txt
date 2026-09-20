@@ -1,0 +1,21 @@
+Full-body player base mesh, v0.11
+
+MakeHuman Community base.obj
+Source: https://github.com/makehumancommunity/makehuman/blob/master/makehuman/data/3dobjs/base.obj
+Retrieved: 2026-09-14 via GitHub's contents API.
+Local original: source_assets/human-base/base.obj
+
+The source OBJ explicitly states that this asset was released as CC0 in
+September 2020. Copyright holders at release:
+Copyright (C) 2020 Data Collection AB, https://www.datacollection.se
+Copyright (C) 2020 Joel Palmius
+Copyright (C) 2020 Jonas Hauquier
+License: CC0 1.0, https://creativecommons.org/publicdomain/zero/1.0/
+
+Changes: metre normalization, padded clothing proportions, new skin weights,
+split body and legs, fitted armor/hood/boots/coats, class-specific accessories,
+animation and glTF export. Original source mesh retained for attribution.
+This is distinct from the previously credited para/MakeHuman FPS arms mesh.
+
+Ghostrunner and Vermintide are visual/motion references only. Their proprietary
+models, textures, animation data and audio are not included in this build.

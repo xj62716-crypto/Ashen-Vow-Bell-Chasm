@@ -1,0 +1,42 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/player_controller.gd" id="1_player"]
+[ext_resource type="Script" path="res://viewmodel_r16/arms.gd" id="2_arms"]
+[ext_resource type="Script" path="res://scripts/combat/player_combat.gd" id="3_combat"]
+[ext_resource type="Script" path="res://scripts/player/temporal_focus.gd" id="4_focus"]
+[ext_resource type="Script" path="res://scripts/player/position_rewind.gd" id="5_rewind"]
+
+[sub_resource type="CapsuleShape3D" id="Capsule_body"]
+radius = 0.35
+height = 1.8
+
+[node name="Player" type="CharacterBody3D"]
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("1_player")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0.9, 0)
+shape = SubResource("Capsule_body")
+
+[node name="Head" type="Node3D" parent="."]
+position = Vector3(0, 1.6, 0)
+
+[node name="Camera3D" type="Camera3D" parent="Head"]
+current = true
+fov = 75.0
+
+[node name="AttackOrigin" type="Marker3D" parent="Head/Camera3D"]
+position = Vector3(0, -0.15, -0.6)
+
+[node name="FirstPersonArms" type="CanvasLayer" parent="."]
+script = ExtResource("2_arms")
+
+[node name="Combat" type="Node" parent="."]
+script = ExtResource("3_combat")
+
+[node name="TemporalFocus" type="Node" parent="."]
+script = ExtResource("4_focus")
+
+[node name="PositionRewind" type="Node" parent="."]
+script = ExtResource("5_rewind")

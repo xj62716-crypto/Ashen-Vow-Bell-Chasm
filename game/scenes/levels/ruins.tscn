@@ -1,0 +1,17 @@
+[gd_scene format=3]
+
+[node name="Ruins" type="Node3D"]
+
+[node name="Area01Entrance" type="Node3D" parent="."]
+
+[node name="Area02Bridge" type="Node3D" parent="."]
+
+[node name="Area03Altar" type="Node3D" parent="."]
+
+[node name="Enemies" type="Node3D" parent="."]
+
+[node name="Triggers" type="Node3D" parent="."]
+
+[node name="SpawnPoint" type="Marker3D" parent="."]
+
+[node name="ExitPoint" type="Marker3D" parent="."]

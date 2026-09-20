@@ -1,0 +1,247 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/kenney_castle/wall-pillar.glb" id="1"]
+[ext_resource type="PackedScene" path="res://assets/models/kenney_castle/tower-square-arch.glb" id="2"]
+[ext_resource type="PackedScene" path="res://assets/models/kenney_castle/tower-square-top.glb" id="3"]
+[ext_resource type="PackedScene" path="res://assets/models/kenney_castle/tower-square-mid.glb" id="4"]
+[ext_resource type="PackedScene" path="res://assets/models/kenney_castle/flag.glb" id="5"]
+[ext_resource type="PackedScene" path="res://assets/models/kenney_castle/rocks-large.glb" id="6"]
+[ext_resource type="PackedScene" path="res://assets/models/kenney_castle/rocks-small.glb" id="7"]
+[ext_resource type="PackedScene" path="res://assets/models/kenney_castle/wall-half.glb" id="8"]
+
+[sub_resource type="BoxShape3D" id="PillarShape"]
+size = Vector3(1.4, 5.6, 1.4)
+
+[node name="CastleDressing" type="Node3D"]
+
+[node name="GatePillar0" parent="." instance=ExtResource("1")]
+position = Vector3(-5, 0, 0)
+scale = Vector3(1.5, 4.5, 1.5)
+rotation_degrees = Vector3(0, 0, 0)
+
+[node name="Banner0" parent="." instance=ExtResource("5")]
+position = Vector3(-5, 5.9, 0)
+scale = Vector3(3, 3, 3)
+rotation_degrees = Vector3(0, -90, 0)
+
+[node name="PillarBody0" type="StaticBody3D" parent="."]
+position = Vector3(-5, 2.8, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Collision" type="CollisionShape3D" parent="PillarBody0"]
+shape = SubResource("PillarShape")
+
+[node name="GatePillar1" parent="." instance=ExtResource("1")]
+position = Vector3(5, 0, 0)
+scale = Vector3(1.5, 4.5, 1.5)
+rotation_degrees = Vector3(0, 0, 0)
+
+[node name="Banner1" parent="." instance=ExtResource("5")]
+position = Vector3(5, 5.9, 0)
+scale = Vector3(3, 3, 3)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="PillarBody1" type="StaticBody3D" parent="."]
+position = Vector3(5, 2.8, 0)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Collision" type="CollisionShape3D" parent="PillarBody1"]
+shape = SubResource("PillarShape")
+
+[node name="GatePillar2" parent="." instance=ExtResource("1")]
+position = Vector3(-3, 1.6, -77)
+scale = Vector3(1.5, 4.5, 1.5)
+rotation_degrees = Vector3(0, 0, 0)
+
+[node name="Banner2" parent="." instance=ExtResource("5")]
+position = Vector3(-3, 7.5, -77)
+scale = Vector3(3, 3, 3)
+rotation_degrees = Vector3(0, -90, 0)
+
+[node name="PillarBody2" type="StaticBody3D" parent="."]
+position = Vector3(-3, 4.4, -77)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Collision" type="CollisionShape3D" parent="PillarBody2"]
+shape = SubResource("PillarShape")
+
+[node name="GatePillar3" parent="." instance=ExtResource("1")]
+position = Vector3(7, 1.6, -77)
+scale = Vector3(1.5, 4.5, 1.5)
+rotation_degrees = Vector3(0, 0, 0)
+
+[node name="Banner3" parent="." instance=ExtResource("5")]
+position = Vector3(7, 7.5, -77)
+scale = Vector3(3, 3, 3)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="PillarBody3" type="StaticBody3D" parent="."]
+position = Vector3(7, 4.4, -77)
+collision_layer = 1
+collision_mask = 0
+
+[node name="Collision" type="CollisionShape3D" parent="PillarBody3"]
+shape = SubResource("PillarShape")
+
+[node name="Island0" parent="." instance=ExtResource("6")]
+position = Vector3(-20, -2, -17)
+scale = Vector3(7.800000000000001, 7.800000000000001, 7.800000000000001)
+rotation_degrees = Vector3(180, 0, 0)
+
+[node name="TowerArch0" parent="." instance=ExtResource("2")]
+position = Vector3(-20, -2, -17)
+scale = Vector3(6, 6, 6)
+rotation_degrees = Vector3(0, 0, 0)
+
+[node name="TowerMiddle0" parent="." instance=ExtResource("4")]
+position = Vector3(-20, 4, -17)
+scale = Vector3(6, 6, 6)
+rotation_degrees = Vector3(0, 0, 0)
+
+[node name="TowerCrown0" parent="." instance=ExtResource("3")]
+position = Vector3(-20, 10, -17)
+scale = Vector3(6, 6, 6)
+rotation_degrees = Vector3(0, 0, 0)
+
+[node name="TowerFlag0" parent="." instance=ExtResource("5")]
+position = Vector3(-20, 11.799999999999999, -17)
+scale = Vector3(4.199999999999999, 4.199999999999999, 4.199999999999999)
+rotation_degrees = Vector3(0, 40, 0)
+
+[node name="SideRuin0" parent="." instance=ExtResource("8")]
+position = Vector3(-15.8, -2, -14)
+scale = Vector3(4.800000000000001, 4.800000000000001, 4.800000000000001)
+rotation_degrees = Vector3(0, 30, 0)
+
+[node name="Island1" parent="." instance=ExtResource("6")]
+position = Vector3(21, -4, -43)
+scale = Vector3(10.4, 10.4, 10.4)
+rotation_degrees = Vector3(180, 25, 0)
+
+[node name="TowerArch1" parent="." instance=ExtResource("2")]
+position = Vector3(21, -4, -43)
+scale = Vector3(8, 8, 8)
+rotation_degrees = Vector3(0, 0, 0)
+
+[node name="TowerMiddle1" parent="." instance=ExtResource("4")]
+position = Vector3(21, 4, -43)
+scale = Vector3(8, 8, 8)
+rotation_degrees = Vector3(0, 0, 0)
+
+[node name="TowerCrown1" parent="." instance=ExtResource("3")]
+position = Vector3(21, 12, -43)
+scale = Vector3(8, 8, 8)
+rotation_degrees = Vector3(0, 0, 0)
+
+[node name="TowerFlag1" parent="." instance=ExtResource("5")]
+position = Vector3(21, 14.399999999999999, -43)
+scale = Vector3(5.6, 5.6, 5.6)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="SideRuin1" parent="." instance=ExtResource("8")]
+position = Vector3(26.6, -4, -39)
+scale = Vector3(6.4, 6.4, 6.4)
+rotation_degrees = Vector3(0, 30, 0)
+
+[node name="Island2" parent="." instance=ExtResource("6")]
+position = Vector3(-24, 0, -73)
+scale = Vector3(9.1, 9.1, 9.1)
+rotation_degrees = Vector3(180, 50, 0)
+
+[node name="TowerArch2" parent="." instance=ExtResource("2")]
+position = Vector3(-24, 0, -73)
+scale = Vector3(7, 7, 7)
+rotation_degrees = Vector3(0, 0, 0)
+
+[node name="TowerMiddle2" parent="." instance=ExtResource("4")]
+position = Vector3(-24, 7, -73)
+scale = Vector3(7, 7, 7)
+rotation_degrees = Vector3(0, 0, 0)
+
+[node name="TowerCrown2" parent="." instance=ExtResource("3")]
+position = Vector3(-24, 14, -73)
+scale = Vector3(7, 7, 7)
+rotation_degrees = Vector3(0, 0, 0)
+
+[node name="TowerFlag2" parent="." instance=ExtResource("5")]
+position = Vector3(-24, 16.099999999999998, -73)
+scale = Vector3(4.8999999999999995, 4.8999999999999995, 4.8999999999999995)
+rotation_degrees = Vector3(0, 140, 0)
+
+[node name="SideRuin2" parent="." instance=ExtResource("8")]
+position = Vector3(-19.1, 0, -69.5)
+scale = Vector3(5.6000000000000005, 5.6000000000000005, 5.6000000000000005)
+rotation_degrees = Vector3(0, 30, 0)
+
+[node name="Island3" parent="." instance=ExtResource("6")]
+position = Vector3(22, -1, -90)
+scale = Vector3(6.5, 6.5, 6.5)
+rotation_degrees = Vector3(180, 75, 0)
+
+[node name="TowerArch3" parent="." instance=ExtResource("2")]
+position = Vector3(22, -1, -90)
+scale = Vector3(5, 5, 5)
+rotation_degrees = Vector3(0, 0, 0)
+
+[node name="TowerMiddle3" parent="." instance=ExtResource("4")]
+position = Vector3(22, 4, -90)
+scale = Vector3(5, 5, 5)
+rotation_degrees = Vector3(0, 0, 0)
+
+[node name="TowerCrown3" parent="." instance=ExtResource("3")]
+position = Vector3(22, 9, -90)
+scale = Vector3(5, 5, 5)
+rotation_degrees = Vector3(0, 0, 0)
+
+[node name="TowerFlag3" parent="." instance=ExtResource("5")]
+position = Vector3(22, 10.5, -90)
+scale = Vector3(3.5, 3.5, 3.5)
+rotation_degrees = Vector3(0, 190, 0)
+
+[node name="SideRuin3" parent="." instance=ExtResource("8")]
+position = Vector3(25.5, -1, -87.5)
+scale = Vector3(4, 4, 4)
+rotation_degrees = Vector3(0, 30, 0)
+
+[node name="EdgeRock0" parent="." instance=ExtResource("7")]
+position = Vector3(-5, -1, 8)
+scale = Vector3(1.4, 1.4, 1.4)
+rotation_degrees = Vector3(0, 0, 0)
+
+[node name="EdgeRock1" parent="." instance=ExtResource("7")]
+position = Vector3(5, -1, 10)
+scale = Vector3(1.4, 1.4, 1.4)
+rotation_degrees = Vector3(0, 43, 0)
+
+[node name="EdgeRock2" parent="." instance=ExtResource("7")]
+position = Vector3(7, -0.5, -19)
+scale = Vector3(1.4, 1.4, 1.4)
+rotation_degrees = Vector3(0, 86, 0)
+
+[node name="EdgeRock3" parent="." instance=ExtResource("7")]
+position = Vector3(-1, -0.5, -21)
+scale = Vector3(1.4, 1.4, 1.4)
+rotation_degrees = Vector3(0, 129, 0)
+
+[node name="EdgeRock4" parent="." instance=ExtResource("7")]
+position = Vector3(-1, -0.5, -38)
+scale = Vector3(1.4, 1.4, 1.4)
+rotation_degrees = Vector3(0, 172, 0)
+
+[node name="EdgeRock5" parent="." instance=ExtResource("7")]
+position = Vector3(-7, -0.2, -49)
+scale = Vector3(1.4, 1.4, 1.4)
+rotation_degrees = Vector3(0, 215, 0)
+
+[node name="EdgeRock6" parent="." instance=ExtResource("7")]
+position = Vector3(6, 0.3, -61)
+scale = Vector3(1.4, 1.4, 1.4)
+rotation_degrees = Vector3(0, 258, 0)
+
+[node name="EdgeRock7" parent="." instance=ExtResource("7")]
+position = Vector3(-4, 0.3, -74)
+scale = Vector3(1.4, 1.4, 1.4)
+rotation_degrees = Vector3(0, 301, 0)

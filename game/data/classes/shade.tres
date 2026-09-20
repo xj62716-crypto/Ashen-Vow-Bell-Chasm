@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ParkourProfile" load_steps=3 format=3]
+[ext_resource type="Script" path="res://scripts/player/parkour_profile.gd" id="1"]
+[ext_resource type="Resource" path="res://data/equipment/long_sword.tres" id="2"]
+[resource]
+script = ExtResource("1")
+id = &"shade"
+display_name = "影刃"
+description = "长刀 · 飞檐猎杀 / 返刃决斗 / 掠地突袭 · 敌人也是移动节点"
+wall_speed = 16.0
+wall_acceleration = 24.0
+wall_duration = 1.8
+right_hand_item = ExtResource("2")

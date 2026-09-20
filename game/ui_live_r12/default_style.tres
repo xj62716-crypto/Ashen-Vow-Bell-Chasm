@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="" load_steps=2 format=3]
+[ext_resource type="Script" path="res://ui_live_r12/ui_style.gd" id="1"]
+[resource]
+script = ExtResource("1")
+hud_opacity = 0.94
+focus_strength = 0.92
+focus_enter_seconds = 0.06
+focus_exit_seconds = 0.10
+notice_seconds = 2.2

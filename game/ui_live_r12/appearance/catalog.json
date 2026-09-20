@@ -1,0 +1,562 @@
+{
+  "branches": {
+    "shade_parry": {
+      "title": "流刃决斗",
+      "stages": [
+        {
+          "id": "base",
+          "weapon": "res://viewmodel_refit/plates/shade_parry-tier-0.png",
+          "garment": "res://ui_live_r12/appearance/blade-front.webp"
+        },
+        {
+          "id": "core",
+          "weapon": "res://viewmodel_refit/plates/shade_parry-tier-1.png",
+          "garment": "res://ui_live_r12/appearance/blade-front.webp"
+        },
+        {
+          "id": "linked",
+          "weapon": "res://viewmodel_refit/plates/shade_parry-tier-2.png",
+          "garment": "res://ui_live_r12/appearance/blade-front.webp"
+        }
+      ],
+      "version": "Blender weapon refit / equipped source-scene capture",
+      "manual_adoption": false
+    },
+    "shade_wall": {
+      "title": "飞檐猎杀",
+      "stages": [
+        {
+          "id": "base",
+          "weapon": "res://viewmodel_refit/plates/shade_wall-tier-0.png",
+          "garment": "res://ui_live_r12/appearance/blade-front.webp"
+        },
+        {
+          "id": "core",
+          "weapon": "res://viewmodel_refit/plates/shade_wall-tier-1.png",
+          "garment": "res://ui_live_r12/appearance/blade-front.webp"
+        },
+        {
+          "id": "linked",
+          "weapon": "res://viewmodel_refit/plates/shade_wall-tier-2.png",
+          "garment": "res://ui_live_r12/appearance/blade-front.webp"
+        }
+      ],
+      "version": "Blender weapon refit / equipped source-scene capture",
+      "manual_adoption": false
+    },
+    "shade_slide": {
+      "title": "掠地破阵",
+      "stages": [
+        {
+          "id": "base",
+          "weapon": "res://viewmodel_refit/plates/shade_slide-tier-0.png",
+          "garment": "res://ui_live_r12/appearance/blade-front.webp"
+        },
+        {
+          "id": "core",
+          "weapon": "res://viewmodel_refit/plates/shade_slide-tier-1.png",
+          "garment": "res://ui_live_r12/appearance/blade-front.webp"
+        },
+        {
+          "id": "linked",
+          "weapon": "res://viewmodel_refit/plates/shade_slide-tier-2.png",
+          "garment": "res://ui_live_r12/appearance/blade-front.webp"
+        }
+      ],
+      "version": "Blender weapon refit / equipped source-scene capture",
+      "manual_adoption": false
+    },
+    "shade_echo": {
+      "title": "残影行者",
+      "stages": [
+        {
+          "id": "base",
+          "weapon": "res://viewmodel_refit/plates/shade_echo-tier-0.png",
+          "garment": "res://ui_live_r12/appearance/blade-front.webp"
+        },
+        {
+          "id": "core",
+          "weapon": "res://viewmodel_refit/plates/shade_echo-tier-1.png",
+          "garment": "res://ui_live_r12/appearance/blade-front.webp"
+        },
+        {
+          "id": "linked",
+          "weapon": "res://viewmodel_refit/plates/shade_echo-tier-2.png",
+          "garment": "res://ui_live_r12/appearance/blade-front.webp"
+        }
+      ],
+      "version": "Blender weapon refit / equipped source-scene capture",
+      "manual_adoption": false
+    },
+    "arcane_storm": {
+      "title": "风暴行者",
+      "stages": [
+        {
+          "id": "base",
+          "weapon": "res://viewmodel_refit/plates/arcane_storm-tier-0.png",
+          "garment": "res://ui_live_r12/appearance/staff-front.webp"
+        },
+        {
+          "id": "core",
+          "weapon": "res://viewmodel_refit/plates/arcane_storm-tier-1.png",
+          "garment": "res://ui_live_r12/appearance/staff-front.webp"
+        },
+        {
+          "id": "linked",
+          "weapon": "res://viewmodel_refit/plates/arcane_storm-tier-2.png",
+          "garment": "res://ui_live_r12/appearance/staff-front.webp"
+        }
+      ],
+      "version": "Blender weapon refit / equipped source-scene capture",
+      "manual_adoption": false
+    },
+    "arcane_shape": {
+      "title": "裂隙塑形",
+      "stages": [
+        {
+          "id": "base",
+          "weapon": "res://viewmodel_refit/plates/arcane_shape-tier-0.png",
+          "garment": "res://ui_live_r12/appearance/staff-front.webp"
+        },
+        {
+          "id": "core",
+          "weapon": "res://viewmodel_refit/plates/arcane_shape-tier-1.png",
+          "garment": "res://ui_live_r12/appearance/staff-front.webp"
+        },
+        {
+          "id": "linked",
+          "weapon": "res://viewmodel_refit/plates/arcane_shape-tier-2.png",
+          "garment": "res://ui_live_r12/appearance/staff-front.webp"
+        }
+      ],
+      "version": "Blender weapon refit / equipped source-scene capture",
+      "manual_adoption": false
+    },
+    "arcane_seal": {
+      "title": "封印术士",
+      "stages": [
+        {
+          "id": "base",
+          "weapon": "res://viewmodel_refit/plates/arcane_seal-tier-0.png",
+          "garment": "res://ui_live_r12/appearance/staff-front.webp"
+        },
+        {
+          "id": "core",
+          "weapon": "res://viewmodel_refit/plates/arcane_seal-tier-1.png",
+          "garment": "res://ui_live_r12/appearance/staff-front.webp"
+        },
+        {
+          "id": "linked",
+          "weapon": "res://viewmodel_refit/plates/arcane_seal-tier-2.png",
+          "garment": "res://ui_live_r12/appearance/staff-front.webp"
+        }
+      ],
+      "version": "Blender weapon refit / equipped source-scene capture",
+      "manual_adoption": false
+    },
+    "arcane_element": {
+      "title": "元素塑能者",
+      "stages": [
+        {
+          "id": "base",
+          "weapon": "res://viewmodel_refit/plates/arcane_element-tier-0.png",
+          "garment": "res://ui_live_r12/appearance/staff-front.webp"
+        },
+        {
+          "id": "core",
+          "weapon": "res://viewmodel_refit/plates/arcane_element-tier-1.png",
+          "garment": "res://ui_live_r12/appearance/staff-front.webp"
+        },
+        {
+          "id": "linked",
+          "weapon": "res://viewmodel_refit/plates/arcane_element-tier-2.png",
+          "garment": "res://ui_live_r12/appearance/staff-front.webp"
+        }
+      ],
+      "version": "Blender weapon refit / equipped source-scene capture",
+      "manual_adoption": false
+    },
+    "arcane_fire": {
+      "title": "焚烬 · 火",
+      "stages": [
+        {
+          "id": "base",
+          "weapon": "res://viewmodel_refit/plates/arcane_element-tier-0.png",
+          "garment": "res://ui_live_r12/appearance/staff-front.webp"
+        },
+        {
+          "id": "core",
+          "weapon": "res://viewmodel_refit/plates/arcane_element-tier-1.png",
+          "garment": "res://ui_live_r12/appearance/staff-front.webp"
+        },
+        {
+          "id": "linked",
+          "weapon": "res://viewmodel_refit/plates/arcane_element-tier-2.png",
+          "garment": "res://ui_live_r12/appearance/staff-front.webp"
+        }
+      ],
+      "version": "Blender weapon refit / equipped source-scene capture",
+      "manual_adoption": false
+    },
+    "arcane_ice": {
+      "title": "凝霜 · 冰",
+      "stages": [
+        {
+          "id": "base",
+          "weapon": "res://viewmodel_refit/plates/arcane_element-tier-0.png",
+          "garment": "res://ui_live_r12/appearance/staff-front.webp"
+        },
+        {
+          "id": "core",
+          "weapon": "res://viewmodel_refit/plates/arcane_element-ice-tier-1.png",
+          "garment": "res://ui_live_r12/appearance/staff-front.webp"
+        },
+        {
+          "id": "linked",
+          "weapon": "res://viewmodel_refit/plates/arcane_element-ice-tier-2.png",
+          "garment": "res://ui_live_r12/appearance/staff-front.webp"
+        }
+      ],
+      "version": "Blender weapon refit / equipped source-scene capture",
+      "manual_adoption": false
+    },
+    "arcane_float": {
+      "title": "踏风 · 风",
+      "stages": [
+        {
+          "id": "base",
+          "weapon": "res://viewmodel_refit/plates/arcane_element-tier-0.png",
+          "garment": "res://ui_live_r12/appearance/staff-front.webp"
+        },
+        {
+          "id": "core",
+          "weapon": "res://viewmodel_refit/plates/arcane_element-wind-tier-1.png",
+          "garment": "res://ui_live_r12/appearance/staff-front.webp"
+        },
+        {
+          "id": "linked",
+          "weapon": "res://viewmodel_refit/plates/arcane_element-wind-tier-2.png",
+          "garment": "res://ui_live_r12/appearance/staff-front.webp"
+        }
+      ],
+      "version": "Blender weapon refit / equipped source-scene capture",
+      "manual_adoption": false
+    },
+    "arcane_charge": {
+      "title": "雷鸣 · 雷",
+      "stages": [
+        {
+          "id": "base",
+          "weapon": "res://viewmodel_refit/plates/arcane_element-tier-0.png",
+          "garment": "res://ui_live_r12/appearance/staff-front.webp"
+        },
+        {
+          "id": "core",
+          "weapon": "res://viewmodel_refit/plates/arcane_element-lightning-tier-1.png",
+          "garment": "res://ui_live_r12/appearance/staff-front.webp"
+        },
+        {
+          "id": "linked",
+          "weapon": "res://viewmodel_refit/plates/arcane_element-lightning-tier-2.png",
+          "garment": "res://ui_live_r12/appearance/staff-front.webp"
+        }
+      ],
+      "version": "Blender weapon refit / equipped source-scene capture",
+      "manual_adoption": false
+    }
+  },
+  "sources": {
+    "duel_core-base.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\evolution-fit-r6\\previews\\duel_core-base.png",
+      "source_sha256": "3260288bb27154c0a60b088c55888cb1dfd86c35aa413d69fc6d8d5a1e3c8d78",
+      "sha256": "6362ea0ecc33f482b59764cea1127a3f720ab23fb83407267d46201451d1e65f"
+    },
+    "blade-front.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\body-cohesion-r6\\previews\\blade-front.png",
+      "source_sha256": "8134f501cbc314ef82a185ca40f92444d34b7607879ace6fc38062ec02dce95f",
+      "sha256": "ce6e9e9982a5d170bfb0c3846582b83c51e6be234697ea8edde07d2c7f36fc20"
+    },
+    "duel_core-dark.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\evolution-fit-r6\\previews\\duel_core-dark.png",
+      "source_sha256": "8c131d30ba66e3d47aa9b839f026c6988f67ae276f378c5e1321aa5a68089a81",
+      "sha256": "7ac1bddb0ee84cb6e484664f4bc161c07fcd352a5217a7ef2d5459d2ab8649ee"
+    },
+    "blade-body-flow-core-dark.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\body-cohesion-r6\\previews\\blade-body-flow-core-dark.png",
+      "source_sha256": "7d59415d2d6c15e18fba57ee069f6b7545e29f352e392c5bbcc0e8a06fc09150",
+      "sha256": "b2d7f7ab5b220ca784ed318fd7ba4da91a934a2fef8a976fa57a0806e901faff"
+    },
+    "duel_synergy-dark.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\evolution-fit-r6\\previews\\duel_synergy-dark.png",
+      "source_sha256": "90f2bba6a8b5ff25a54381a31ab880940e438eaae5dc3e587a1197bfb3418157",
+      "sha256": "7d29532e5cc8381bba98c3d0541c7232f9c182208b9b2b995c74f265917eafd0"
+    },
+    "blade-body-flow-linked-dark.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\body-cohesion-r6\\previews\\blade-body-flow-linked-dark.png",
+      "source_sha256": "bc5a3834febf907667890959a11e8f2ea8aa4dc3fb176852a82848c543dbf5ac",
+      "sha256": "f2f230c2fc236242f2026341eea26d1487851daa741cd5f3315b3039816c173d"
+    },
+    "sky_core-base.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\evolution-fit-r6\\previews\\sky_core-base.png",
+      "source_sha256": "3260288bb27154c0a60b088c55888cb1dfd86c35aa413d69fc6d8d5a1e3c8d78",
+      "sha256": "6362ea0ecc33f482b59764cea1127a3f720ab23fb83407267d46201451d1e65f"
+    },
+    "sky_core-dark.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\evolution-fit-r6\\previews\\sky_core-dark.png",
+      "source_sha256": "c53586206e57229ca99cf5cdba8a13e3368d1a6b30614e497974fd547682689e",
+      "sha256": "a8ea39e20d331f297bd4a7761b724612330a24a0504632a846c4dc1d71ab02ae"
+    },
+    "blade-body-hunt-core-dark.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\body-cohesion-r6\\previews\\blade-body-hunt-core-dark.png",
+      "source_sha256": "51b1e1e417ba8a21bf546567d685690985d5c3e7a2114f52e155d52848e35e06",
+      "sha256": "d5b5230f068f140e1dbf4eeb2a8467851429a0c961f1c5530ec6b126b602860a"
+    },
+    "sky_synergy-dark.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\evolution-fit-r6\\previews\\sky_synergy-dark.png",
+      "source_sha256": "904532552635dcf908448a27690dbfe8767797dcc40f1fed6dfe1054f78faf89",
+      "sha256": "67cb7f2c00008a27f414a83d8118cd8fa6369f2d1a1d80978cfe424882d0b6f9"
+    },
+    "blade-body-hunt-linked-dark.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\body-cohesion-r6\\previews\\blade-body-hunt-linked-dark.png",
+      "source_sha256": "6e12feff6d822a1cc073ff196be7b234ce3a541c7064042c8ed4c2081f84b4e7",
+      "sha256": "ad6a77aa4aace22e1d4fe543364699ea91ec55c43344d95c4ade66254155c684"
+    },
+    "ground_core-base.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\evolution-fit-r6\\previews\\ground_core-base.png",
+      "source_sha256": "3260288bb27154c0a60b088c55888cb1dfd86c35aa413d69fc6d8d5a1e3c8d78",
+      "sha256": "6362ea0ecc33f482b59764cea1127a3f720ab23fb83407267d46201451d1e65f"
+    },
+    "ground_core-dark.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\evolution-fit-r6\\previews\\ground_core-dark.png",
+      "source_sha256": "2f9fb039d44b0b0214641e5c252dd6f3705d3a78a7d1289cf9bedc13995ae74b",
+      "sha256": "4189c3939dd9032f8a2f70207bebd7736bbd88ebcecd7ae1b36c18170b7aa667"
+    },
+    "blade-body-ground-core-dark.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\body-cohesion-r6\\previews\\blade-body-ground-core-dark.png",
+      "source_sha256": "272832481c6e5077bf6ea52b80bc109a67b5c534c135b11eef6791f80dad51ad",
+      "sha256": "205e3767ed34d60e237be970666ccc5d74dffe0324a919de3b1e5b076817f6f5"
+    },
+    "ground_synergy-dark.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\evolution-fit-r6\\previews\\ground_synergy-dark.png",
+      "source_sha256": "100fafee185adec3f16b335ecb8205bdf5a76bcec3e4a7aeb74becc88b9e8295",
+      "sha256": "43528a734096d5b81370410a880158e936c7a9e9626fd8c64356b1f89e6cd262"
+    },
+    "blade-body-ground-linked-dark.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\body-cohesion-r6\\previews\\blade-body-ground-linked-dark.png",
+      "source_sha256": "87dea2c7579972b15a92047296e1c91814f5bfe0ba24719af24c113895ea3b46",
+      "sha256": "b8ff2e7569b9ffc95fbb01964ccf50578199850182036714e38b90ef4c22ef09"
+    },
+    "echo_core-base.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\evolution-fit-r6\\previews\\echo_core-base.png",
+      "source_sha256": "3260288bb27154c0a60b088c55888cb1dfd86c35aa413d69fc6d8d5a1e3c8d78",
+      "sha256": "6362ea0ecc33f482b59764cea1127a3f720ab23fb83407267d46201451d1e65f"
+    },
+    "echo_core-dark.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\evolution-fit-r6\\previews\\echo_core-dark.png",
+      "source_sha256": "f95871ca8d78b515dbe563109ca4e06407504e85d4ddd547e9b39caeee9dcae7",
+      "sha256": "601ccb5acce2a8b5d093d32b07cdaf99b851971bfa169efce067ab41a0c842dc"
+    },
+    "blade-body-echo-core-dark.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\body-cohesion-r6\\previews\\blade-body-echo-core-dark.png",
+      "source_sha256": "2754868c1205ab9afb123bfd218746fd638ebdc99faf5834abf4835f13d2d958",
+      "sha256": "f88ab868b03dfa2a8b0608a99949586b2f04b3c4732c9fa4600df6398f221a05"
+    },
+    "echo_synergy-dark.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\evolution-fit-r6\\previews\\echo_synergy-dark.png",
+      "source_sha256": "c9f3fbe113a84032acd36c49b959529aaf27fd9cb93b2c4d02554a85e538ad87",
+      "sha256": "3a384cecbfe0ed65e34f098b2853455dfadb8643ded209d82f4d8de4e2ee69f9"
+    },
+    "blade-body-echo-linked-dark.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\body-cohesion-r6\\previews\\blade-body-echo-linked-dark.png",
+      "source_sha256": "c554c7b58d4e68f3410699c079bdfc6f7665fef291498ddc218c263ab3c15045",
+      "sha256": "a111125d4534d71a787af8f0531037b5c62ca0d8c73bd94821d734f3e2f1f27a"
+    },
+    "storm_core-base.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\evolution-fit-r6\\previews\\storm_core-base.png",
+      "source_sha256": "2869640c76eca8465b929ea202b1060f8ea981764de1fbd3e5cbe7316fbb3ec6",
+      "sha256": "10fa43ddefa108e787bd4514b5d670b37e76480a55a9348eed84302c01a3f4a0"
+    },
+    "staff-front.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\body-cohesion-r6\\previews\\staff-front.png",
+      "source_sha256": "ff15153cf3d9021df6b8d327f9bd6671f86be469fa8f8bbc200bb43dd7290e38",
+      "sha256": "f0b2daf695fb2325e899b6a1ae566ee2b9305627dabbfcedc71367ee3789e86c"
+    },
+    "storm_core-dark.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\evolution-fit-r6\\previews\\storm_core-dark.png",
+      "source_sha256": "17f35f04cc1d61e9408271580a6c6b474aaa9f500dd1058aafa7d1f3598ef555",
+      "sha256": "4d0a907c8ffa57e811ba89c32028f343479cfbb119b10cf8663d837c10cda17e"
+    },
+    "staff-body-storm-core-dark.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\body-cohesion-r6\\previews\\staff-body-storm-core-dark.png",
+      "source_sha256": "d5fff94a9913633b90ceda7145c6408d538e8d1442b26c452e1108a3be263b82",
+      "sha256": "e638d3e095b0d61bba88f50a856f995346586316cda711c63e820afcfafacc8d"
+    },
+    "storm_synergy-dark.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\evolution-fit-r6\\previews\\storm_synergy-dark.png",
+      "source_sha256": "c035b576e670d2f23582f4b81eae8bfcac0913f1593c0b5c300e2657da9255cb",
+      "sha256": "2abd7ce10412006844844d1915f91a5ba7c8751ef2130fd5a66adcdb9f25ec02"
+    },
+    "staff-body-storm-linked-dark.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\body-cohesion-r6\\previews\\staff-body-storm-linked-dark.png",
+      "source_sha256": "a93cd02406ddb34a0a71428374de88a7e82c8cbb3806359c70cbb117e12e93a0",
+      "sha256": "b2d14e9a8db48bcfdd1f1db9c3cec4c5e08b23ec0ebc85fdf2f301f762ae6a3d"
+    },
+    "shape_core-base.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\evolution-fit-r6\\previews\\shape_core-base.png",
+      "source_sha256": "2869640c76eca8465b929ea202b1060f8ea981764de1fbd3e5cbe7316fbb3ec6",
+      "sha256": "10fa43ddefa108e787bd4514b5d670b37e76480a55a9348eed84302c01a3f4a0"
+    },
+    "shape_core-dark.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\evolution-fit-r6\\previews\\shape_core-dark.png",
+      "source_sha256": "0829169aa1424fb378f84f58fc9ce8ee583902af76024a44c5b049197f674a2c",
+      "sha256": "8f787a2b2814868c56d3d543e763700bbc606362bd21a7ba97562f1b9d2acf7c"
+    },
+    "staff-body-shape-core-dark.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\body-cohesion-r6\\previews\\staff-body-shape-core-dark.png",
+      "source_sha256": "0d165b9de17bb78a86868244050efd18cf0db2bfa82abdb343ecc9569f9efa32",
+      "sha256": "54c20bff347ac2dd6cfc9aad0a3ab719951361af51ae338b9ea34e555919913f"
+    },
+    "shape_synergy-dark.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\evolution-fit-r6\\previews\\shape_synergy-dark.png",
+      "source_sha256": "af7a715729438a34311eef25979522125a6311ba19457f4b10dd23022d1468f8",
+      "sha256": "114273e0f613e21c1a4847931fb0b5e2591844a38f05e85eee0b9fc8e1de99a3"
+    },
+    "staff-body-shape-linked-dark.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\body-cohesion-r6\\previews\\staff-body-shape-linked-dark.png",
+      "source_sha256": "0ee8c35eaa84b3a22aacec822bf815dc5a2b5061cd33f3b4a5fd6fcce1cad546",
+      "sha256": "140df5ec3734b7926cc0034c79b970b7c6439cc2296ee1ba7bf7dcb79071913d"
+    },
+    "seal_core-base.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\evolution-fit-r6\\previews\\seal_core-base.png",
+      "source_sha256": "2869640c76eca8465b929ea202b1060f8ea981764de1fbd3e5cbe7316fbb3ec6",
+      "sha256": "10fa43ddefa108e787bd4514b5d670b37e76480a55a9348eed84302c01a3f4a0"
+    },
+    "seal_core-dark.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\evolution-fit-r6\\previews\\seal_core-dark.png",
+      "source_sha256": "b6939646b22d250c461862890bd7bec84b224870e4b405f63e8debb794ecd892",
+      "sha256": "72bbcb799d4543762c711e4c3356289bb1d75eaee5087c018d6b8f2124941d1a"
+    },
+    "staff-body-seal-core-dark.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\body-cohesion-r6\\previews\\staff-body-seal-core-dark.png",
+      "source_sha256": "68abd3597c4aaf0f7ce50523c83ced37ffdb4101f9012e32c44ed9b049cad895",
+      "sha256": "7cbbe265e2baa9a5f22ad9cf16540da5492a4cb8d3999acd0f5c5e7f904aec4e"
+    },
+    "seal_synergy-dark.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\evolution-fit-r6\\previews\\seal_synergy-dark.png",
+      "source_sha256": "4cb7e547acc1b9b18eba48bd6b59a5d05b40f8f9063bcb1a67f92c4c03693c6d",
+      "sha256": "34ebbca309f563819f7fc5f04bbfbcb7321329a4ae45b698d35a56b27c741611"
+    },
+    "staff-body-seal-linked-dark.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\body-cohesion-r6\\previews\\staff-body-seal-linked-dark.png",
+      "source_sha256": "45df2383da51c1874983790ee2901e54cf885954868f4e3fae44a8d73b034930",
+      "sha256": "e7cccdc7ecf9f9696f72e87632d65c3958587a0024731a2071ba4f507ae99331"
+    },
+    "element_fire_core-base.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\evolution-fit-r6\\previews\\element_fire_core-base.png",
+      "source_sha256": "2869640c76eca8465b929ea202b1060f8ea981764de1fbd3e5cbe7316fbb3ec6",
+      "sha256": "10fa43ddefa108e787bd4514b5d670b37e76480a55a9348eed84302c01a3f4a0"
+    },
+    "element_fire_core-dark.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\evolution-fit-r6\\previews\\element_fire_core-dark.png",
+      "source_sha256": "9388f40076773ab7d13ae0e936882fd058d1ece72feaaf3408ffcb8267e1fb56",
+      "sha256": "663eaf52dfbdf1d1a2e573bbef98130231dea40ad7b66e1db3f741c835e6e267"
+    },
+    "staff-body-element-core-dark.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\body-cohesion-r6\\previews\\staff-body-element-core-dark.png",
+      "source_sha256": "22c7befe103cfb0f5a31f95ac0ed517962d3b49e5806633a1e856d5dbb8c0f96",
+      "sha256": "2c305be49c7ef342ab47a38a13d69e12dd4fe2bb6ffb2deb0f0b08beb38eafd5"
+    },
+    "element_fire_synergy-dark.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\evolution-fit-r6\\previews\\element_fire_synergy-dark.png",
+      "source_sha256": "0883122d72be164c4f43f425df6c9d2289528a0a9fc1d2360e8813b81e292e0a",
+      "sha256": "77ec911f15d286dcd3b30b334befad3a41360838b5a6fc34bb1e51208b8251af"
+    },
+    "staff-body-element-linked-dark.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\body-cohesion-r6\\previews\\staff-body-element-linked-dark.png",
+      "source_sha256": "11828eabedf78c6da03248e92991c5ba8eac1f9cc36d2f0f551ff5ce49e71096",
+      "sha256": "bb6503a0c9bbba41218a4aa8ebe46b693c2ad573cf2744c34046c0e7f2dc488a"
+    },
+    "element_ice_core-base.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\evolution-fit-r6\\previews\\element_ice_core-base.png",
+      "source_sha256": "2869640c76eca8465b929ea202b1060f8ea981764de1fbd3e5cbe7316fbb3ec6",
+      "sha256": "10fa43ddefa108e787bd4514b5d670b37e76480a55a9348eed84302c01a3f4a0"
+    },
+    "element_ice_core-dark.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\evolution-fit-r6\\previews\\element_ice_core-dark.png",
+      "source_sha256": "31cabf4f29d242cf8d74fc9efd90f2caefcbd23ee459ec995b9f3311df678863",
+      "sha256": "067c1fef460368774665dc6a4276e3017b79cd59f90eb8421891bf73d5d64421"
+    },
+    "element_ice_synergy-dark.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\evolution-fit-r6\\previews\\element_ice_synergy-dark.png",
+      "source_sha256": "921d2dba440fc34fd606ae372f70e6296dde92200f5f759b2ea770dd471b0439",
+      "sha256": "fdc96e2f3fc01931d4c1fea0884679b510652c03280d764e66143a7ebbfeced0"
+    },
+    "element_wind_core-base.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\evolution-fit-r6\\previews\\element_wind_core-base.png",
+      "source_sha256": "2869640c76eca8465b929ea202b1060f8ea981764de1fbd3e5cbe7316fbb3ec6",
+      "sha256": "10fa43ddefa108e787bd4514b5d670b37e76480a55a9348eed84302c01a3f4a0"
+    },
+    "element_wind_core-dark.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\evolution-fit-r6\\previews\\element_wind_core-dark.png",
+      "source_sha256": "92dc3063cef8f7f3e11bc9be425cfe9fe200bdc1e632075c39fa8a151ccf24f5",
+      "sha256": "3aefa831f898a7c961d952574cb11c003d5b69065eb9b66cfd53edceef7b2a4b"
+    },
+    "element_wind_synergy-dark.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\evolution-fit-r6\\previews\\element_wind_synergy-dark.png",
+      "source_sha256": "95f062218e873a6aa60c5db8805abefa713f466929b9c09ffa6e0d16651620a7",
+      "sha256": "93f548f1c208c00d345a8f84a37c9281af3f5123b70feb7a1cfb3eb37597d597"
+    },
+    "element_lightning_core-base.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\evolution-fit-r6\\previews\\element_lightning_core-base.png",
+      "source_sha256": "2869640c76eca8465b929ea202b1060f8ea981764de1fbd3e5cbe7316fbb3ec6",
+      "sha256": "10fa43ddefa108e787bd4514b5d670b37e76480a55a9348eed84302c01a3f4a0"
+    },
+    "element_lightning_core-dark.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\evolution-fit-r6\\previews\\element_lightning_core-dark.png",
+      "source_sha256": "df7df6f2421b796506e8030212dc8917e8f9711069302aeb866d1823fdf1d4f3",
+      "sha256": "98def99a90a268f16f0cb10332c20316f7beb05c805421d6d36aa57c33448ac9"
+    },
+    "element_lightning_synergy-dark.webp": {
+      "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\evolution-fit-r6\\previews\\element_lightning_synergy-dark.png",
+      "source_sha256": "3af6c732049c4b471f829b60d63c75671de372a3b903f1fd743ace4e4daa4988",
+      "sha256": "dc7b73fbdccd3568e0e1d1926027f201a2d152bcb28fc9027e09017ed36956d3"
+    }
+  },
+  "limits": [
+    "Weapon plates are captured from the equipped formal scene.",
+    "Garment preview retains the base outfit; this batch does not claim live costume evolution.",
+    "Element choice uses the active element; mixed-build primary silhouette follows the latest core."
+  ],
+  "runtime_sources": {
+    "arcane_element-ice-tier-1.png": "9109ed48749c5479a76768721d75bf3d7db8491fd5be0fbed8f3c2af71aa6948",
+    "arcane_element-ice-tier-2.png": "93aa194afe2029daa1570bfacbd6f8c35ab8e6be9b10c4ae66c51bc5a5846e36",
+    "arcane_element-lightning-tier-1.png": "fa44ca3d8c46ad541b56cc087c01cfa03ab6e94fcd6661e6ef55707f1b13ee9e",
+    "arcane_element-lightning-tier-2.png": "08b0466630ee1517e3456acc42a0a8c711809d33bf764de41fd8f5cc5bc5bb4e",
+    "arcane_element-tier-0.png": "d1054e0e687269ae6078d9a8f7be10a26bacfade527fd323d54b218fba72b54b",
+    "arcane_element-tier-1.png": "5acdef92e38d376ca62d8036fa6a2c7d0259d480b3b583a5bcec8cf70d9991d0",
+    "arcane_element-tier-2.png": "d80f4b7e7eed405e64ae5b50eb365901e439a88fb35fc2bd9d0db4f624961f7f",
+    "arcane_element-wind-tier-1.png": "7a60567db8609d79661afe95c7c15c3ee36f522203968f378e709918eb3dabcb",
+    "arcane_element-wind-tier-2.png": "07fcd3015b0f09e8696d1adb2b9acc4b928b5e21943d2bada16c5b5cb04af24a",
+    "arcane_seal-tier-0.png": "a53793e468262f0fcbdae6bf7ce227335432ef5c79e568e3c652381f90bf68a5",
+    "arcane_seal-tier-1.png": "3ab48bcafd79d58a77531a76ed56e51b3232e19d7fd23b9ad6720ea0b760c23e",
+    "arcane_seal-tier-2.png": "12a430ea30a645c6d28cad44b902c557b702095d5bf33ccf91ff06055c577c96",
+    "arcane_shape-tier-0.png": "000fb4d5580c3a7777414838cc8cab5e1eda21f19c0dfc733a6406c063ef7f89",
+    "arcane_shape-tier-1.png": "2d40fe07e55b1b6f2a38b4dbdff49c6eafbf0e04bf6e204c3e427a9d6951ace2",
+    "arcane_shape-tier-2.png": "ae82d4359665a482d478401463fc3751de84f9508d375e70a97679599db4be70",
+    "arcane_storm-tier-0.png": "8793b72fd5f5271f002dfa95b57e623b9d09a17d63ee2a01fff2753d30aba342",
+    "arcane_storm-tier-1.png": "449d2ac20b87d923647fe945b44b13410ace1e0478867b80e1ce0c98f0026577",
+    "arcane_storm-tier-2.png": "fb2de0461fc479caab94f72fd872bddafca99e3442ddc98b5b4cda2302e58372",
+    "shade_echo-tier-0.png": "addfa1697fc46a9db54dbe146c300e9a0776b4dc5310ecfad7f3fa5cbaca5ee2",
+    "shade_echo-tier-1.png": "7ea9cf6458509af0668a06c7e53a60c56be1066f8aea717c1c006a31d5bc7d64",
+    "shade_echo-tier-2.png": "0b504834d7e72a0bac45034759ac651b9c7bde8b7ff9bed7efe295b2fbb5f729",
+    "shade_parry-tier-0.png": "1c7dc36bb7709ba71b6e566a3c12c707db5a18884a7dfb8ecac3ae64c63a3627",
+    "shade_parry-tier-1.png": "7fd76d6084002ffb3fe19e0b776e8af84e9cf576b67fbf7875a66bd4c76be78f",
+    "shade_parry-tier-2.png": "0a2e532505f23e38a5152ac4448a1890147519479cb8ad09e618e0d6b4cca89b",
+    "shade_slide-tier-0.png": "b844ecbd385c6b6e69b14ddb1959a3c90981d21111cdbe2a84e5d0759ee04ac4",
+    "shade_slide-tier-1.png": "021718c612fbe407f9dd70e056163a45521f2348c4288106df31afdff10ccbb2",
+    "shade_slide-tier-2.png": "c8e2323959b27d1d84c9913a6c66df869809f513ab4fb8e95614bc505e9409db",
+    "shade_wall-tier-0.png": "e3c5b0e7b19f2f53d2b9ec695eafbe71edd42a5fdf8481c6510145d2a120b65e",
+    "shade_wall-tier-1.png": "51fe8eef8ee95cd284905456277ac3bb7e1adc478c0536e1b7932dd3125c882b",
+    "shade_wall-tier-2.png": "a3c0dcdb9064847620b0a44499f7c0efeefb3d9d5a31ea09d04415de55929d1f"
+  }
+}

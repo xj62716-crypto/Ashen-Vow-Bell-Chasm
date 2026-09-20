@@ -1,0 +1,5325 @@
+[
+  {
+    "file": "sfx/cut_outward_00.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "knifeSlice",
+        0.9,
+        0.982,
+        "native pitch; energy cropped to .050s"
+      ],
+      [
+        "rpg-audio",
+        "cloth1",
+        0.095,
+        1.0,
+        0
+      ]
+    ],
+    "room_tail": 0,
+    "loop": false,
+    "stereo_pan": -0.48,
+    "license": "CC0-1.0 derivatives of Kenney recordings",
+    "superseded_recipe": {
+      "file": "sfx/cut_outward_00.wav",
+      "layers": [
+        [
+          "rpg-audio",
+          "knifeSlice",
+          0.8,
+          1.51125,
+          0
+        ],
+        [
+          "rpg-audio",
+          "cloth1",
+          0.2,
+          1.1212499999999999,
+          0
+        ],
+        [
+          "rpg-audio",
+          "clothBelt",
+          0.08,
+          0.975,
+          0.04
+        ]
+      ],
+      "room_tail": 0.12,
+      "loop": false,
+      "stereo_pan": -0.48,
+      "license": "CC0-1.0 derivatives of Kenney recordings"
+    },
+    "authoring_script": "tools/workstreams/integration/refine_reference_cut_audio.py",
+    "report": "docs/workstreams/results/integration/art-reference-rebuild/audio-refinement.json",
+    "duration_s": 0.24
+  },
+  {
+    "file": "sfx/cut_outward_01.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "knifeSlice",
+        0.9,
+        1.0,
+        "native pitch; energy cropped to .050s"
+      ],
+      [
+        "rpg-audio",
+        "cloth2",
+        0.095,
+        1.0,
+        0
+      ]
+    ],
+    "room_tail": 0,
+    "loop": false,
+    "stereo_pan": -0.48,
+    "license": "CC0-1.0 derivatives of Kenney recordings",
+    "superseded_recipe": {
+      "file": "sfx/cut_outward_01.wav",
+      "layers": [
+        [
+          "rpg-audio",
+          "knifeSlice",
+          0.8,
+          1.55,
+          0
+        ],
+        [
+          "rpg-audio",
+          "cloth2",
+          0.2,
+          1.15,
+          0
+        ],
+        [
+          "rpg-audio",
+          "clothBelt",
+          0.08,
+          1.0,
+          0.04
+        ]
+      ],
+      "room_tail": 0.12,
+      "loop": false,
+      "stereo_pan": -0.48,
+      "license": "CC0-1.0 derivatives of Kenney recordings"
+    },
+    "authoring_script": "tools/workstreams/integration/refine_reference_cut_audio.py",
+    "report": "docs/workstreams/results/integration/art-reference-rebuild/audio-refinement.json",
+    "duration_s": 0.24
+  },
+  {
+    "file": "sfx/cut_outward_02.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "knifeSlice",
+        0.9,
+        1.018,
+        "native pitch; energy cropped to .050s"
+      ],
+      [
+        "rpg-audio",
+        "cloth1",
+        0.095,
+        1.0,
+        0
+      ]
+    ],
+    "room_tail": 0,
+    "loop": false,
+    "stereo_pan": -0.48,
+    "license": "CC0-1.0 derivatives of Kenney recordings",
+    "superseded_recipe": {
+      "file": "sfx/cut_outward_02.wav",
+      "layers": [
+        [
+          "rpg-audio",
+          "knifeSlice",
+          0.8,
+          1.5887499999999999,
+          0
+        ],
+        [
+          "rpg-audio",
+          "cloth3",
+          0.2,
+          1.1787499999999997,
+          0
+        ],
+        [
+          "rpg-audio",
+          "clothBelt",
+          0.08,
+          1.025,
+          0.04
+        ]
+      ],
+      "room_tail": 0.12,
+      "loop": false,
+      "stereo_pan": -0.48,
+      "license": "CC0-1.0 derivatives of Kenney recordings"
+    },
+    "authoring_script": "tools/workstreams/integration/refine_reference_cut_audio.py",
+    "report": "docs/workstreams/results/integration/art-reference-rebuild/audio-refinement.json",
+    "duration_s": 0.24
+  },
+  {
+    "file": "sfx/cut_return_00.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "knifeSlice",
+        0.9,
+        0.982,
+        "native pitch; energy cropped to .050s"
+      ],
+      [
+        "rpg-audio",
+        "cloth1",
+        0.095,
+        1.0,
+        0
+      ]
+    ],
+    "room_tail": 0,
+    "loop": false,
+    "stereo_pan": 0.48,
+    "license": "CC0-1.0 derivatives of Kenney recordings",
+    "superseded_recipe": {
+      "file": "sfx/cut_return_00.wav",
+      "layers": [
+        [
+          "rpg-audio",
+          "knifeSlice2",
+          0.78,
+          1.60875,
+          0
+        ],
+        [
+          "rpg-audio",
+          "cloth1",
+          0.23,
+          1.17,
+          0
+        ],
+        [
+          "rpg-audio",
+          "clothBelt2",
+          0.09,
+          0.975,
+          0.035
+        ]
+      ],
+      "room_tail": 0.12,
+      "loop": false,
+      "stereo_pan": 0.48,
+      "license": "CC0-1.0 derivatives of Kenney recordings"
+    },
+    "authoring_script": "tools/workstreams/integration/refine_reference_cut_audio.py",
+    "report": "docs/workstreams/results/integration/art-reference-rebuild/audio-refinement.json",
+    "duration_s": 0.22
+  },
+  {
+    "file": "sfx/cut_return_01.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "knifeSlice",
+        0.9,
+        1.0,
+        "native pitch; energy cropped to .050s"
+      ],
+      [
+        "rpg-audio",
+        "cloth2",
+        0.095,
+        1.0,
+        0
+      ]
+    ],
+    "room_tail": 0,
+    "loop": false,
+    "stereo_pan": 0.48,
+    "license": "CC0-1.0 derivatives of Kenney recordings",
+    "superseded_recipe": {
+      "file": "sfx/cut_return_01.wav",
+      "layers": [
+        [
+          "rpg-audio",
+          "knifeSlice2",
+          0.78,
+          1.65,
+          0
+        ],
+        [
+          "rpg-audio",
+          "cloth2",
+          0.23,
+          1.2,
+          0
+        ],
+        [
+          "rpg-audio",
+          "clothBelt2",
+          0.09,
+          1.0,
+          0.035
+        ]
+      ],
+      "room_tail": 0.12,
+      "loop": false,
+      "stereo_pan": 0.48,
+      "license": "CC0-1.0 derivatives of Kenney recordings"
+    },
+    "authoring_script": "tools/workstreams/integration/refine_reference_cut_audio.py",
+    "report": "docs/workstreams/results/integration/art-reference-rebuild/audio-refinement.json",
+    "duration_s": 0.22
+  },
+  {
+    "file": "sfx/cut_return_02.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "knifeSlice",
+        0.9,
+        1.018,
+        "native pitch; energy cropped to .050s"
+      ],
+      [
+        "rpg-audio",
+        "cloth1",
+        0.095,
+        1.0,
+        0
+      ]
+    ],
+    "room_tail": 0,
+    "loop": false,
+    "stereo_pan": 0.48,
+    "license": "CC0-1.0 derivatives of Kenney recordings",
+    "superseded_recipe": {
+      "file": "sfx/cut_return_02.wav",
+      "layers": [
+        [
+          "rpg-audio",
+          "knifeSlice2",
+          0.78,
+          1.6912499999999997,
+          0
+        ],
+        [
+          "rpg-audio",
+          "cloth3",
+          0.23,
+          1.2299999999999998,
+          0
+        ],
+        [
+          "rpg-audio",
+          "clothBelt2",
+          0.09,
+          1.025,
+          0.035
+        ]
+      ],
+      "room_tail": 0.12,
+      "loop": false,
+      "stereo_pan": 0.48,
+      "license": "CC0-1.0 derivatives of Kenney recordings"
+    },
+    "authoring_script": "tools/workstreams/integration/refine_reference_cut_audio.py",
+    "report": "docs/workstreams/results/integration/art-reference-rebuild/audio-refinement.json",
+    "duration_s": 0.22
+  },
+  {
+    "file": "sfx/hit_flesh_00.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "chop",
+        0.85,
+        0.897,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactPunch_heavy_000",
+        0.62,
+        1.092,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth1",
+        0.08,
+        0.975,
+        0.025
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/hit_flesh_01.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "chop",
+        0.85,
+        0.92,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactPunch_heavy_001",
+        0.62,
+        1.12,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth2",
+        0.08,
+        1.0,
+        0.025
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/hit_flesh_02.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "chop",
+        0.85,
+        0.943,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactPunch_heavy_002",
+        0.62,
+        1.148,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth3",
+        0.08,
+        1.025,
+        0.025
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/hit_armor_00.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactMetal_medium_000",
+        0.8,
+        0.9944999999999999,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactPlate_light_000",
+        0.25,
+        0.94575,
+        0.015
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/hit_armor_01.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactMetal_medium_001",
+        0.8,
+        1.02,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactPlate_light_001",
+        0.25,
+        0.97,
+        0.015
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/hit_armor_02.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactMetal_medium_002",
+        0.8,
+        1.0454999999999999,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactPlate_light_002",
+        0.25,
+        0.9942499999999999,
+        0.015
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/hit_stone_00.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactMining_000",
+        0.65,
+        0.975,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactWood_light_000",
+        0.24,
+        0.975,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/hit_stone_01.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactMining_001",
+        0.65,
+        1.0,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactWood_light_001",
+        0.24,
+        1.0,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/hit_stone_02.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactMining_002",
+        0.65,
+        1.025,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactWood_light_002",
+        0.24,
+        1.025,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/block_00.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactMetal_heavy_000",
+        0.7,
+        1.092,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth1",
+        0.24,
+        0.975,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactSoft_medium_000",
+        0.35,
+        0.975,
+        0
+      ]
+    ],
+    "room_tail": 0.1,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/block_01.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactMetal_heavy_001",
+        0.7,
+        1.12,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth2",
+        0.24,
+        1.0,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactSoft_medium_001",
+        0.35,
+        1.0,
+        0
+      ]
+    ],
+    "room_tail": 0.1,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/block_02.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactMetal_heavy_002",
+        0.7,
+        1.148,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth3",
+        0.24,
+        1.025,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactSoft_medium_002",
+        0.35,
+        1.025,
+        0
+      ]
+    ],
+    "room_tail": 0.1,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/parry_00.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactMetal_light_000",
+        0.65,
+        0.82875,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactPlate_light_000",
+        0.36,
+        0.7605,
+        0
+      ],
+      [
+        "rpg-audio",
+        "drawKnife2",
+        0.18,
+        0.78,
+        0.035
+      ]
+    ],
+    "room_tail": 0.28,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/parry_01.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactMetal_light_001",
+        0.65,
+        0.85,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactPlate_light_001",
+        0.36,
+        0.78,
+        0
+      ],
+      [
+        "rpg-audio",
+        "drawKnife2",
+        0.18,
+        0.8,
+        0.035
+      ]
+    ],
+    "room_tail": 0.28,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/parry_02.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactMetal_light_002",
+        0.65,
+        0.8712499999999999,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactPlate_light_002",
+        0.36,
+        0.7995,
+        0
+      ],
+      [
+        "rpg-audio",
+        "drawKnife2",
+        0.18,
+        0.82,
+        0.035
+      ]
+    ],
+    "room_tail": 0.28,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/execution_00.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "chop",
+        0.78,
+        1.0,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactPunch_heavy_000",
+        0.24,
+        1.0,
+        0
+      ]
+    ],
+    "room_tail": 0,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings",
+    "superseded_recipe": {
+      "file": "sfx/execution_00.wav",
+      "layers": [
+        [
+          "rpg-audio",
+          "chop",
+          0.8,
+          1.0725,
+          0
+        ],
+        [
+          "impact-sounds",
+          "impactPunch_heavy_000",
+          0.8,
+          1.23825,
+          0
+        ],
+        [
+          "impact-sounds",
+          "impactSoft_heavy_000",
+          0.25,
+          1.365,
+          0.11
+        ]
+      ],
+      "room_tail": 0.12,
+      "loop": false,
+      "stereo_pan": 0,
+      "license": "CC0-1.0 derivatives of Kenney recordings"
+    },
+    "authoring_script": "tools/workstreams/integration/refine_reference_cut_audio.py",
+    "report": "docs/workstreams/results/integration/art-reference-rebuild/audio-refinement.json",
+    "duration_s": 0.34
+  },
+  {
+    "file": "sfx/execution_01.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "chop",
+        0.78,
+        1.0,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactPunch_heavy_001",
+        0.24,
+        1.0,
+        0
+      ]
+    ],
+    "room_tail": 0,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings",
+    "superseded_recipe": {
+      "file": "sfx/execution_01.wav",
+      "layers": [
+        [
+          "rpg-audio",
+          "chop",
+          0.8,
+          1.1,
+          0
+        ],
+        [
+          "impact-sounds",
+          "impactPunch_heavy_001",
+          0.8,
+          1.27,
+          0
+        ],
+        [
+          "impact-sounds",
+          "impactSoft_heavy_001",
+          0.25,
+          1.4,
+          0.11
+        ]
+      ],
+      "room_tail": 0.12,
+      "loop": false,
+      "stereo_pan": 0,
+      "license": "CC0-1.0 derivatives of Kenney recordings"
+    },
+    "authoring_script": "tools/workstreams/integration/refine_reference_cut_audio.py",
+    "report": "docs/workstreams/results/integration/art-reference-rebuild/audio-refinement.json",
+    "duration_s": 0.34
+  },
+  {
+    "file": "sfx/execution_02.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "chop",
+        0.78,
+        1.0,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactPunch_heavy_002",
+        0.24,
+        1.0,
+        0
+      ]
+    ],
+    "room_tail": 0,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings",
+    "superseded_recipe": {
+      "file": "sfx/execution_02.wav",
+      "layers": [
+        [
+          "rpg-audio",
+          "chop",
+          0.8,
+          1.1275,
+          0
+        ],
+        [
+          "impact-sounds",
+          "impactPunch_heavy_002",
+          0.8,
+          1.30175,
+          0
+        ],
+        [
+          "impact-sounds",
+          "impactSoft_heavy_002",
+          0.25,
+          1.4349999999999998,
+          0.11
+        ]
+      ],
+      "room_tail": 0.12,
+      "loop": false,
+      "stereo_pan": 0,
+      "license": "CC0-1.0 derivatives of Kenney recordings"
+    },
+    "authoring_script": "tools/workstreams/integration/refine_reference_cut_audio.py",
+    "report": "docs/workstreams/results/integration/art-reference-rebuild/audio-refinement.json",
+    "duration_s": 0.34
+  },
+  {
+    "file": "sfx/guard_break_00.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactMetal_heavy_000",
+        0.45,
+        1.17,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_medium_000",
+        0.5,
+        1.1504999999999999,
+        0.018
+      ]
+    ],
+    "room_tail": 0.4,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/guard_break_01.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactMetal_heavy_001",
+        0.45,
+        1.2,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_medium_001",
+        0.5,
+        1.18,
+        0.018
+      ]
+    ],
+    "room_tail": 0.4,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/guard_break_02.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactMetal_heavy_002",
+        0.45,
+        1.2299999999999998,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_medium_002",
+        0.5,
+        1.2094999999999998,
+        0.018
+      ]
+    ],
+    "room_tail": 0.4,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/cloth_00.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "cloth1",
+        0.5,
+        0.975,
+        0
+      ],
+      [
+        "rpg-audio",
+        "clothBelt",
+        0.13,
+        0.975,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/cloth_01.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "cloth2",
+        0.5,
+        1.0,
+        0
+      ],
+      [
+        "rpg-audio",
+        "clothBelt",
+        0.13,
+        1.0,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/cloth_02.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "cloth3",
+        0.5,
+        1.025,
+        0
+      ],
+      [
+        "rpg-audio",
+        "clothBelt",
+        0.13,
+        1.025,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/cloth_03.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "cloth4",
+        0.5,
+        1.05,
+        0
+      ],
+      [
+        "rpg-audio",
+        "clothBelt",
+        0.13,
+        1.05,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/step_stone_00.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "footstep_concrete_000",
+        0.65,
+        0.975,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth1",
+        0.08,
+        0.8775,
+        0.03
+      ]
+    ],
+    "room_tail": 0.06,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/step_stone_01.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "footstep_concrete_001",
+        0.65,
+        1.0,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth2",
+        0.08,
+        0.9,
+        0.03
+      ]
+    ],
+    "room_tail": 0.06,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/step_stone_02.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "footstep_concrete_002",
+        0.65,
+        1.025,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth3",
+        0.08,
+        0.9225,
+        0.03
+      ]
+    ],
+    "room_tail": 0.06,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/step_stone_03.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "footstep_concrete_003",
+        0.65,
+        1.05,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth4",
+        0.08,
+        0.9450000000000001,
+        0.03
+      ]
+    ],
+    "room_tail": 0.06,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/step_wood_00.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "footstep_wood_000",
+        0.65,
+        0.975,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth1",
+        0.08,
+        0.8775,
+        0.03
+      ]
+    ],
+    "room_tail": 0.06,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/step_wood_01.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "footstep_wood_001",
+        0.65,
+        1.0,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth2",
+        0.08,
+        0.9,
+        0.03
+      ]
+    ],
+    "room_tail": 0.06,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/step_wood_02.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "footstep_wood_002",
+        0.65,
+        1.025,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth3",
+        0.08,
+        0.9225,
+        0.03
+      ]
+    ],
+    "room_tail": 0.06,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/step_wood_03.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "footstep_wood_003",
+        0.65,
+        1.05,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth4",
+        0.08,
+        0.9450000000000001,
+        0.03
+      ]
+    ],
+    "room_tail": 0.06,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/step_earth_00.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "footstep_grass_000",
+        0.65,
+        0.975,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth1",
+        0.08,
+        0.8775,
+        0.03
+      ]
+    ],
+    "room_tail": 0.06,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/step_earth_01.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "footstep_grass_001",
+        0.65,
+        1.0,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth2",
+        0.08,
+        0.9,
+        0.03
+      ]
+    ],
+    "room_tail": 0.06,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/step_earth_02.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "footstep_grass_002",
+        0.65,
+        1.025,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth3",
+        0.08,
+        0.9225,
+        0.03
+      ]
+    ],
+    "room_tail": 0.06,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/step_earth_03.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "footstep_grass_003",
+        0.65,
+        1.05,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth4",
+        0.08,
+        0.9450000000000001,
+        0.03
+      ]
+    ],
+    "room_tail": 0.06,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/step_snow_00.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "footstep_snow_000",
+        0.65,
+        0.975,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth1",
+        0.08,
+        0.8775,
+        0.03
+      ]
+    ],
+    "room_tail": 0.06,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/step_snow_01.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "footstep_snow_001",
+        0.65,
+        1.0,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth2",
+        0.08,
+        0.9,
+        0.03
+      ]
+    ],
+    "room_tail": 0.06,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/step_snow_02.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "footstep_snow_002",
+        0.65,
+        1.025,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth3",
+        0.08,
+        0.9225,
+        0.03
+      ]
+    ],
+    "room_tail": 0.06,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/step_snow_03.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "footstep_snow_003",
+        0.65,
+        1.05,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth4",
+        0.08,
+        0.9450000000000001,
+        0.03
+      ]
+    ],
+    "room_tail": 0.06,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/wall_step_00.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "footstep_concrete_000",
+        0.5,
+        0.897,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactMining_000",
+        0.18,
+        0.8775,
+        0.01
+      ],
+      [
+        "rpg-audio",
+        "cloth1",
+        0.2,
+        0.975,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/wall_step_01.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "footstep_concrete_001",
+        0.5,
+        0.92,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactMining_001",
+        0.18,
+        0.9,
+        0.01
+      ],
+      [
+        "rpg-audio",
+        "cloth2",
+        0.2,
+        1.0,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/wall_step_02.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "footstep_concrete_002",
+        0.5,
+        0.943,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactMining_002",
+        0.18,
+        0.9225,
+        0.01
+      ],
+      [
+        "rpg-audio",
+        "cloth3",
+        0.2,
+        1.025,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/wall_step_03.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "footstep_concrete_003",
+        0.5,
+        0.9660000000000001,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactMining_003",
+        0.18,
+        0.9450000000000001,
+        0.01
+      ],
+      [
+        "rpg-audio",
+        "cloth4",
+        0.2,
+        1.05,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/wall_kick_00.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "footstep_concrete_000",
+        0.55,
+        1.1504999999999999,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth1",
+        0.35,
+        1.17,
+        0
+      ],
+      [
+        "rpg-audio",
+        "knifeSlice",
+        0.16,
+        1.2675,
+        0.055
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/wall_kick_01.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "footstep_concrete_001",
+        0.55,
+        1.18,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth2",
+        0.35,
+        1.2,
+        0
+      ],
+      [
+        "rpg-audio",
+        "knifeSlice",
+        0.16,
+        1.3,
+        0.055
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/wall_kick_02.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "footstep_concrete_002",
+        0.55,
+        1.2094999999999998,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth3",
+        0.35,
+        1.2299999999999998,
+        0
+      ],
+      [
+        "rpg-audio",
+        "knifeSlice",
+        0.16,
+        1.3325,
+        0.055
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/jump_00.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "cloth1",
+        0.6,
+        0.975,
+        0
+      ],
+      [
+        "rpg-audio",
+        "beltHandle1",
+        0.12,
+        0.975,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/jump_01.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "cloth2",
+        0.6,
+        1.0,
+        0
+      ],
+      [
+        "rpg-audio",
+        "beltHandle1",
+        0.12,
+        1.0,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/jump_02.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "cloth3",
+        0.6,
+        1.025,
+        0
+      ],
+      [
+        "rpg-audio",
+        "beltHandle1",
+        0.12,
+        1.025,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/land_00.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "footstep_concrete_000",
+        0.6,
+        1.1504999999999999,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactSoft_heavy_000",
+        0.25,
+        1.17,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth1",
+        0.15,
+        0.975,
+        0.025
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/land_01.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "footstep_concrete_001",
+        0.6,
+        1.18,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactSoft_heavy_001",
+        0.25,
+        1.2,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth2",
+        0.15,
+        1.0,
+        0.025
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/land_02.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "footstep_concrete_002",
+        0.6,
+        1.2094999999999998,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactSoft_heavy_002",
+        0.25,
+        1.2299999999999998,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth3",
+        0.15,
+        1.025,
+        0.025
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/dash_00.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "knifeSlice2",
+        0.5,
+        1.56,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth1",
+        0.32,
+        1.2675,
+        0
+      ]
+    ],
+    "room_tail": 0.2,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/dash_01.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "knifeSlice2",
+        0.5,
+        1.6,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth2",
+        0.32,
+        1.3,
+        0
+      ]
+    ],
+    "room_tail": 0.2,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/dash_02.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "knifeSlice2",
+        0.5,
+        1.64,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth3",
+        0.32,
+        1.3325,
+        0
+      ]
+    ],
+    "room_tail": 0.2,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/slide_00.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "cloth1",
+        0.45,
+        1.4625,
+        0
+      ],
+      [
+        "impact-sounds",
+        "footstep_concrete_000",
+        0.3,
+        1.17,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/slide_01.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "cloth2",
+        0.45,
+        1.5,
+        0
+      ],
+      [
+        "impact-sounds",
+        "footstep_concrete_001",
+        0.3,
+        1.2,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/slide_02.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "cloth3",
+        0.45,
+        1.5374999999999999,
+        0
+      ],
+      [
+        "impact-sounds",
+        "footstep_concrete_002",
+        0.3,
+        1.2299999999999998,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/slide_loop_00.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "cloth3",
+        0.5,
+        2.2424999999999997,
+        0
+      ],
+      [
+        "impact-sounds",
+        "footstep_concrete_003",
+        0.12,
+        2.145,
+        0.17
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": true,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/slide_jump_00.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "cloth1",
+        0.65,
+        1.1212499999999999,
+        0
+      ],
+      [
+        "rpg-audio",
+        "knifeSlice",
+        0.16,
+        1.365,
+        0.015
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/slide_jump_01.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "cloth2",
+        0.65,
+        1.15,
+        0
+      ],
+      [
+        "rpg-audio",
+        "knifeSlice",
+        0.16,
+        1.4,
+        0.015
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/slide_jump_02.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "cloth3",
+        0.65,
+        1.1787499999999997,
+        0
+      ],
+      [
+        "rpg-audio",
+        "knifeSlice",
+        0.16,
+        1.4349999999999998,
+        0.015
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/grapple_cast_00.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "drawKnife1",
+        0.4,
+        1.365,
+        0
+      ],
+      [
+        "rpg-audio",
+        "metalLatch",
+        0.35,
+        0.7995,
+        0
+      ],
+      [
+        "rpg-audio",
+        "knifeSlice2",
+        0.32,
+        1.6575,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/grapple_cast_01.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "drawKnife1",
+        0.4,
+        1.4,
+        0
+      ],
+      [
+        "rpg-audio",
+        "metalLatch",
+        0.35,
+        0.82,
+        0
+      ],
+      [
+        "rpg-audio",
+        "knifeSlice2",
+        0.32,
+        1.7,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/grapple_cast_02.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "drawKnife1",
+        0.4,
+        1.4349999999999998,
+        0
+      ],
+      [
+        "rpg-audio",
+        "metalLatch",
+        0.35,
+        0.8404999999999999,
+        0
+      ],
+      [
+        "rpg-audio",
+        "knifeSlice2",
+        0.32,
+        1.7424999999999997,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/grapple_attach_00.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactMetal_medium_000",
+        0.5,
+        1.17,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactMining_000",
+        0.34,
+        0.975,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_light_000",
+        0.18,
+        1.755,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/grapple_attach_01.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactMetal_medium_001",
+        0.5,
+        1.2,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactMining_001",
+        0.34,
+        1.0,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_light_001",
+        0.18,
+        1.8,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/grapple_attach_02.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactMetal_medium_002",
+        0.5,
+        1.2299999999999998,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactMining_002",
+        0.34,
+        1.025,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_light_002",
+        0.18,
+        1.845,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/grapple_swing_00.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "creak2",
+        0.2,
+        1.6575,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth3",
+        0.22,
+        2.145,
+        0
+      ],
+      [
+        "rpg-audio",
+        "metalPot2",
+        0.06,
+        1.755,
+        0.12
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": true,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/grapple_release_00.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "metalClick",
+        0.38,
+        0.82875,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth1",
+        0.25,
+        0.975,
+        0
+      ],
+      [
+        "rpg-audio",
+        "knifeSlice",
+        0.2,
+        1.17,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/grapple_release_01.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "metalClick",
+        0.38,
+        0.85,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth2",
+        0.25,
+        1.0,
+        0
+      ],
+      [
+        "rpg-audio",
+        "knifeSlice",
+        0.2,
+        1.2,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/grapple_release_02.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "metalClick",
+        0.38,
+        0.8712499999999999,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth3",
+        0.25,
+        1.025,
+        0
+      ],
+      [
+        "rpg-audio",
+        "knifeSlice",
+        0.2,
+        1.2299999999999998,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/cast_fire_00.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "clothBelt",
+        0.18,
+        0.975,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactSoft_heavy_000",
+        0.58,
+        1.4625,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth3",
+        0.3,
+        2.0475,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactWood_light_000",
+        0.24,
+        0.6825,
+        0.025
+      ]
+    ],
+    "room_tail": 0.55,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/cast_fire_01.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "clothBelt",
+        0.18,
+        1.0,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactSoft_heavy_001",
+        0.58,
+        1.5,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth3",
+        0.3,
+        2.1,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactWood_light_001",
+        0.24,
+        0.7,
+        0.025
+      ]
+    ],
+    "room_tail": 0.55,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/cast_fire_02.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "clothBelt",
+        0.18,
+        1.025,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactSoft_heavy_002",
+        0.58,
+        1.5374999999999999,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth3",
+        0.3,
+        2.1525,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactWood_light_002",
+        0.24,
+        0.7174999999999999,
+        0.025
+      ]
+    ],
+    "room_tail": 0.55,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/impact_fire_00.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactPunch_medium_000",
+        0.35,
+        1.17,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactSoft_heavy_000",
+        0.58,
+        1.4625,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth3",
+        0.3,
+        2.0475,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactWood_light_000",
+        0.24,
+        0.6825,
+        0.025
+      ]
+    ],
+    "room_tail": 0.7,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/impact_fire_01.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactPunch_medium_001",
+        0.35,
+        1.2,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactSoft_heavy_001",
+        0.58,
+        1.5,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth3",
+        0.3,
+        2.1,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactWood_light_001",
+        0.24,
+        0.7,
+        0.025
+      ]
+    ],
+    "room_tail": 0.7,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/impact_fire_02.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactPunch_medium_002",
+        0.35,
+        1.2299999999999998,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactSoft_heavy_002",
+        0.58,
+        1.5374999999999999,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth3",
+        0.3,
+        2.1525,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactWood_light_002",
+        0.24,
+        0.7174999999999999,
+        0.025
+      ]
+    ],
+    "room_tail": 0.7,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/cast_ice_00.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "clothBelt",
+        0.18,
+        0.975,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_light_000",
+        0.65,
+        0.82875,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_medium_000",
+        0.18,
+        1.4625,
+        0.07
+      ]
+    ],
+    "room_tail": 0.55,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/cast_ice_01.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "clothBelt",
+        0.18,
+        1.0,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_light_001",
+        0.65,
+        0.85,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_medium_001",
+        0.18,
+        1.5,
+        0.07
+      ]
+    ],
+    "room_tail": 0.55,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/cast_ice_02.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "clothBelt",
+        0.18,
+        1.025,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_light_002",
+        0.65,
+        0.8712499999999999,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_medium_002",
+        0.18,
+        1.5374999999999999,
+        0.07
+      ]
+    ],
+    "room_tail": 0.55,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/impact_ice_00.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactPunch_medium_000",
+        0.35,
+        1.17,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_light_000",
+        0.65,
+        0.82875,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_medium_000",
+        0.18,
+        1.4625,
+        0.07
+      ]
+    ],
+    "room_tail": 0.7,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/impact_ice_01.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactPunch_medium_001",
+        0.35,
+        1.2,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_light_001",
+        0.65,
+        0.85,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_medium_001",
+        0.18,
+        1.5,
+        0.07
+      ]
+    ],
+    "room_tail": 0.7,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/impact_ice_02.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactPunch_medium_002",
+        0.35,
+        1.2299999999999998,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_light_002",
+        0.65,
+        0.8712499999999999,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_medium_002",
+        0.18,
+        1.5374999999999999,
+        0.07
+      ]
+    ],
+    "room_tail": 0.7,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/cast_wind_00.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "clothBelt",
+        0.18,
+        0.975,
+        0
+      ],
+      [
+        "rpg-audio",
+        "knifeSlice2",
+        0.45,
+        2.34,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth1",
+        0.34,
+        2.535,
+        0
+      ]
+    ],
+    "room_tail": 0.55,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/cast_wind_01.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "clothBelt",
+        0.18,
+        1.0,
+        0
+      ],
+      [
+        "rpg-audio",
+        "knifeSlice2",
+        0.45,
+        2.4,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth2",
+        0.34,
+        2.6,
+        0
+      ]
+    ],
+    "room_tail": 0.55,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/cast_wind_02.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "clothBelt",
+        0.18,
+        1.025,
+        0
+      ],
+      [
+        "rpg-audio",
+        "knifeSlice2",
+        0.45,
+        2.4599999999999995,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth3",
+        0.34,
+        2.665,
+        0
+      ]
+    ],
+    "room_tail": 0.55,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/impact_wind_00.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactPunch_medium_000",
+        0.35,
+        1.17,
+        0
+      ],
+      [
+        "rpg-audio",
+        "knifeSlice2",
+        0.45,
+        2.34,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth1",
+        0.34,
+        2.535,
+        0
+      ]
+    ],
+    "room_tail": 0.7,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/impact_wind_01.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactPunch_medium_001",
+        0.35,
+        1.2,
+        0
+      ],
+      [
+        "rpg-audio",
+        "knifeSlice2",
+        0.45,
+        2.4,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth2",
+        0.34,
+        2.6,
+        0
+      ]
+    ],
+    "room_tail": 0.7,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/impact_wind_02.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactPunch_medium_002",
+        0.35,
+        1.2299999999999998,
+        0
+      ],
+      [
+        "rpg-audio",
+        "knifeSlice2",
+        0.45,
+        2.4599999999999995,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth3",
+        0.34,
+        2.665,
+        0
+      ]
+    ],
+    "room_tail": 0.7,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/cast_lightning_00.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "clothBelt",
+        0.18,
+        0.975,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactTin_medium_000",
+        0.2,
+        0.663,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_heavy_000",
+        0.5,
+        0.6825,
+        0
+      ],
+      [
+        "rpg-audio",
+        "clothBelt2",
+        0.3,
+        0.4875,
+        0.06
+      ]
+    ],
+    "room_tail": 0.55,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/cast_lightning_01.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "clothBelt",
+        0.18,
+        1.0,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactTin_medium_001",
+        0.2,
+        0.68,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_heavy_001",
+        0.5,
+        0.7,
+        0
+      ],
+      [
+        "rpg-audio",
+        "clothBelt2",
+        0.3,
+        0.5,
+        0.06
+      ]
+    ],
+    "room_tail": 0.55,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/cast_lightning_02.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "clothBelt",
+        0.18,
+        1.025,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactTin_medium_002",
+        0.2,
+        0.697,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_heavy_002",
+        0.5,
+        0.7174999999999999,
+        0
+      ],
+      [
+        "rpg-audio",
+        "clothBelt2",
+        0.3,
+        0.5125,
+        0.06
+      ]
+    ],
+    "room_tail": 0.55,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/impact_lightning_00.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactPunch_medium_000",
+        0.35,
+        1.17,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactTin_medium_000",
+        0.2,
+        0.663,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_heavy_000",
+        0.5,
+        0.6825,
+        0
+      ],
+      [
+        "rpg-audio",
+        "clothBelt2",
+        0.3,
+        0.4875,
+        0.06
+      ]
+    ],
+    "room_tail": 0.7,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/impact_lightning_01.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactPunch_medium_001",
+        0.35,
+        1.2,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactTin_medium_001",
+        0.2,
+        0.68,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_heavy_001",
+        0.5,
+        0.7,
+        0
+      ],
+      [
+        "rpg-audio",
+        "clothBelt2",
+        0.3,
+        0.5,
+        0.06
+      ]
+    ],
+    "room_tail": 0.7,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/impact_lightning_02.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactPunch_medium_002",
+        0.35,
+        1.2299999999999998,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactTin_medium_002",
+        0.2,
+        0.697,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_heavy_002",
+        0.5,
+        0.7174999999999999,
+        0
+      ],
+      [
+        "rpg-audio",
+        "clothBelt2",
+        0.3,
+        0.5125,
+        0.06
+      ]
+    ],
+    "room_tail": 0.7,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/cast_arcane_00.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "clothBelt",
+        0.18,
+        0.975,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_light_000",
+        0.43,
+        1.80375,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactBell_heavy_000",
+        0.15,
+        1.6575,
+        0
+      ],
+      [
+        "rpg-audio",
+        "clothBelt2",
+        0.18,
+        0.975,
+        0
+      ]
+    ],
+    "room_tail": 0.55,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/cast_arcane_01.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "clothBelt",
+        0.18,
+        1.0,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_light_001",
+        0.43,
+        1.85,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactBell_heavy_001",
+        0.15,
+        1.7,
+        0
+      ],
+      [
+        "rpg-audio",
+        "clothBelt2",
+        0.18,
+        1.0,
+        0
+      ]
+    ],
+    "room_tail": 0.55,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/cast_arcane_02.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "clothBelt",
+        0.18,
+        1.025,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_light_002",
+        0.43,
+        1.89625,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactBell_heavy_002",
+        0.15,
+        1.7424999999999997,
+        0
+      ],
+      [
+        "rpg-audio",
+        "clothBelt2",
+        0.18,
+        1.025,
+        0
+      ]
+    ],
+    "room_tail": 0.55,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/impact_arcane_00.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactPunch_medium_000",
+        0.35,
+        1.17,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_light_000",
+        0.43,
+        1.80375,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactBell_heavy_000",
+        0.15,
+        1.6575,
+        0
+      ],
+      [
+        "rpg-audio",
+        "clothBelt2",
+        0.18,
+        0.975,
+        0
+      ]
+    ],
+    "room_tail": 0.7,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/impact_arcane_01.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactPunch_medium_001",
+        0.35,
+        1.2,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_light_001",
+        0.43,
+        1.85,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactBell_heavy_001",
+        0.15,
+        1.7,
+        0
+      ],
+      [
+        "rpg-audio",
+        "clothBelt2",
+        0.18,
+        1.0,
+        0
+      ]
+    ],
+    "room_tail": 0.7,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/impact_arcane_02.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactPunch_medium_002",
+        0.35,
+        1.2299999999999998,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_light_002",
+        0.43,
+        1.89625,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactBell_heavy_002",
+        0.15,
+        1.7424999999999997,
+        0
+      ],
+      [
+        "rpg-audio",
+        "clothBelt2",
+        0.18,
+        1.025,
+        0
+      ]
+    ],
+    "room_tail": 0.7,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/staff_charge_00.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactBell_heavy_001",
+        0.25,
+        2.145,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_light_003",
+        0.2,
+        2.145,
+        0.3
+      ]
+    ],
+    "room_tail": 0.6,
+    "loop": true,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/shape_wall_00.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactMining_000",
+        0.6,
+        1.56,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactWood_heavy_000",
+        0.3,
+        1.56,
+        0.08
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_light_000",
+        0.2,
+        1.755,
+        0.11
+      ]
+    ],
+    "room_tail": 0.8,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/shape_wall_01.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactMining_001",
+        0.6,
+        1.6,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactWood_heavy_001",
+        0.3,
+        1.6,
+        0.08
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_light_001",
+        0.2,
+        1.8,
+        0.11
+      ]
+    ],
+    "room_tail": 0.8,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/shape_wall_02.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactMining_002",
+        0.6,
+        1.64,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactWood_heavy_002",
+        0.3,
+        1.64,
+        0.08
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_light_002",
+        0.2,
+        1.845,
+        0.11
+      ]
+    ],
+    "room_tail": 0.8,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/shape_anchor_00.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactBell_heavy_000",
+        0.4,
+        1.8524999999999998,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_medium_000",
+        0.3,
+        1.4625,
+        0
+      ]
+    ],
+    "room_tail": 0.6,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/shape_anchor_01.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactBell_heavy_001",
+        0.4,
+        1.9,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_medium_001",
+        0.3,
+        1.5,
+        0
+      ]
+    ],
+    "room_tail": 0.6,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/shape_anchor_02.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactBell_heavy_002",
+        0.4,
+        1.9474999999999998,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_medium_002",
+        0.3,
+        1.5374999999999999,
+        0
+      ]
+    ],
+    "room_tail": 0.6,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/shape_well_00.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "knifeSlice",
+        0.45,
+        3.2175,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactMining_000",
+        0.23,
+        1.6575,
+        0
+      ]
+    ],
+    "room_tail": 0.7,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/shape_well_01.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "knifeSlice",
+        0.45,
+        3.3,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactMining_001",
+        0.23,
+        1.7,
+        0
+      ]
+    ],
+    "room_tail": 0.7,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/shape_well_02.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "knifeSlice",
+        0.45,
+        3.3824999999999994,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactMining_002",
+        0.23,
+        1.7424999999999997,
+        0
+      ]
+    ],
+    "room_tail": 0.7,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/shape_collapse_00.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactMining_000",
+        0.4,
+        1.6575,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_light_000",
+        0.25,
+        1.8524999999999998,
+        0.15
+      ]
+    ],
+    "room_tail": 0.6,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/shape_collapse_01.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactMining_001",
+        0.4,
+        1.7,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_light_001",
+        0.25,
+        1.9,
+        0.15
+      ]
+    ],
+    "room_tail": 0.6,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/shape_collapse_02.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactMining_002",
+        0.4,
+        1.7424999999999997,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_light_002",
+        0.25,
+        1.9474999999999998,
+        0.15
+      ]
+    ],
+    "room_tail": 0.6,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/mark_00.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactGlass_light_000",
+        0.38,
+        1.2675,
+        0
+      ],
+      [
+        "rpg-audio",
+        "bookClose",
+        0.2,
+        0.82875,
+        0
+      ]
+    ],
+    "room_tail": 0.4,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/mark_01.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactGlass_light_001",
+        0.38,
+        1.3,
+        0
+      ],
+      [
+        "rpg-audio",
+        "bookClose",
+        0.2,
+        0.85,
+        0
+      ]
+    ],
+    "room_tail": 0.4,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/mark_02.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactGlass_light_002",
+        0.38,
+        1.3325,
+        0
+      ],
+      [
+        "rpg-audio",
+        "bookClose",
+        0.2,
+        0.8712499999999999,
+        0
+      ]
+    ],
+    "room_tail": 0.4,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/detonate_00.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactPunch_heavy_000",
+        0.55,
+        1.365,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_heavy_000",
+        0.4,
+        1.17,
+        0.025
+      ]
+    ],
+    "room_tail": 0.6,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/detonate_01.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactPunch_heavy_001",
+        0.55,
+        1.4,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_heavy_001",
+        0.4,
+        1.2,
+        0.025
+      ]
+    ],
+    "room_tail": 0.6,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/detonate_02.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactPunch_heavy_002",
+        0.55,
+        1.4349999999999998,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_heavy_002",
+        0.4,
+        1.2299999999999998,
+        0.025
+      ]
+    ],
+    "room_tail": 0.6,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/blink_00.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "knifeSlice2",
+        0.5,
+        1.6575,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_light_000",
+        0.2,
+        1.6575,
+        0
+      ]
+    ],
+    "room_tail": 0.5,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/blink_01.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "knifeSlice2",
+        0.5,
+        1.7,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_light_001",
+        0.2,
+        1.7,
+        0
+      ]
+    ],
+    "room_tail": 0.5,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/blink_02.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "knifeSlice2",
+        0.5,
+        1.7424999999999997,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_light_002",
+        0.2,
+        1.7424999999999997,
+        0
+      ]
+    ],
+    "room_tail": 0.5,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/sweep_00.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "knifeSlice",
+        0.72,
+        1.9012499999999999,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth1",
+        0.25,
+        1.4625,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": -0.55,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/sweep_01.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "knifeSlice",
+        0.72,
+        1.95,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth2",
+        0.25,
+        1.5,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": -0.55,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/sweep_02.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "knifeSlice",
+        0.72,
+        1.9987499999999998,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth3",
+        0.25,
+        1.5374999999999999,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": -0.55,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/execute_00.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "knifeSlice2",
+        0.55,
+        1.4625,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth1",
+        0.27,
+        0.975,
+        0
+      ],
+      [
+        "rpg-audio",
+        "drawKnife1",
+        0.16,
+        0.975,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/execute_01.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "knifeSlice2",
+        0.55,
+        1.5,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth2",
+        0.27,
+        1.0,
+        0
+      ],
+      [
+        "rpg-audio",
+        "drawKnife1",
+        0.16,
+        1.0,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/execute_02.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "knifeSlice2",
+        0.55,
+        1.5374999999999999,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth3",
+        0.27,
+        1.025,
+        0
+      ],
+      [
+        "rpg-audio",
+        "drawKnife1",
+        0.16,
+        1.025,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/storm_00.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactTin_medium_000",
+        0.2,
+        0.663,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_heavy_000",
+        0.5,
+        0.6825,
+        0
+      ],
+      [
+        "rpg-audio",
+        "clothBelt2",
+        0.3,
+        0.4875,
+        0.06
+      ],
+      [
+        "rpg-audio",
+        "knifeSlice2",
+        0.3,
+        2.0475,
+        0
+      ]
+    ],
+    "room_tail": 0.7,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/storm_01.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactTin_medium_001",
+        0.2,
+        0.68,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_heavy_001",
+        0.5,
+        0.7,
+        0
+      ],
+      [
+        "rpg-audio",
+        "clothBelt2",
+        0.3,
+        0.5,
+        0.06
+      ],
+      [
+        "rpg-audio",
+        "knifeSlice2",
+        0.3,
+        2.1,
+        0
+      ]
+    ],
+    "room_tail": 0.7,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/storm_02.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactTin_medium_002",
+        0.2,
+        0.697,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_heavy_002",
+        0.5,
+        0.7174999999999999,
+        0
+      ],
+      [
+        "rpg-audio",
+        "clothBelt2",
+        0.3,
+        0.5125,
+        0.06
+      ],
+      [
+        "rpg-audio",
+        "knifeSlice2",
+        0.3,
+        2.1525,
+        0
+      ]
+    ],
+    "room_tail": 0.7,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/echo_spawn_00.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "cloth3",
+        0.5,
+        1.95,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_light_000",
+        0.2,
+        2.145,
+        0
+      ]
+    ],
+    "room_tail": 0.8,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/echo_spawn_01.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "cloth3",
+        0.5,
+        2.0,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_light_001",
+        0.2,
+        2.2,
+        0
+      ]
+    ],
+    "room_tail": 0.8,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/echo_spawn_02.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "cloth3",
+        0.5,
+        2.05,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_light_002",
+        0.2,
+        2.255,
+        0
+      ]
+    ],
+    "room_tail": 0.8,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/rewind_start_00.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactBell_heavy_000",
+        0.23,
+        2.145,
+        0
+      ],
+      [
+        "rpg-audio",
+        "knifeSlice2",
+        0.38,
+        2.535,
+        0
+      ]
+    ],
+    "room_tail": 0.8,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/rewind_start_01.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactBell_heavy_001",
+        0.23,
+        2.2,
+        0
+      ],
+      [
+        "rpg-audio",
+        "knifeSlice2",
+        0.38,
+        2.6,
+        0
+      ]
+    ],
+    "room_tail": 0.8,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/rewind_start_02.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactBell_heavy_002",
+        0.23,
+        2.255,
+        0
+      ],
+      [
+        "rpg-audio",
+        "knifeSlice2",
+        0.38,
+        2.665,
+        0
+      ]
+    ],
+    "room_tail": 0.8,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/rewind_arrive_00.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactGlass_light_000",
+        0.3,
+        1.8524999999999998,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth1",
+        0.3,
+        0.975,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactSoft_medium_000",
+        0.2,
+        0.975,
+        0
+      ]
+    ],
+    "room_tail": 0.6,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/rewind_arrive_01.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactGlass_light_001",
+        0.3,
+        1.9,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth2",
+        0.3,
+        1.0,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactSoft_medium_001",
+        0.2,
+        1.0,
+        0
+      ]
+    ],
+    "room_tail": 0.6,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/rewind_arrive_02.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactGlass_light_002",
+        0.3,
+        1.9474999999999998,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth3",
+        0.3,
+        1.025,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactSoft_medium_002",
+        0.2,
+        1.025,
+        0
+      ]
+    ],
+    "room_tail": 0.6,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/focus_enter_00.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactBell_heavy_001",
+        0.25,
+        2.145,
+        0
+      ],
+      [
+        "rpg-audio",
+        "clothBelt2",
+        0.28,
+        2.145,
+        0
+      ]
+    ],
+    "room_tail": 0.7,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/focus_exit_00.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactBell_heavy_001",
+        0.25,
+        0.8775,
+        0
+      ],
+      [
+        "rpg-audio",
+        "clothBelt2",
+        0.28,
+        0.8775,
+        0
+      ]
+    ],
+    "room_tail": 0.7,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/focus_loop_00.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactGlass_light_001",
+        0.2,
+        3.7049999999999996,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth3",
+        0.13,
+        3.12,
+        0
+      ]
+    ],
+    "room_tail": 0.8,
+    "loop": true,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/enemy_melee_windup_00.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "cloth1",
+        0.6,
+        1.17,
+        0
+      ],
+      [
+        "rpg-audio",
+        "drawKnife1",
+        0.25,
+        1.2675,
+        0
+      ]
+    ],
+    "room_tail": 0.25,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/enemy_melee_windup_01.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "cloth1",
+        0.6,
+        1.2,
+        0
+      ],
+      [
+        "rpg-audio",
+        "drawKnife1",
+        0.25,
+        1.3,
+        0
+      ]
+    ],
+    "room_tail": 0.25,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/enemy_ranged_windup_00.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "creak1",
+        0.6,
+        1.17,
+        0
+      ],
+      [
+        "rpg-audio",
+        "metalClick",
+        0.25,
+        0.78,
+        0.04
+      ]
+    ],
+    "room_tail": 0.25,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/enemy_ranged_windup_01.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "creak1",
+        0.6,
+        1.2,
+        0
+      ],
+      [
+        "rpg-audio",
+        "metalClick",
+        0.25,
+        0.8,
+        0.04
+      ]
+    ],
+    "room_tail": 0.25,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/enemy_sweep_windup_00.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "knifeSlice2",
+        0.5,
+        2.34,
+        0
+      ],
+      [
+        "rpg-audio",
+        "metalPot1",
+        0.27,
+        1.365,
+        0
+      ]
+    ],
+    "room_tail": 0.25,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/enemy_sweep_windup_01.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "knifeSlice2",
+        0.5,
+        2.4,
+        0
+      ],
+      [
+        "rpg-audio",
+        "metalPot1",
+        0.27,
+        1.4,
+        0
+      ]
+    ],
+    "room_tail": 0.25,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/enemy_groundwave_windup_00.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactMining_002",
+        0.4,
+        2.145,
+        0
+      ],
+      [
+        "rpg-audio",
+        "creak3",
+        0.4,
+        1.6575,
+        0
+      ]
+    ],
+    "room_tail": 0.25,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/enemy_groundwave_windup_01.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactMining_002",
+        0.4,
+        2.2,
+        0
+      ],
+      [
+        "rpg-audio",
+        "creak3",
+        0.4,
+        1.7,
+        0
+      ]
+    ],
+    "room_tail": 0.25,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/enemy_aoe_windup_00.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactBell_heavy_002",
+        0.35,
+        1.755,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_light_002",
+        0.3,
+        2.0475,
+        0.1
+      ]
+    ],
+    "room_tail": 0.25,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/enemy_aoe_windup_01.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactBell_heavy_002",
+        0.35,
+        1.8,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_light_002",
+        0.3,
+        2.1,
+        0.1
+      ]
+    ],
+    "room_tail": 0.25,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/enemy_air_windup_00.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "cloth4",
+        0.55,
+        1.755,
+        0
+      ],
+      [
+        "rpg-audio",
+        "knifeSlice2",
+        0.3,
+        1.365,
+        0.12
+      ]
+    ],
+    "room_tail": 0.25,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/enemy_air_windup_01.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "cloth4",
+        0.55,
+        1.8,
+        0
+      ],
+      [
+        "rpg-audio",
+        "knifeSlice2",
+        0.3,
+        1.4,
+        0.12
+      ]
+    ],
+    "room_tail": 0.25,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/enemy_core_open_00.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactGlass_medium_000",
+        0.4,
+        0.975,
+        0
+      ],
+      [
+        "rpg-audio",
+        "metalLatch",
+        0.27,
+        0.78,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/enemy_core_open_01.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactGlass_medium_001",
+        0.4,
+        1.0,
+        0
+      ],
+      [
+        "rpg-audio",
+        "metalLatch",
+        0.27,
+        0.8,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/enemy_core_open_02.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactGlass_medium_002",
+        0.4,
+        1.025,
+        0
+      ],
+      [
+        "rpg-audio",
+        "metalLatch",
+        0.27,
+        0.82,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/boss_phase_00.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactBell_heavy_002",
+        0.4,
+        2.0475,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactMining_004",
+        0.3,
+        1.95,
+        0
+      ],
+      [
+        "rpg-audio",
+        "creak3",
+        0.3,
+        1.755,
+        0
+      ]
+    ],
+    "room_tail": 0.8,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/hostile_bolt_00.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "knifeSlice2",
+        0.55,
+        0.7605,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactMetal_light_000",
+        0.15,
+        0.78,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/hostile_bolt_01.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "knifeSlice2",
+        0.55,
+        0.78,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactMetal_light_001",
+        0.15,
+        0.8,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/hostile_bolt_02.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "knifeSlice2",
+        0.55,
+        0.7995,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactMetal_light_002",
+        0.15,
+        0.82,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/mechanism_open_00.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "doorOpen_1",
+        0.5,
+        1.1504999999999999,
+        0
+      ],
+      [
+        "rpg-audio",
+        "metalLatch",
+        0.2,
+        0.975,
+        0
+      ]
+    ],
+    "room_tail": 0.3,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/mechanism_open_01.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "doorOpen_1",
+        0.5,
+        1.18,
+        0
+      ],
+      [
+        "rpg-audio",
+        "metalLatch",
+        0.2,
+        1.0,
+        0
+      ]
+    ],
+    "room_tail": 0.3,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/mechanism_open_02.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "doorOpen_1",
+        0.5,
+        1.2094999999999998,
+        0
+      ],
+      [
+        "rpg-audio",
+        "metalLatch",
+        0.2,
+        1.025,
+        0
+      ]
+    ],
+    "room_tail": 0.3,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/mechanism_close_00.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "doorClose_2",
+        0.5,
+        1.1115,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactMining_000",
+        0.2,
+        1.17,
+        0
+      ]
+    ],
+    "room_tail": 0.3,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/mechanism_close_01.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "doorClose_2",
+        0.5,
+        1.14,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactMining_001",
+        0.2,
+        1.2,
+        0
+      ]
+    ],
+    "room_tail": 0.3,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/mechanism_close_02.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "doorClose_2",
+        0.5,
+        1.1684999999999999,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactMining_002",
+        0.2,
+        1.2299999999999998,
+        0
+      ]
+    ],
+    "room_tail": 0.3,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/mechanism_trigger_00.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "metalLatch",
+        0.5,
+        0.975,
+        0
+      ],
+      [
+        "rpg-audio",
+        "metalClick",
+        0.22,
+        0.975,
+        0.07
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/mechanism_trigger_01.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "metalLatch",
+        0.5,
+        1.0,
+        0
+      ],
+      [
+        "rpg-audio",
+        "metalClick",
+        0.22,
+        1.0,
+        0.07
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/mechanism_trigger_02.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "metalLatch",
+        0.5,
+        1.025,
+        0
+      ],
+      [
+        "rpg-audio",
+        "metalClick",
+        0.22,
+        1.025,
+        0.07
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/altar_00.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactBell_heavy_001",
+        0.25,
+        1.6575,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_light_002",
+        0.3,
+        2.0475,
+        0.11
+      ]
+    ],
+    "room_tail": 0.9,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/checkpoint_00.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "bookClose",
+        0.3,
+        0.975,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_light_001",
+        0.23,
+        1.4625,
+        0
+      ]
+    ],
+    "room_tail": 0.5,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/finish_00.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactBell_heavy_000",
+        0.3,
+        1.56,
+        0
+      ],
+      [
+        "rpg-audio",
+        "metalLatch",
+        0.2,
+        1.4625,
+        0.04
+      ]
+    ],
+    "room_tail": 0.7,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/hurt_00.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactSoft_heavy_000",
+        0.65,
+        1.17,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth1",
+        0.24,
+        0.975,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_light_000",
+        0.18,
+        1.17,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/hurt_01.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactSoft_heavy_001",
+        0.65,
+        1.2,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth2",
+        0.24,
+        1.0,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_light_001",
+        0.18,
+        1.2,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/hurt_02.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactSoft_heavy_002",
+        0.65,
+        1.2299999999999998,
+        0
+      ],
+      [
+        "rpg-audio",
+        "cloth3",
+        0.24,
+        1.025,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactGlass_light_002",
+        0.18,
+        1.2299999999999998,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/death_00.wav",
+    "layers": [
+      [
+        "impact-sounds",
+        "impactSoft_heavy_002",
+        0.45,
+        1.6575,
+        0
+      ],
+      [
+        "rpg-audio",
+        "dropLeather",
+        0.35,
+        1.56,
+        0
+      ],
+      [
+        "impact-sounds",
+        "impactMetal_light_000",
+        0.15,
+        1.4625,
+        0.09
+      ]
+    ],
+    "room_tail": 0.35,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  },
+  {
+    "file": "sfx/retry_00.wav",
+    "layers": [
+      [
+        "rpg-audio",
+        "cloth2",
+        0.3,
+        0.975,
+        0
+      ],
+      [
+        "rpg-audio",
+        "drawKnife3",
+        0.2,
+        1.17,
+        0
+      ]
+    ],
+    "room_tail": 0.12,
+    "loop": false,
+    "stereo_pan": 0,
+    "license": "CC0-1.0 derivatives of Kenney recordings"
+  }
+]

@@ -1,0 +1,98 @@
+[
+  {
+    "id": "flow_blade",
+    "title": "流刃决斗",
+    "file": "flow_blade.svg",
+    "source": "Original editable SVG paths authored for FantasyParkour; no external icon pack."
+  },
+  {
+    "id": "sky_hunter",
+    "title": "飞檐猎杀",
+    "file": "sky_hunter.svg",
+    "source": "Original editable SVG paths authored for FantasyParkour; no external icon pack."
+  },
+  {
+    "id": "ground_raider",
+    "title": "掠地破阵",
+    "file": "ground_raider.svg",
+    "source": "Original editable SVG paths authored for FantasyParkour; no external icon pack."
+  },
+  {
+    "id": "afterimage",
+    "title": "残影行者",
+    "file": "afterimage.svg",
+    "source": "Original editable SVG paths authored for FantasyParkour; no external icon pack."
+  },
+  {
+    "id": "storm_walker",
+    "title": "风暴行者",
+    "file": "storm_walker.svg",
+    "source": "Original editable SVG paths authored for FantasyParkour; no external icon pack."
+  },
+  {
+    "id": "rift_shaper",
+    "title": "裂隙塑形",
+    "file": "rift_shaper.svg",
+    "source": "Original editable SVG paths authored for FantasyParkour; no external icon pack."
+  },
+  {
+    "id": "seal_binder",
+    "title": "封印术士",
+    "file": "seal_binder.svg",
+    "source": "Original editable SVG paths authored for FantasyParkour; no external icon pack."
+  },
+  {
+    "id": "elementalist",
+    "title": "元素塑能",
+    "file": "elementalist.svg",
+    "source": "Original editable SVG paths authored for FantasyParkour; no external icon pack."
+  },
+  {
+    "id": "fire",
+    "title": "火",
+    "file": "fire.svg",
+    "source": "Original editable SVG paths authored for FantasyParkour; no external icon pack."
+  },
+  {
+    "id": "ice",
+    "title": "冰",
+    "file": "ice.svg",
+    "source": "Original editable SVG paths authored for FantasyParkour; no external icon pack."
+  },
+  {
+    "id": "wind",
+    "title": "风",
+    "file": "wind.svg",
+    "source": "Original editable SVG paths authored for FantasyParkour; no external icon pack."
+  },
+  {
+    "id": "lightning",
+    "title": "雷",
+    "file": "lightning.svg",
+    "source": "Original editable SVG paths authored for FantasyParkour; no external icon pack."
+  },
+  {
+    "id": "focus",
+    "title": "专注",
+    "file": "focus.svg",
+    "source": "Original editable SVG paths authored for FantasyParkour; no external icon pack."
+  },
+  {
+    "id": "grapple",
+    "title": "奇幻钩锁",
+    "file": "grapple.svg",
+    "source": "Original editable SVG paths authored for FantasyParkour; no external icon pack."
+  },
+  {
+    "id": "guard",
+    "title": "护契",
+    "file": "guard.svg",
+    "source": "Original editable SVG paths authored for FantasyParkour; no external icon pack."
+  },
+  {
+    "id": "altar",
+    "title": "契印祭坛",
+    "file": "altar.svg",
+    "source": "Original editable SVG paths authored for FantasyParkour; no external icon pack."
+  }
+]

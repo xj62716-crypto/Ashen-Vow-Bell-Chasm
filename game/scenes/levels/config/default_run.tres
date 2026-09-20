@@ -1,0 +1,374 @@
+[gd_resource type="Resource" script_class="LevelRunConfiguration" load_steps=37 format=3]
+[ext_resource type="Script" path="res://scenes/levels/config/run_configuration.gd" id="1"]
+[ext_resource type="Script" path="res://scenes/levels/config/encounter_entry.gd" id="2"]
+[ext_resource type="Resource" path="res://scenes/levels/config/default_mechanisms.tres" id="3"]
+
+[sub_resource type="Resource" id="stage_1_spawn_01"]
+script = ExtResource("2")
+id = &"stage_1_spawn_01"
+stage = 1
+position_m = Vector3(-8.0, 2.04, -77.0)
+archetype = "normal"
+role = "crossbow"
+required_guardian = false
+initial_delay_seconds = 1.1
+attack_range_m = 18.0
+
+[sub_resource type="Resource" id="stage_1_spawn_02"]
+script = ExtResource("2")
+id = &"stage_1_spawn_02"
+stage = 1
+position_m = Vector3(2.0, 2.04, -83.0)
+archetype = "shield"
+role = "heavy"
+required_guardian = false
+initial_delay_seconds = 1.45
+attack_range_m = 18.0
+
+[sub_resource type="Resource" id="stage_1_spawn_03"]
+script = ExtResource("2")
+id = &"stage_1_spawn_03"
+stage = 1
+position_m = Vector3(-9.0, 4.04, -182.0)
+archetype = "normal"
+role = "caster"
+required_guardian = false
+initial_delay_seconds = 1.8
+attack_range_m = 18.0
+
+[sub_resource type="Resource" id="stage_1_spawn_04"]
+script = ExtResource("2")
+id = &"stage_1_spawn_04"
+stage = 1
+position_m = Vector3(3.0, 4.04, -187.0)
+archetype = "normal"
+role = "pursuer"
+required_guardian = true
+initial_delay_seconds = 2.15
+attack_range_m = 18.0
+
+[sub_resource type="Resource" id="stage_1_spawn_05"]
+script = ExtResource("2")
+id = &"stage_1_spawn_05"
+stage = 1
+position_m = Vector3(15.0, 7.04, -79.0)
+archetype = "normal"
+role = "bell"
+required_guardian = false
+initial_delay_seconds = 2.5
+attack_range_m = 18.0
+
+[sub_resource type="Resource" id="stage_1_spawn_06"]
+script = ExtResource("2")
+id = &"stage_1_spawn_06"
+stage = 1
+position_m = Vector3(-4.5, 2.04, -111.0)
+archetype = "normal"
+role = "sentinel"
+required_guardian = false
+initial_delay_seconds = 1.25
+attack_range_m = 14.0
+
+[sub_resource type="Resource" id="stage_1_spawn_07"]
+script = ExtResource("2")
+id = &"stage_1_spawn_07"
+stage = 1
+position_m = Vector3(2.0, 2.04, -153.0)
+archetype = "normal"
+role = "crossbow"
+required_guardian = false
+initial_delay_seconds = 1.55
+attack_range_m = 16.0
+
+[sub_resource type="Resource" id="stage_1_spawn_08"]
+script = ExtResource("2")
+id = &"stage_1_spawn_08"
+stage = 1
+position_m = Vector3(-7.0, 2.04, -160.0)
+archetype = "normal"
+role = "bell"
+required_guardian = false
+initial_delay_seconds = 1.85
+attack_range_m = 15.0
+
+[sub_resource type="Resource" id="stage_2_spawn_01"]
+script = ExtResource("2")
+id = &"stage_2_spawn_01"
+stage = 2
+position_m = Vector3(0.0, 0.04, -10.0)
+archetype = "normal"
+role = "crossbow"
+required_guardian = false
+initial_delay_seconds = 1.1
+attack_range_m = 18.0
+
+[sub_resource type="Resource" id="stage_2_spawn_02"]
+script = ExtResource("2")
+id = &"stage_2_spawn_02"
+stage = 2
+position_m = Vector3(4.0, 0.04, -18.0)
+archetype = "shield"
+role = "heavy"
+required_guardian = false
+initial_delay_seconds = 1.45
+attack_range_m = 18.0
+
+[sub_resource type="Resource" id="stage_2_spawn_03"]
+script = ExtResource("2")
+id = &"stage_2_spawn_03"
+stage = 2
+position_m = Vector3(4.0, 3.04, -36.0)
+archetype = "normal"
+role = "caster"
+required_guardian = false
+initial_delay_seconds = 1.8
+attack_range_m = 18.0
+
+[sub_resource type="Resource" id="stage_2_spawn_04"]
+script = ExtResource("2")
+id = &"stage_2_spawn_04"
+stage = 2
+position_m = Vector3(18.0, 4.04, -91.0)
+archetype = "shield"
+role = "heavy"
+required_guardian = false
+initial_delay_seconds = 2.15
+attack_range_m = 18.0
+
+[sub_resource type="Resource" id="stage_2_spawn_05"]
+script = ExtResource("2")
+id = &"stage_2_spawn_05"
+stage = 2
+position_m = Vector3(24.0, 8.04, -126.0)
+archetype = "normal"
+role = "crossbow"
+required_guardian = false
+initial_delay_seconds = 2.5
+attack_range_m = 18.0
+
+[sub_resource type="Resource" id="stage_2_spawn_06"]
+script = ExtResource("2")
+id = &"stage_2_spawn_06"
+stage = 2
+position_m = Vector3(32.0, 8.04, -134.0)
+archetype = "elite"
+role = "pursuer"
+required_guardian = true
+initial_delay_seconds = 2.85
+attack_range_m = 18.0
+
+[sub_resource type="Resource" id="stage_2_spawn_07"]
+script = ExtResource("2")
+id = &"stage_2_spawn_07"
+stage = 2
+position_m = Vector3(-7.0, 11.04, -162.0)
+archetype = "normal"
+role = "caster"
+required_guardian = false
+initial_delay_seconds = 3.2
+attack_range_m = 18.0
+
+[sub_resource type="Resource" id="stage_2_spawn_08"]
+script = ExtResource("2")
+id = &"stage_2_spawn_08"
+stage = 2
+position_m = Vector3(-23.0, 14.04, -200.0)
+archetype = "normal"
+role = "sentinel"
+required_guardian = false
+initial_delay_seconds = 3.55
+attack_range_m = 18.0
+
+[sub_resource type="Resource" id="stage_2_spawn_09"]
+script = ExtResource("2")
+id = &"stage_2_spawn_09"
+stage = 2
+position_m = Vector3(-15.0, 14.04, -208.0)
+archetype = "elite"
+role = "bell"
+required_guardian = false
+initial_delay_seconds = 3.9
+attack_range_m = 18.0
+
+[sub_resource type="Resource" id="stage_2_spawn_10"]
+script = ExtResource("2")
+id = &"stage_2_spawn_10"
+stage = 2
+position_m = Vector3(-39.0, 12.04, -172.0)
+archetype = "elite"
+role = "sentinel"
+required_guardian = false
+initial_delay_seconds = 4.25
+attack_range_m = 18.0
+
+[sub_resource type="Resource" id="stage_2_spawn_11"]
+script = ExtResource("2")
+id = &"stage_2_spawn_11"
+stage = 2
+position_m = Vector3(49.0, 12.04, -135.0)
+archetype = "elite"
+role = "heavy"
+required_guardian = false
+initial_delay_seconds = 4.6
+attack_range_m = 18.0
+
+[sub_resource type="Resource" id="stage_2_spawn_12"]
+script = ExtResource("2")
+id = &"stage_2_spawn_12"
+stage = 2
+position_m = Vector3(0.0, 11.04, -247.0)
+archetype = "miniboss"
+role = "caster"
+required_guardian = true
+initial_delay_seconds = 4.95
+attack_range_m = 18.0
+
+[sub_resource type="Resource" id="stage_3_spawn_01"]
+script = ExtResource("2")
+id = &"stage_3_spawn_01"
+stage = 3
+position_m = Vector3(-5.0, 1.04, -11.0)
+archetype = "elite"
+role = "pursuer"
+required_guardian = false
+initial_delay_seconds = 1.1
+attack_range_m = 18.0
+
+[sub_resource type="Resource" id="stage_3_spawn_02"]
+script = ExtResource("2")
+id = &"stage_3_spawn_02"
+stage = 3
+position_m = Vector3(-4.0, 1.04, -24.0)
+archetype = "normal"
+role = "crossbow"
+required_guardian = false
+initial_delay_seconds = 1.45
+attack_range_m = 18.0
+
+[sub_resource type="Resource" id="stage_3_spawn_03"]
+script = ExtResource("2")
+id = &"stage_3_spawn_03"
+stage = 3
+position_m = Vector3(4.0, 1.04, -24.0)
+archetype = "normal"
+role = "sentinel"
+required_guardian = false
+initial_delay_seconds = 1.8
+attack_range_m = 18.0
+
+[sub_resource type="Resource" id="stage_3_spawn_04"]
+script = ExtResource("2")
+id = &"stage_3_spawn_04"
+stage = 3
+position_m = Vector3(-27.0, 4.04, -95.0)
+archetype = "shield"
+role = "heavy"
+required_guardian = false
+initial_delay_seconds = 2.15
+attack_range_m = 18.0
+
+[sub_resource type="Resource" id="stage_3_spawn_05"]
+script = ExtResource("2")
+id = &"stage_3_spawn_05"
+stage = 3
+position_m = Vector3(-30.0, 7.04, -131.0)
+archetype = "normal"
+role = "crossbow"
+required_guardian = false
+initial_delay_seconds = 2.5
+attack_range_m = 18.0
+
+[sub_resource type="Resource" id="stage_3_spawn_06"]
+script = ExtResource("2")
+id = &"stage_3_spawn_06"
+stage = 3
+position_m = Vector3(-22.0, 7.04, -139.0)
+archetype = "elite"
+role = "pursuer"
+required_guardian = true
+initial_delay_seconds = 2.85
+attack_range_m = 18.0
+
+[sub_resource type="Resource" id="stage_3_spawn_07"]
+script = ExtResource("2")
+id = &"stage_3_spawn_07"
+stage = 3
+position_m = Vector3(-4.0, 11.04, -166.0)
+archetype = "elite"
+role = "caster"
+required_guardian = false
+initial_delay_seconds = 3.2
+attack_range_m = 18.0
+
+[sub_resource type="Resource" id="stage_3_spawn_08"]
+script = ExtResource("2")
+id = &"stage_3_spawn_08"
+stage = 3
+position_m = Vector3(22.0, 14.04, -204.0)
+archetype = "normal"
+role = "sentinel"
+required_guardian = false
+initial_delay_seconds = 3.55
+attack_range_m = 18.0
+
+[sub_resource type="Resource" id="stage_3_spawn_09"]
+script = ExtResource("2")
+id = &"stage_3_spawn_09"
+stage = 3
+position_m = Vector3(30.0, 14.04, -212.0)
+archetype = "elite"
+role = "bell"
+required_guardian = false
+initial_delay_seconds = 3.9
+attack_range_m = 18.0
+
+[sub_resource type="Resource" id="stage_3_spawn_10"]
+script = ExtResource("2")
+id = &"stage_3_spawn_10"
+stage = 3
+position_m = Vector3(9.0, 12.04, -240.0)
+archetype = "elite"
+role = "crossbow"
+required_guardian = false
+initial_delay_seconds = 4.25
+attack_range_m = 18.0
+
+[sub_resource type="Resource" id="stage_3_spawn_11"]
+script = ExtResource("2")
+id = &"stage_3_spawn_11"
+stage = 3
+position_m = Vector3(49.0, 10.04, -175.0)
+archetype = "elite"
+role = "sentinel"
+required_guardian = false
+initial_delay_seconds = 4.6
+attack_range_m = 18.0
+
+[sub_resource type="Resource" id="stage_3_spawn_12"]
+script = ExtResource("2")
+id = &"stage_3_spawn_12"
+stage = 3
+position_m = Vector3(-47.0, 11.04, -140.0)
+archetype = "shield"
+role = "heavy"
+required_guardian = false
+initial_delay_seconds = 4.95
+attack_range_m = 18.0
+
+[sub_resource type="Resource" id="stage_3_spawn_13"]
+script = ExtResource("2")
+id = &"stage_3_spawn_13"
+stage = 3
+position_m = Vector3(0.0, 10.04, -281.0)
+archetype = "boss"
+role = "caster"
+required_guardian = true
+initial_delay_seconds = 5.3
+attack_range_m = 18.0
+
+[resource]
+script = ExtResource("1")
+schema_version = 1
+id = &"formal_default"
+mechanisms = ExtResource("3")
+encounters = Array[ExtResource("2")]( [SubResource("stage_1_spawn_01"), SubResource("stage_1_spawn_02"), SubResource("stage_1_spawn_03"), SubResource("stage_1_spawn_04"), SubResource("stage_1_spawn_05"), SubResource("stage_1_spawn_06"), SubResource("stage_1_spawn_07"), SubResource("stage_1_spawn_08"), SubResource("stage_2_spawn_01"), SubResource("stage_2_spawn_02"), SubResource("stage_2_spawn_03"), SubResource("stage_2_spawn_04"), SubResource("stage_2_spawn_05"), SubResource("stage_2_spawn_06"), SubResource("stage_2_spawn_07"), SubResource("stage_2_spawn_08"), SubResource("stage_2_spawn_09"), SubResource("stage_2_spawn_10"), SubResource("stage_2_spawn_11"), SubResource("stage_2_spawn_12"), SubResource("stage_3_spawn_01"), SubResource("stage_3_spawn_02"), SubResource("stage_3_spawn_03"), SubResource("stage_3_spawn_04"), SubResource("stage_3_spawn_05"), SubResource("stage_3_spawn_06"), SubResource("stage_3_spawn_07"), SubResource("stage_3_spawn_08"), SubResource("stage_3_spawn_09"), SubResource("stage_3_spawn_10"), SubResource("stage_3_spawn_11"), SubResource("stage_3_spawn_12"), SubResource("stage_3_spawn_13")] )

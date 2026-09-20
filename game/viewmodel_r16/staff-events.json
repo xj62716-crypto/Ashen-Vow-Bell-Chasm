@@ -1,0 +1,93 @@
+[
+  {
+    "clip": "staff_quick_cast",
+    "release_s": 0.2325,
+    "recovery_start_s": 0.31,
+    "end_s": 0.5166666666666667,
+    "role": "art proposal; actual cast success controls emission"
+  },
+  {
+    "clip": "staff_charge",
+    "release_s": 0.814,
+    "recovery_start_s": 0.902,
+    "end_s": 1.1,
+    "role": "art proposal; actual cast success controls emission"
+  },
+  {
+    "clip": "staff_shape",
+    "release_s": 0.485833,
+    "recovery_start_s": 0.623333,
+    "end_s": 0.9166666666666666,
+    "role": "art proposal; actual cast success controls emission"
+  },
+  {
+    "clip": "staff_seal",
+    "release_s": 0.429167,
+    "recovery_start_s": 0.5665,
+    "end_s": 0.8583333333333333,
+    "role": "art proposal; actual cast success controls emission"
+  },
+  {
+    "clip": "staff_detonate",
+    "release_s": 0.300667,
+    "recovery_start_s": 0.444167,
+    "end_s": 0.6833333333333333,
+    "role": "art proposal; actual cast success controls emission"
+  },
+  {
+    "clip": "staff_storm",
+    "release_s": 0.3675,
+    "recovery_start_s": 0.49,
+    "end_s": 0.8166666666666667,
+    "role": "art proposal; actual cast success controls emission"
+  },
+  {
+    "clip": "staff_cast_fire",
+    "release_s": 0.315,
+    "recovery_start_s": 0.42,
+    "end_s": 0.7,
+    "role": "art proposal; actual cast success controls emission"
+  },
+  {
+    "clip": "staff_cast_ice",
+    "release_s": 0.34125,
+    "recovery_start_s": 0.455,
+    "end_s": 0.7583333333333333,
+    "role": "art proposal; actual cast success controls emission"
+  },
+  {
+    "clip": "staff_cast_wind",
+    "release_s": 0.33375,
+    "recovery_start_s": 0.445,
+    "end_s": 0.7416666666666667,
+    "role": "art proposal; actual cast success controls emission"
+  },
+  {
+    "clip": "staff_attack",
+    "release_s": 0.2325,
+    "recovery_start_s": 0.31,
+    "end_s": 0.5166666666666667,
+    "role": "art proposal; actual cast success controls emission"
+  },
+  {
+    "clip": "staff_mark",
+    "release_s": 0.429167,
+    "recovery_start_s": 0.5665,
+    "end_s": 0.8583333333333333,
+    "role": "art proposal; actual cast success controls emission"
+  },
+  {
+    "clip": "staff_parry",
+    "release_s": 0.34125,
+    "recovery_start_s": 0.455,
+    "end_s": 0.7583333333333333,
+    "role": "art proposal; actual cast success controls emission"
+  },
+  {
+    "clip": "staff_cast_lightning",
+    "release_s": 0.2992,
+    "recovery_start_s": 0.4216,
+    "end_s": 0.68,
+    "role": "art proposal; actual cast success controls emission"
+  }
+]

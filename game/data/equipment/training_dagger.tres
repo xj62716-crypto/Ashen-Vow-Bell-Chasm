@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="HeldItemDefinition" load_steps=3 format=3]
+[ext_resource type="Script" path="res://scripts/player/held_item_definition.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/equipment/training_dagger.tscn" id="2"]
+[resource]
+script = ExtResource("1")
+display_name = "训练短刃"
+scene = ExtResource("2")
+grip_position = Vector3(0.005, 0.105, 0.035)
+grip_rotation_degrees = Vector3(0, 0, -90)
+hand_pose_offset = Vector3(0.0, 0.035, -0.015)
+hand_pose_rotation_degrees = Vector3(0, -20, -28)
+finger_curl = 0.85
+running_swing_multiplier = 0.55
+melee_damage = 40

@@ -1,0 +1,1055 @@
+{
+  "version": 1,
+  "events": {
+    "cut_outward": {
+      "label": "横劈·右向左",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/cut_outward_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/cut_outward_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/cut_outward_02.wav"
+      ],
+      "bus": "PlayerSFX",
+      "gain_db": -3,
+      "priority": 2,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": false
+    },
+    "cut_return": {
+      "label": "横劈·左向右",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/cut_return_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/cut_return_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/cut_return_02.wav"
+      ],
+      "bus": "PlayerSFX",
+      "gain_db": -3,
+      "priority": 2,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": false
+    },
+    "hit_flesh": {
+      "label": "刃口入肉",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/hit_flesh_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/hit_flesh_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/hit_flesh_02.wav"
+      ],
+      "bus": "PlayerSFX",
+      "gain_db": -1,
+      "priority": 4,
+      "cooldown": 0.045,
+      "max_voices": 4,
+      "loop": false,
+      "world_time": false
+    },
+    "hit_armor": {
+      "label": "刃口击甲",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/hit_armor_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/hit_armor_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/hit_armor_02.wav"
+      ],
+      "bus": "WorldSFX",
+      "gain_db": -1,
+      "priority": 4,
+      "cooldown": 0.045,
+      "max_voices": 4,
+      "loop": false,
+      "world_time": true
+    },
+    "hit_stone": {
+      "label": "刃口击石",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/hit_stone_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/hit_stone_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/hit_stone_02.wav"
+      ],
+      "bus": "WorldSFX",
+      "gain_db": -3,
+      "priority": 2,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": true
+    },
+    "block": {
+      "label": "挡刀·闷钢与手臂承力",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/block_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/block_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/block_02.wav"
+      ],
+      "bus": "PlayerSFX",
+      "gain_db": -1,
+      "priority": 4,
+      "cooldown": 0.045,
+      "max_voices": 4,
+      "loop": false,
+      "world_time": false
+    },
+    "parry": {
+      "label": "弹反·清脆刃鸣",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/parry_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/parry_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/parry_02.wav"
+      ],
+      "bus": "PlayerSFX",
+      "gain_db": -1,
+      "priority": 5,
+      "cooldown": 0.045,
+      "max_voices": 4,
+      "loop": false,
+      "world_time": false
+    },
+    "execution": {
+      "label": "处决·切断与坠落",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/execution_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/execution_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/execution_02.wav"
+      ],
+      "bus": "PlayerSFX",
+      "gain_db": -1,
+      "priority": 5,
+      "cooldown": 0.045,
+      "max_voices": 4,
+      "loop": false,
+      "world_time": false
+    },
+    "guard_break": {
+      "label": "护甲／封印破裂",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/guard_break_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/guard_break_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/guard_break_02.wav"
+      ],
+      "bus": "WorldSFX",
+      "gain_db": -1,
+      "priority": 5,
+      "cooldown": 0.045,
+      "max_voices": 4,
+      "loop": false,
+      "world_time": true
+    },
+    "cloth": {
+      "label": "衣甲摩擦",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/cloth_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/cloth_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/cloth_02.wav",
+        "res://assets/audio/dark_fantasy/sfx/cloth_03.wav"
+      ],
+      "bus": "PlayerSFX",
+      "gain_db": -3,
+      "priority": 0,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": false
+    },
+    "step_stone": {
+      "label": "脚步·stone",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/step_stone_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/step_stone_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/step_stone_02.wav",
+        "res://assets/audio/dark_fantasy/sfx/step_stone_03.wav"
+      ],
+      "bus": "Foley",
+      "gain_db": -3,
+      "priority": 1,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": false
+    },
+    "step_wood": {
+      "label": "脚步·wood",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/step_wood_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/step_wood_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/step_wood_02.wav",
+        "res://assets/audio/dark_fantasy/sfx/step_wood_03.wav"
+      ],
+      "bus": "Foley",
+      "gain_db": -3,
+      "priority": 1,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": false
+    },
+    "step_earth": {
+      "label": "脚步·earth",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/step_earth_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/step_earth_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/step_earth_02.wav",
+        "res://assets/audio/dark_fantasy/sfx/step_earth_03.wav"
+      ],
+      "bus": "Foley",
+      "gain_db": -3,
+      "priority": 1,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": false
+    },
+    "step_snow": {
+      "label": "脚步·snow",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/step_snow_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/step_snow_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/step_snow_02.wav",
+        "res://assets/audio/dark_fantasy/sfx/step_snow_03.wav"
+      ],
+      "bus": "Foley",
+      "gain_db": -3,
+      "priority": 1,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": false
+    },
+    "wall_step": {
+      "label": "墙跑·重靴擦石",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/wall_step_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/wall_step_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/wall_step_02.wav",
+        "res://assets/audio/dark_fantasy/sfx/wall_step_03.wav"
+      ],
+      "bus": "Foley",
+      "gain_db": -3,
+      "priority": 2,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": false
+    },
+    "wall_kick": {
+      "label": "蹬墙·蹬踏离壁",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/wall_kick_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/wall_kick_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/wall_kick_02.wav"
+      ],
+      "bus": "PlayerSFX",
+      "gain_db": -3,
+      "priority": 2,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": false
+    },
+    "jump": {
+      "label": "起跳衣甲",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/jump_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/jump_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/jump_02.wav"
+      ],
+      "bus": "PlayerSFX",
+      "gain_db": -3,
+      "priority": 2,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": false
+    },
+    "land": {
+      "label": "落地·靴底承重",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/land_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/land_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/land_02.wav"
+      ],
+      "bus": "PlayerSFX",
+      "gain_db": -3,
+      "priority": 2,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": false
+    },
+    "dash": {
+      "label": "空冲·裂风",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/dash_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/dash_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/dash_02.wav"
+      ],
+      "bus": "PlayerSFX",
+      "gain_db": -3,
+      "priority": 2,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": false
+    },
+    "slide": {
+      "label": "滑铲入势",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/slide_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/slide_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/slide_02.wav"
+      ],
+      "bus": "PlayerSFX",
+      "gain_db": -3,
+      "priority": 2,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": false
+    },
+    "slide_loop": {
+      "label": "滑铲持续·擦地",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/slide_loop_00.wav"
+      ],
+      "bus": "Foley",
+      "gain_db": -3,
+      "priority": 0,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": true,
+      "world_time": false
+    },
+    "slide_jump": {
+      "label": "滑铲跳·收腿腾空",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/slide_jump_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/slide_jump_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/slide_jump_02.wav"
+      ],
+      "bus": "PlayerSFX",
+      "gain_db": -3,
+      "priority": 2,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": false
+    },
+    "grapple_cast": {
+      "label": "符链·抛出",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/grapple_cast_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/grapple_cast_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/grapple_cast_02.wav"
+      ],
+      "bus": "PlayerSFX",
+      "gain_db": -3,
+      "priority": 2,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": false
+    },
+    "grapple_attach": {
+      "label": "符链·锚定",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/grapple_attach_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/grapple_attach_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/grapple_attach_02.wav"
+      ],
+      "bus": "WorldSFX",
+      "gain_db": -3,
+      "priority": 2,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": true
+    },
+    "grapple_swing": {
+      "label": "符链·受力摆荡",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/grapple_swing_00.wav"
+      ],
+      "bus": "Foley",
+      "gain_db": -3,
+      "priority": 0,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": true,
+      "world_time": false
+    },
+    "grapple_release": {
+      "label": "符链·脱钩",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/grapple_release_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/grapple_release_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/grapple_release_02.wav"
+      ],
+      "bus": "PlayerSFX",
+      "gain_db": -3,
+      "priority": 2,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": false
+    },
+    "cast_fire": {
+      "label": "施法·火·灰烬爆燃",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/cast_fire_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/cast_fire_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/cast_fire_02.wav"
+      ],
+      "bus": "Magic",
+      "gain_db": -3,
+      "priority": 2,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": true
+    },
+    "impact_fire": {
+      "label": "命中·火·灰烬爆燃",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/impact_fire_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/impact_fire_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/impact_fire_02.wav"
+      ],
+      "bus": "Magic",
+      "gain_db": -1,
+      "priority": 4,
+      "cooldown": 0.045,
+      "max_voices": 4,
+      "loop": false,
+      "world_time": true
+    },
+    "cast_ice": {
+      "label": "施法·冰·霜晶碎裂",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/cast_ice_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/cast_ice_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/cast_ice_02.wav"
+      ],
+      "bus": "Magic",
+      "gain_db": -3,
+      "priority": 2,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": true
+    },
+    "impact_ice": {
+      "label": "命中·冰·霜晶碎裂",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/impact_ice_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/impact_ice_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/impact_ice_02.wav"
+      ],
+      "bus": "Magic",
+      "gain_db": -1,
+      "priority": 4,
+      "cooldown": 0.045,
+      "max_voices": 4,
+      "loop": false,
+      "world_time": true
+    },
+    "cast_wind": {
+      "label": "施法·风·旋流裂风",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/cast_wind_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/cast_wind_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/cast_wind_02.wav"
+      ],
+      "bus": "Magic",
+      "gain_db": -3,
+      "priority": 2,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": true
+    },
+    "impact_wind": {
+      "label": "命中·风·旋流裂风",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/impact_wind_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/impact_wind_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/impact_wind_02.wav"
+      ],
+      "bus": "Magic",
+      "gain_db": -1,
+      "priority": 4,
+      "cooldown": 0.045,
+      "max_voices": 4,
+      "loop": false,
+      "world_time": true
+    },
+    "cast_lightning": {
+      "label": "施法·雷·电弧裂响",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/cast_lightning_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/cast_lightning_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/cast_lightning_02.wav"
+      ],
+      "bus": "Magic",
+      "gain_db": -3,
+      "priority": 2,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": true
+    },
+    "impact_lightning": {
+      "label": "命中·雷·电弧裂响",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/impact_lightning_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/impact_lightning_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/impact_lightning_02.wav"
+      ],
+      "bus": "Magic",
+      "gain_db": -1,
+      "priority": 4,
+      "cooldown": 0.045,
+      "max_voices": 4,
+      "loop": false,
+      "world_time": true
+    },
+    "cast_arcane": {
+      "label": "施法·秘法·共鸣封印",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/cast_arcane_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/cast_arcane_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/cast_arcane_02.wav"
+      ],
+      "bus": "Magic",
+      "gain_db": -3,
+      "priority": 2,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": true
+    },
+    "impact_arcane": {
+      "label": "命中·秘法·共鸣封印",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/impact_arcane_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/impact_arcane_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/impact_arcane_02.wav"
+      ],
+      "bus": "Magic",
+      "gain_db": -1,
+      "priority": 4,
+      "cooldown": 0.045,
+      "max_voices": 4,
+      "loop": false,
+      "world_time": true
+    },
+    "staff_charge": {
+      "label": "法杖蓄力·符文渐明",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/staff_charge_00.wav"
+      ],
+      "bus": "Magic",
+      "gain_db": -3,
+      "priority": 1,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": true,
+      "world_time": true
+    },
+    "shape_wall": {
+      "label": "塑形·石壁拔起",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/shape_wall_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/shape_wall_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/shape_wall_02.wav"
+      ],
+      "bus": "Magic",
+      "gain_db": -3,
+      "priority": 2,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": true
+    },
+    "shape_anchor": {
+      "label": "塑形·锚点缔结",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/shape_anchor_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/shape_anchor_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/shape_anchor_02.wav"
+      ],
+      "bus": "Magic",
+      "gain_db": -3,
+      "priority": 2,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": true
+    },
+    "shape_well": {
+      "label": "塑形·风井开启",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/shape_well_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/shape_well_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/shape_well_02.wav"
+      ],
+      "bus": "Magic",
+      "gain_db": -3,
+      "priority": 2,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": true
+    },
+    "shape_collapse": {
+      "label": "塑形·消散落石",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/shape_collapse_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/shape_collapse_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/shape_collapse_02.wav"
+      ],
+      "bus": "WorldSFX",
+      "gain_db": -3,
+      "priority": 2,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": true
+    },
+    "mark": {
+      "label": "封印·烙印",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/mark_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/mark_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/mark_02.wav"
+      ],
+      "bus": "Magic",
+      "gain_db": -3,
+      "priority": 2,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": true
+    },
+    "detonate": {
+      "label": "封印·连锁引爆",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/detonate_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/detonate_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/detonate_02.wav"
+      ],
+      "bus": "Magic",
+      "gain_db": -1,
+      "priority": 4,
+      "cooldown": 0.045,
+      "max_voices": 4,
+      "loop": false,
+      "world_time": true
+    },
+    "blink": {
+      "label": "返刃·折跃",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/blink_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/blink_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/blink_02.wav"
+      ],
+      "bus": "Magic",
+      "gain_db": -3,
+      "priority": 2,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": true
+    },
+    "sweep": {
+      "label": "掠地·大横斩",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/sweep_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/sweep_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/sweep_02.wav"
+      ],
+      "bus": "PlayerSFX",
+      "gain_db": -3,
+      "priority": 2,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": false
+    },
+    "execute": {
+      "label": "飞檐·处决出手",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/execute_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/execute_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/execute_02.wav"
+      ],
+      "bus": "PlayerSFX",
+      "gain_db": -3,
+      "priority": 2,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": false
+    },
+    "storm": {
+      "label": "风暴·连锁电弧",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/storm_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/storm_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/storm_02.wav"
+      ],
+      "bus": "Magic",
+      "gain_db": -3,
+      "priority": 2,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": true
+    },
+    "echo_spawn": {
+      "label": "残影·分身",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/echo_spawn_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/echo_spawn_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/echo_spawn_02.wav"
+      ],
+      "bus": "Magic",
+      "gain_db": -3,
+      "priority": 2,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": true
+    },
+    "rewind_start": {
+      "label": "回溯·时痕开启",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/rewind_start_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/rewind_start_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/rewind_start_02.wav"
+      ],
+      "bus": "PlayerSFX",
+      "gain_db": -3,
+      "priority": 2,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": false
+    },
+    "rewind_arrive": {
+      "label": "回溯·落定",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/rewind_arrive_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/rewind_arrive_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/rewind_arrive_02.wav"
+      ],
+      "bus": "PlayerSFX",
+      "gain_db": -3,
+      "priority": 2,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": false
+    },
+    "focus_enter": {
+      "label": "专注进入",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/focus_enter_00.wav"
+      ],
+      "bus": "PlayerSFX",
+      "gain_db": -1,
+      "priority": 5,
+      "cooldown": 0.045,
+      "max_voices": 4,
+      "loop": false,
+      "world_time": false
+    },
+    "focus_exit": {
+      "label": "专注解除",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/focus_exit_00.wav"
+      ],
+      "bus": "PlayerSFX",
+      "gain_db": -1,
+      "priority": 5,
+      "cooldown": 0.045,
+      "max_voices": 4,
+      "loop": false,
+      "world_time": false
+    },
+    "focus_loop": {
+      "label": "专注·持续时流",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/focus_loop_00.wav"
+      ],
+      "bus": "PlayerSFX",
+      "gain_db": -3,
+      "priority": 1,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": true,
+      "world_time": false
+    },
+    "enemy_melee_windup": {
+      "label": "危险·近战蓄力",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/enemy_melee_windup_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/enemy_melee_windup_01.wav"
+      ],
+      "bus": "Danger",
+      "gain_db": -1,
+      "priority": 6,
+      "cooldown": 0.12,
+      "max_voices": 4,
+      "loop": false,
+      "world_time": true
+    },
+    "enemy_ranged_windup": {
+      "label": "危险·射手锁定",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/enemy_ranged_windup_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/enemy_ranged_windup_01.wav"
+      ],
+      "bus": "Danger",
+      "gain_db": -1,
+      "priority": 6,
+      "cooldown": 0.12,
+      "max_voices": 4,
+      "loop": false,
+      "world_time": true
+    },
+    "enemy_sweep_windup": {
+      "label": "危险·高位横扫",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/enemy_sweep_windup_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/enemy_sweep_windup_01.wav"
+      ],
+      "bus": "Danger",
+      "gain_db": -1,
+      "priority": 6,
+      "cooldown": 0.12,
+      "max_voices": 4,
+      "loop": false,
+      "world_time": true
+    },
+    "enemy_groundwave_windup": {
+      "label": "危险·地波重击",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/enemy_groundwave_windup_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/enemy_groundwave_windup_01.wav"
+      ],
+      "bus": "Danger",
+      "gain_db": -1,
+      "priority": 6,
+      "cooldown": 0.12,
+      "max_voices": 4,
+      "loop": false,
+      "world_time": true
+    },
+    "enemy_aoe_windup": {
+      "label": "危险·法阵咏唱",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/enemy_aoe_windup_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/enemy_aoe_windup_01.wav"
+      ],
+      "bus": "Danger",
+      "gain_db": -1,
+      "priority": 6,
+      "cooldown": 0.12,
+      "max_voices": 4,
+      "loop": false,
+      "world_time": true
+    },
+    "enemy_air_windup": {
+      "label": "危险·空中压制",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/enemy_air_windup_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/enemy_air_windup_01.wav"
+      ],
+      "bus": "Danger",
+      "gain_db": -1,
+      "priority": 6,
+      "cooldown": 0.12,
+      "max_voices": 4,
+      "loop": false,
+      "world_time": true
+    },
+    "enemy_core_open": {
+      "label": "核心暴露",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/enemy_core_open_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/enemy_core_open_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/enemy_core_open_02.wav"
+      ],
+      "bus": "Danger",
+      "gain_db": -1,
+      "priority": 5,
+      "cooldown": 0.045,
+      "max_voices": 4,
+      "loop": false,
+      "world_time": true
+    },
+    "boss_phase": {
+      "label": "首领换阶段",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/boss_phase_00.wav"
+      ],
+      "bus": "Danger",
+      "gain_db": -1,
+      "priority": 6,
+      "cooldown": 0.045,
+      "max_voices": 4,
+      "loop": false,
+      "world_time": true
+    },
+    "hostile_bolt": {
+      "label": "敌弹掠过",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/hostile_bolt_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/hostile_bolt_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/hostile_bolt_02.wav"
+      ],
+      "bus": "WorldSFX",
+      "gain_db": -3,
+      "priority": 2,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": true
+    },
+    "mechanism_open": {
+      "label": "铁木机关开启",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/mechanism_open_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/mechanism_open_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/mechanism_open_02.wav"
+      ],
+      "bus": "WorldSFX",
+      "gain_db": -3,
+      "priority": 2,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": true
+    },
+    "mechanism_close": {
+      "label": "闸门闭合",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/mechanism_close_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/mechanism_close_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/mechanism_close_02.wav"
+      ],
+      "bus": "WorldSFX",
+      "gain_db": -3,
+      "priority": 2,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": true
+    },
+    "mechanism_trigger": {
+      "label": "机关扣锁",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/mechanism_trigger_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/mechanism_trigger_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/mechanism_trigger_02.wav"
+      ],
+      "bus": "WorldSFX",
+      "gain_db": -3,
+      "priority": 2,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": true
+    },
+    "altar": {
+      "label": "祭坛授予",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/altar_00.wav"
+      ],
+      "bus": "UI",
+      "gain_db": -1,
+      "priority": 5,
+      "cooldown": 0.045,
+      "max_voices": 4,
+      "loop": false,
+      "world_time": false
+    },
+    "checkpoint": {
+      "label": "检查点",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/checkpoint_00.wav"
+      ],
+      "bus": "UI",
+      "gain_db": -3,
+      "priority": 2,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": false
+    },
+    "finish": {
+      "label": "完成·封印落定",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/finish_00.wav"
+      ],
+      "bus": "UI",
+      "gain_db": -3,
+      "priority": 2,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": false
+    },
+    "hurt": {
+      "label": "受击·保护破裂",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/hurt_00.wav",
+        "res://assets/audio/dark_fantasy/sfx/hurt_01.wav",
+        "res://assets/audio/dark_fantasy/sfx/hurt_02.wav"
+      ],
+      "bus": "PlayerSFX",
+      "gain_db": -1,
+      "priority": 6,
+      "cooldown": 0.045,
+      "max_voices": 4,
+      "loop": false,
+      "world_time": false
+    },
+    "death": {
+      "label": "死亡·铠甲坠落",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/death_00.wav"
+      ],
+      "bus": "UI",
+      "gain_db": -1,
+      "priority": 6,
+      "cooldown": 0.045,
+      "max_voices": 4,
+      "loop": false,
+      "world_time": false
+    },
+    "retry": {
+      "label": "重开·醒转",
+      "clips": [
+        "res://assets/audio/dark_fantasy/sfx/retry_00.wav"
+      ],
+      "bus": "UI",
+      "gain_db": -3,
+      "priority": 2,
+      "cooldown": 0.045,
+      "max_voices": 3,
+      "loop": false,
+      "world_time": false
+    }
+  },
+  "aliases": {
+    "swing": "cut_outward",
+    "hit": "hit_flesh",
+    "impact_blade": "hit_flesh",
+    "kill": "execution",
+    "bolt": "cast_arcane",
+    "shape": "shape_wall",
+    "footstep": "step_stone"
+  }
+}

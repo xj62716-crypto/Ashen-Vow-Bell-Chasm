@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/blender/arcane_staff_blender.glb" id="1"]
+
+[node name="ArcaneStaff" type="Node3D"]
+[node name="BlenderModel" parent="." instance=ExtResource("1")]

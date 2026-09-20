@@ -1,0 +1,20 @@
+* text=auto
+*.gd text eol=lf
+*.gdshader text eol=lf
+*.tscn text eol=lf
+*.tres text eol=lf
+*.godot text eol=lf
+*.md text eol=lf
+*.py text eol=lf
+*.json text eol=lf
+*.blend filter=lfs diff=lfs merge=lfs -text
+*.glb filter=lfs diff=lfs merge=lfs -text
+# Baked Godot binary scenes. Text .tscn sources remain ordinary Git files.
+/game/environment_live/modules/*.scn filter=lfs diff=lfs merge=lfs -text
+*.png binary
+*.jpg binary
+*.wav binary
+*.ogg binary
+*.mp3 binary
+*.ttf binary
+*.otf binary

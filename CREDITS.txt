@@ -1,0 +1,59 @@
+Ashen Vow: Bell Chasm - third-party assets and licenses
+
+Music
+-----
+"The Adventure Begins" by Bart Kelsey (bart)
+Source: https://opengameart.org/content/adventure-begins
+License: CC BY 3.0
+https://creativecommons.org/licenses/by/3.0/
+
+Changes: loop-boundary overlap, gain adjustment and Ogg Vorbis re-encoding.
+No endorsement by the original author is implied.
+
+Models and sound samples
+------------------------
+Kenney
+https://kenney.nl/
+
+Castle Kit: https://kenney.nl/assets/castle-kit
+Impact Sounds: https://kenney.nl/assets/impact-sounds
+RPG Audio: https://kenney.nl/assets/rpg-audio
+Interface Sounds: https://kenney.nl/assets/interface-sounds
+License: CC0 1.0
+https://creativecommons.org/publicdomain/zero/1.0/
+
+Changes: model scaling, placement and palette edits; sound layering,
+resampling, pitch/gain adjustment and fades. Original license files are kept
+under game/assets/licenses/.
+
+First-person arms
+-----------------
+"fps arms (rigged only)" by para; based on a MakeHuman mesh/texture.
+Source: https://opengameart.org/content/fps-arms-rigged-only
+License: CC0 1.0
+https://creativecommons.org/publicdomain/zero/1.0/
+
+Changes: shoulder and upper-arm geometry, glove materials, bracers, weapon
+sockets, procedural motion and first-person placement.
+
+Materials and scanned geometry
+------------------------------
+Poly Haven
+https://polyhaven.com/
+
+Assets: castle_wall_slates, stone_floor, brown_leather, metal_plate,
+rock_face and boulder_01.
+License: CC0 1.0
+https://polyhaven.com/license
+
+Changes: tint, roughness, texture scale, placement and model scale.
+
+Project-authored work
+---------------------
+Weapons, encounter models, animation data, level layouts, mechanisms,
+shaders and gameplay code were authored or adapted for this project. Adopted
+editable weapon sources are stored under assets/source/weapons/; runtime
+exports and their textures are stored under game/.
+
+No Ghostrunner, Mirror's Edge or Vermintide models, artwork, audio or game
+files are included.

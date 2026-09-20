@@ -1,0 +1,16 @@
+[
+  {
+    "kind": "blade",
+    "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\body-cohesion-r7\\models\\blade-body-cohesion-r7.blend",
+    "source_sha256": "a0a4f0ca4651f1b03844e3b595590ffdae62bbd2dd02087472c600619996443f",
+    "runtime_sha256": "e73c5255394665d0f47e94a8d08ea947ee137e787c8cac1824c189e8f4e70ff2",
+    "changes": "Remove obsolete R7 weapon; split left shadow meshes. Geometry, materials and rigs retained."
+  },
+  {
+    "kind": "staff",
+    "source": "C:\\Users\\iridescent\\Documents\\FantasyParkour-worktrees\\art\\deliverables\\art\\body-cohesion-r7\\models\\staff-body-cohesion-r7.blend",
+    "source_sha256": "142383e784ff9b51e306cb55f10c4b5a241b2084e266af8285b09a50c21331c2",
+    "runtime_sha256": "ef432e69bc6f5a9493f552179b89f376dece1a311336767052ef3d8976d590f2",
+    "changes": "Remove obsolete R7 weapon; split left shadow meshes. Geometry, materials and rigs retained."
+  }
+]

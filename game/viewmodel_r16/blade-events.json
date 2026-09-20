@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "profile_id": "blade_arc_r2",
+  "source_glb_sha256": "1f069041593a274483bb5c2df8c91d68189f8feabf3804c0a7a460e184409410",
+  "profile_sha256": "b81c58d3bcf1e3f558af96b211dc7c4b0d9f736c33dbc1c86c004a1a9b43d599",
+  "events": [
+    {
+      "clip": "blade_attack",
+      "duration_s": 0.58,
+      "cuts": [
+        {
+          "cut_id": "blade_attack.1",
+          "active_start_s": 0.152,
+          "nominal_contact_s": 0.20500000000000002,
+          "active_end_s": 0.265,
+          "follow_end_s": 0.35,
+          "hit_audio_and_impact": "Only the actual combat hit result may trigger impact; nominal contact is a review cue."
+        }
+      ]
+    },
+    {
+      "clip": "blade_attack_return",
+      "duration_s": 0.58,
+      "cuts": [
+        {
+          "cut_id": "blade_attack_return.1",
+          "active_start_s": 0.152,
+          "nominal_contact_s": 0.20500000000000002,
+          "active_end_s": 0.265,
+          "follow_end_s": 0.35,
+          "hit_audio_and_impact": "Only the actual combat hit result may trigger impact; nominal contact is a review cue."
+        }
+      ]
+    },
+    {
+      "clip": "blade_combo",
+      "duration_s": 0.98,
+      "cuts": [
+        {
+          "cut_id": "blade_combo.1",
+          "active_start_s": 0.152,
+          "nominal_contact_s": 0.20500000000000002,
+          "active_end_s": 0.265,
+          "follow_end_s": 0.35,
+          "hit_audio_and_impact": "Only the actual combat hit result may trigger impact; nominal contact is a review cue."
+        },
+        {
+          "cut_id": "blade_combo.2",
+          "active_start_s": 0.552,
+          "nominal_contact_s": 0.605,
+          "active_end_s": 0.665,
+          "follow_end_s": 0.75,
+          "hit_audio_and_impact": "Only the actual combat hit result may trigger impact; nominal contact is a review cue."
+        }
+      ]
+    },
+    {
+      "clip": "blade_sweep",
+      "duration_s": 0.66,
+      "cuts": [
+        {
+          "cut_id": "blade_sweep.1",
+          "active_start_s": 0.17296551724137932,
+          "nominal_contact_s": 0.23327586206896556,
+          "active_end_s": 0.3015517241379311,
+          "follow_end_s": 0.39827586206896554,
+          "hit_audio_and_impact": "Only the actual combat hit result may trigger impact; nominal contact is a review cue."
+        }
+      ]
+    },
+    {
+      "clip": "blade_execute",
+      "duration_s": 0.62,
+      "cuts": [
+        {
+          "cut_id": "blade_execute.1",
+          "active_start_s": 0.16248275862068967,
+          "nominal_contact_s": 0.2191379310344828,
+          "active_end_s": 0.28327586206896554,
+          "follow_end_s": 0.3741379310344828,
+          "hit_audio_and_impact": "Only the actual combat hit result may trigger impact; nominal contact is a review cue."
+        }
+      ]
+    },
+    {
+      "clip": "blade_blink",
+      "duration_s": 0.58,
+      "cuts": [
+        {
+          "cut_id": "blade_blink.1",
+          "active_start_s": 0.152,
+          "nominal_contact_s": 0.20500000000000002,
+          "active_end_s": 0.265,
+          "follow_end_s": 0.35,
+          "hit_audio_and_impact": "Only the actual combat hit result may trigger impact; nominal contact is a review cue."
+        }
+      ]
+    },
+    {
+      "clip": "blade_rewind",
+      "duration_s": 0.6,
+      "cuts": [
+        {
+          "cut_id": "blade_rewind.1",
+          "active_start_s": 0.15724137931034482,
+          "nominal_contact_s": 0.21206896551724136,
+          "active_end_s": 0.2741379310344828,
+          "follow_end_s": 0.3620689655172414,
+          "hit_audio_and_impact": "Existing EchoSlash hit_confirmed owns damage and audio."
+        }
+      ]
+    }
+  ],
+  "runtime_integration": true,
+  "retained_from_r14": false,
+  "notes": "Contact sample times unchanged. Source clips .58s; existing combat .44s is preserved through phase_map. Nominal contact .205 maps to first real overlap at windup+.05.",
+  "motion_profile_sha256": "5d21c88e026522d02f89a8e4c4e2e105ff38da0cc88daa0554c10f78a0a36705"
+}

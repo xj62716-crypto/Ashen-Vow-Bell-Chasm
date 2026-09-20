@@ -1,0 +1,13 @@
+v17 architectural scans
+Large Castle Door — Poly Haven: https://polyhaven.com/a/large_castle_door
+Gothic Statue — Poly Haven: https://polyhaven.com/a/gothic_statue
+License: CC0, https://polyhaven.com/license
+Source files verified against the public API checksums on 2026-09-15.
+Imported into Blender via MCP, saved as editable Blend sources and exported to GLB.
+Changes: engine placement, scale and lighting. Original PBR texture channels retained.
+
+v17 cut_outward / cut_return sounds
+Directional stereo remixes of the existing Kenney CC0 recording mixes.
+Original recording credits: kenney_rpg-audio.txt and kenney_impact-sounds.txt.
+Production recipe: tools/refine_cut_audio_v17.py.
+Reference gameplay videos are documentation only and are not shipped with the game.

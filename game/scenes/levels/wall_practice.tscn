@@ -1,0 +1,353 @@
+[gd_scene load_steps=40 format=3]
+[ext_resource type="Material" path="res://assets/materials/pbr/stone.tres" id="stone"]
+[ext_resource type="Material" path="res://assets/materials/pbr/floor.tres" id="floor"]
+[ext_resource type="Material" path="res://assets/materials/pbr/iron.tres" id="iron"]
+[ext_resource type="Material" path="res://assets/materials/wall_rune.tres" id="rune"]
+[ext_resource type="Font" path="res://assets/materials/trial_font.tres" id="font"]
+[sub_resource type="BoxMesh" id="LaunchMesh"]
+size = Vector3(4.1, 1.6, 9)
+material = ExtResource("stone")
+
+[sub_resource type="BoxShape3D" id="LaunchShape"]
+size = Vector3(4.1, 1.6, 9)
+
+[sub_resource type="BoxMesh" id="LaunchTopMesh"]
+size = Vector3(4.1, 0.03, 9)
+material = ExtResource("floor")
+
+[sub_resource type="BoxMesh" id="RunWallMesh"]
+size = Vector3(1.2, 10, 28)
+material = ExtResource("stone")
+
+[sub_resource type="BoxShape3D" id="RunWallShape"]
+size = Vector3(1.2, 10, 28)
+
+[sub_resource type="BoxMesh" id="LandingMesh"]
+size = Vector3(8, 1.6, 9)
+material = ExtResource("stone")
+
+[sub_resource type="BoxShape3D" id="LandingShape"]
+size = Vector3(8, 1.6, 9)
+
+[sub_resource type="BoxMesh" id="LandingTopMesh"]
+size = Vector3(8, 0.03, 9)
+material = ExtResource("floor")
+
+[sub_resource type="BoxMesh" id="WallBandLowMesh"]
+size = Vector3(0.045, 0.075, 27)
+material = ExtResource("iron")
+
+[sub_resource type="BoxMesh" id="WallBandHighMesh"]
+size = Vector3(0.045, 0.075, 27)
+material = ExtResource("iron")
+
+[sub_resource type="BoxMesh" id="Rune0Mesh"]
+size = Vector3(0.035, 0.075, 0.65)
+material = ExtResource("rune")
+
+[sub_resource type="BoxMesh" id="RuneTick0Mesh"]
+size = Vector3(0.035, 0.27, 0.075)
+material = ExtResource("rune")
+
+[sub_resource type="BoxMesh" id="Rune1Mesh"]
+size = Vector3(0.035, 0.075, 0.65)
+material = ExtResource("rune")
+
+[sub_resource type="BoxMesh" id="RuneTick1Mesh"]
+size = Vector3(0.035, 0.27, 0.075)
+material = ExtResource("rune")
+
+[sub_resource type="BoxMesh" id="Rune2Mesh"]
+size = Vector3(0.035, 0.075, 0.65)
+material = ExtResource("rune")
+
+[sub_resource type="BoxMesh" id="RuneTick2Mesh"]
+size = Vector3(0.035, 0.27, 0.075)
+material = ExtResource("rune")
+
+[sub_resource type="BoxMesh" id="Rune3Mesh"]
+size = Vector3(0.035, 0.075, 0.65)
+material = ExtResource("rune")
+
+[sub_resource type="BoxMesh" id="RuneTick3Mesh"]
+size = Vector3(0.035, 0.27, 0.075)
+material = ExtResource("rune")
+
+[sub_resource type="BoxMesh" id="Rune4Mesh"]
+size = Vector3(0.035, 0.075, 0.65)
+material = ExtResource("rune")
+
+[sub_resource type="BoxMesh" id="RuneTick4Mesh"]
+size = Vector3(0.035, 0.27, 0.075)
+material = ExtResource("rune")
+
+[sub_resource type="BoxMesh" id="Rune5Mesh"]
+size = Vector3(0.035, 0.075, 0.65)
+material = ExtResource("rune")
+
+[sub_resource type="BoxMesh" id="RuneTick5Mesh"]
+size = Vector3(0.035, 0.27, 0.075)
+material = ExtResource("rune")
+
+[sub_resource type="BoxMesh" id="Rune6Mesh"]
+size = Vector3(0.035, 0.075, 0.65)
+material = ExtResource("rune")
+
+[sub_resource type="BoxMesh" id="RuneTick6Mesh"]
+size = Vector3(0.035, 0.27, 0.075)
+material = ExtResource("rune")
+
+[sub_resource type="BoxMesh" id="Rune7Mesh"]
+size = Vector3(0.035, 0.075, 0.65)
+material = ExtResource("rune")
+
+[sub_resource type="BoxMesh" id="RuneTick7Mesh"]
+size = Vector3(0.035, 0.27, 0.075)
+material = ExtResource("rune")
+
+[sub_resource type="BoxMesh" id="Rune8Mesh"]
+size = Vector3(0.035, 0.075, 0.65)
+material = ExtResource("rune")
+
+[sub_resource type="BoxMesh" id="RuneTick8Mesh"]
+size = Vector3(0.035, 0.27, 0.075)
+material = ExtResource("rune")
+
+[sub_resource type="BoxMesh" id="LaunchMark0Mesh"]
+size = Vector3(0.45, 0.015, 0.08)
+material = ExtResource("rune")
+
+[sub_resource type="BoxMesh" id="LaunchMark1Mesh"]
+size = Vector3(0.45, 0.015, 0.08)
+material = ExtResource("rune")
+
+[sub_resource type="BoxMesh" id="LaunchMark2Mesh"]
+size = Vector3(0.45, 0.015, 0.08)
+material = ExtResource("rune")
+
+[sub_resource type="BoxMesh" id="JumpMarkerMesh"]
+size = Vector3(0.04, 3, 0.2)
+material = ExtResource("rune")
+
+[sub_resource type="BoxMesh" id="LandingMarkMesh"]
+size = Vector3(5.8, 0.02, 0.12)
+material = ExtResource("rune")
+
+[sub_resource type="BoxShape3D" id="FinishShape"]
+size = Vector3(7.6, 4, 7)
+
+[node name="WallPractice" type="Node3D"]
+
+[node name="Launch" type="StaticBody3D" parent="."]
+position = Vector3(8.05, -0.8, 3.5)
+
+[node name="Collision" type="CollisionShape3D" parent="Launch"]
+shape = SubResource("LaunchShape")
+
+[node name="Visual" type="MeshInstance3D" parent="Launch"]
+mesh = SubResource("LaunchMesh")
+
+[node name="LaunchTop" type="MeshInstance3D" parent="."]
+position = Vector3(8.05, 0.015, 3.5)
+mesh = SubResource("LaunchTopMesh")
+
+[node name="RunWall" type="StaticBody3D" parent="."]
+position = Vector3(10.7, 2, -10)
+
+[node name="Collision" type="CollisionShape3D" parent="RunWall"]
+shape = SubResource("RunWallShape")
+
+[node name="Visual" type="MeshInstance3D" parent="RunWall"]
+mesh = SubResource("RunWallMesh")
+
+[node name="Landing" type="StaticBody3D" parent="."]
+position = Vector3(6.3, -0.8, -26.5)
+
+[node name="Collision" type="CollisionShape3D" parent="Landing"]
+shape = SubResource("LandingShape")
+
+[node name="Visual" type="MeshInstance3D" parent="Landing"]
+mesh = SubResource("LandingMesh")
+
+[node name="LandingTop" type="MeshInstance3D" parent="."]
+position = Vector3(6.3, 0.015, -26.5)
+mesh = SubResource("LandingTopMesh")
+
+[node name="WallBandLow" type="MeshInstance3D" parent="."]
+position = Vector3(10.075, 0.45, -10)
+mesh = SubResource("WallBandLowMesh")
+
+[node name="WallBandHigh" type="MeshInstance3D" parent="."]
+position = Vector3(10.075, 3.9, -10)
+mesh = SubResource("WallBandHighMesh")
+
+[node name="Rune0" type="MeshInstance3D" parent="."]
+position = Vector3(10.045, 1.65, 2)
+mesh = SubResource("Rune0Mesh")
+
+[node name="RuneTick0" type="MeshInstance3D" parent="."]
+position = Vector3(10.045, 1.77, 1.72)
+mesh = SubResource("RuneTick0Mesh")
+
+[node name="Rune1" type="MeshInstance3D" parent="."]
+position = Vector3(10.045, 1.65, -1)
+mesh = SubResource("Rune1Mesh")
+
+[node name="RuneTick1" type="MeshInstance3D" parent="."]
+position = Vector3(10.045, 1.77, -1.28)
+mesh = SubResource("RuneTick1Mesh")
+
+[node name="Rune2" type="MeshInstance3D" parent="."]
+position = Vector3(10.045, 1.65, -4)
+mesh = SubResource("Rune2Mesh")
+
+[node name="RuneTick2" type="MeshInstance3D" parent="."]
+position = Vector3(10.045, 1.77, -4.28)
+mesh = SubResource("RuneTick2Mesh")
+
+[node name="Rune3" type="MeshInstance3D" parent="."]
+position = Vector3(10.045, 1.65, -7)
+mesh = SubResource("Rune3Mesh")
+
+[node name="RuneTick3" type="MeshInstance3D" parent="."]
+position = Vector3(10.045, 1.77, -7.28)
+mesh = SubResource("RuneTick3Mesh")
+
+[node name="Rune4" type="MeshInstance3D" parent="."]
+position = Vector3(10.045, 1.65, -10)
+mesh = SubResource("Rune4Mesh")
+
+[node name="RuneTick4" type="MeshInstance3D" parent="."]
+position = Vector3(10.045, 1.77, -10.28)
+mesh = SubResource("RuneTick4Mesh")
+
+[node name="Rune5" type="MeshInstance3D" parent="."]
+position = Vector3(10.045, 1.65, -13)
+mesh = SubResource("Rune5Mesh")
+
+[node name="RuneTick5" type="MeshInstance3D" parent="."]
+position = Vector3(10.045, 1.77, -13.28)
+mesh = SubResource("RuneTick5Mesh")
+
+[node name="Rune6" type="MeshInstance3D" parent="."]
+position = Vector3(10.045, 1.65, -16)
+mesh = SubResource("Rune6Mesh")
+
+[node name="RuneTick6" type="MeshInstance3D" parent="."]
+position = Vector3(10.045, 1.77, -16.28)
+mesh = SubResource("RuneTick6Mesh")
+
+[node name="Rune7" type="MeshInstance3D" parent="."]
+position = Vector3(10.045, 1.65, -19)
+mesh = SubResource("Rune7Mesh")
+
+[node name="RuneTick7" type="MeshInstance3D" parent="."]
+position = Vector3(10.045, 1.77, -19.28)
+mesh = SubResource("RuneTick7Mesh")
+
+[node name="Rune8" type="MeshInstance3D" parent="."]
+position = Vector3(10.045, 1.65, -22)
+mesh = SubResource("Rune8Mesh")
+
+[node name="RuneTick8" type="MeshInstance3D" parent="."]
+position = Vector3(10.045, 1.77, -22.28)
+mesh = SubResource("RuneTick8Mesh")
+
+[node name="LaunchMark0" type="MeshInstance3D" parent="."]
+position = Vector3(9.6, 0.041, 3.5)
+mesh = SubResource("LaunchMark0Mesh")
+
+[node name="LaunchMark1" type="MeshInstance3D" parent="."]
+position = Vector3(9.6, 0.041, 2)
+mesh = SubResource("LaunchMark1Mesh")
+
+[node name="LaunchMark2" type="MeshInstance3D" parent="."]
+position = Vector3(9.6, 0.041, 0.5)
+mesh = SubResource("LaunchMark2Mesh")
+
+[node name="JumpMarker" type="MeshInstance3D" parent="."]
+position = Vector3(10.015, 1.8, -18)
+mesh = SubResource("JumpMarkerMesh")
+
+[node name="LandingMark" type="MeshInstance3D" parent="."]
+position = Vector3(6.3, 0.045, -25)
+mesh = SubResource("LandingMarkMesh")
+
+[node name="LaunchTitle" type="Label3D" parent="."]
+position = Vector3(8.2, 3.1, -1)
+text = "侧墙练习"
+font = ExtResource("font")
+font_size = 48
+pixel_size = 0.005
+modulate = Color(0.7, 0.87, 0.85, 1)
+outline_size = 5
+no_depth_test = false
+
+[node name="LaunchHelp" type="Label3D" parent="."]
+position = Vector3(8.2, 2.55, -1)
+text = "靠右起跳 · 按住 W 沿墙前进"
+font = ExtResource("font")
+font_size = 27
+pixel_size = 0.005
+modulate = Color(0.7, 0.87, 0.85, 1)
+outline_size = 5
+no_depth_test = false
+
+[node name="JumpHelp" type="Label3D" parent="."]
+position = Vector3(8.7, 3.5, -18)
+text = "SPACE 向左蹬墙跳"
+font = ExtResource("font")
+font_size = 30
+pixel_size = 0.005
+modulate = Color(0.7, 0.87, 0.85, 1)
+outline_size = 5
+no_depth_test = false
+
+[node name="LandingTitle" type="Label3D" parent="."]
+position = Vector3(6.3, 2.9, -28)
+text = "落在石台 · 完成练习"
+font = ExtResource("font")
+font_size = 30
+pixel_size = 0.005
+modulate = Color(0.7, 0.87, 0.85, 1)
+outline_size = 5
+no_depth_test = false
+
+[node name="WallLight0" type="OmniLight3D" parent="."]
+position = Vector3(8.8, 3, 1)
+light_color = Color(0.38, 0.64, 0.64, 1)
+light_energy = 2.8
+omni_range = 10.0
+shadow_enabled = false
+
+[node name="WallLight1" type="OmniLight3D" parent="."]
+position = Vector3(8.8, 3, -9)
+light_color = Color(0.38, 0.64, 0.64, 1)
+light_energy = 2.8
+omni_range = 10.0
+shadow_enabled = false
+
+[node name="WallLight2" type="OmniLight3D" parent="."]
+position = Vector3(8.8, 3, -18)
+light_color = Color(0.38, 0.64, 0.64, 1)
+light_energy = 2.8
+omni_range = 10.0
+shadow_enabled = false
+
+[node name="WallLight3" type="OmniLight3D" parent="."]
+position = Vector3(6.3, 3.5, -26)
+light_color = Color(0.38, 0.64, 0.64, 1)
+light_energy = 2.8
+omni_range = 10.0
+shadow_enabled = false
+
+[node name="Spawn" type="Marker3D" parent="."]
+position = Vector3(9.65, 0.06, 2)
+
+[node name="Finish" type="Area3D" parent="."]
+position = Vector3(6.3, 1.7, -26.5)
+collision_layer = 16
+collision_mask = 2
+
+[node name="Collision" type="CollisionShape3D" parent="Finish"]
+shape = SubResource("FinishShape")

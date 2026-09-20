@@ -1,0 +1,126 @@
+# Godot generated files
+game/.godot/
+game/.godot_uid_cache.bin
+game/export_credentials.cfg
+# Local builds and logs
+builds/
+exports/
+source_assets/
+*.log
+# Editor and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local runtimes, generated caches, credentials and task-machine overrides.
+**/.godot/
+**/__pycache__/
+**/.venv/
+*.pyc
+*.blend1
+*.blend2
+.env
+.env.*
+!.env.example
+/game/override.cfg
+/game/project.mcp-dev.godot
+/tools/blender-portable/
+/tools/mcp/
+/tools/reference-tools/
+/tools/*.zip
+/tools/*.7z
+/tools/*.exe
+/.tmp*
+/.worktree-local.json
+/WORKTREE_TASK.md
+
+# Local production history is intentionally excluded from the playable source
+# repository. Current runtime assets live under game/, while the adopted
+# editable weapon sources live under assets/source/weapons/.
+/docs/
+/deliverables/
+/tools/
+/game/tests/
+/AGENTS.md
+/CONTEXT.md
+/游戏设计与开发分块.md
+
+# Local iteration history and frame-heavy art reviews. Adopted runtime assets,
+# concise manifests, and release evidence are staged explicitly.
+/deliverables/art/blade-arc-r2/before/
+/deliverables/art/blade-arc-r2/blade-motion.*
+/deliverables/art/blade-arc-r2/iteration1/
+/deliverables/art/blade-arc-r2/iteration2/
+/deliverables/art/blade-arc-r2/iteration3/
+/deliverables/art/blade-arc-r2/iteration4/
+/deliverables/art/blade-arc-r2/iteration5/
+/deliverables/art/blade-arc-r2/iteration5-contact-repair/
+/deliverables/art/blade-arc-r2/rejected-*/
+/deliverables/art/blade-motion-correction/
+/deliverables/art/blade-motion-r3/
+/deliverables/art/constrained-grip/
+/deliverables/art/weapon-heritage/r12-weapon-parts.blend
+/deliverables/art/weapon-heritage/staff-crown-refined.*
+/deliverables/audio/reference-cut-before/
+/docs/workstreams/results/integration/art-correction/
+/docs/workstreams/results/integration/art-reference-rebuild/
+/docs/workstreams/results/integration/asset-consumption/
+/docs/workstreams/results/integration/blade-arc-r2/
+/docs/workstreams/results/integration/blade-motion-correction/
+/docs/workstreams/results/integration/blade-motion-r3/
+/docs/workstreams/results/integration/constrained-grip/
+/docs/workstreams/results/integration/weapon-refit/
+/tools/workstreams/integration/author_constrained_motion.py
+/tools/workstreams/integration/author_edge_carry.py
+/tools/workstreams/integration/author_native_keyposes.py
+/tools/workstreams/integration/probe_*.gd
+/tools/workstreams/integration/probe_*.py
+/tools/workstreams/integration/mcp_call.py
+/tools/workstreams/integration/review_constrained_*.py
+/tools/workstreams/integration/review_edge_carry.py
+/tools/workstreams/integration/review_p0a_r2_carry.py
+
+# Historical preview media stays in the original project, without duplication.
+# Track requirements and selection metadata; new worktree outputs go in deliverables/.
+/docs/*
+!/docs/*.md
+!/docs/design/
+!/docs/workstreams/
+!/docs/v19/
+/docs/v19/*
+!/docs/v19/*.md
+!/docs/v19/art/
+/docs/v19/art/*
+!/docs/v19/art/*.md
+!/docs/v19/art/catalogue.json
+!/docs/v19/art/direction-selection.json
+!/docs/v19/art/current-browser-decisions.json
+!/docs/v19/art/handoff-validation.json
+!/docs/v19/art/evidence-validation.json
+
+# Large review movies are delivered by an explicit manifest, not silently committed.
+/deliverables/**/*.avi
+/deliverables/**/*.mp4
+/deliverables/**/*.mov
+
+# Local full-frame capture intermediates. The encoded movies, state traces and
+# delivery manifest are the review artifacts; source frames remain on this PC.
+/docs/workstreams/results/integration/weapon-refit/frames/
+/deliverables/art/weapon-refit/*.blend1
+/docs/workstreams/results/integration/art-correction/frames/
+/docs/workstreams/results/integration/art-correction/inspection/
+/deliverables/art/weapon-heritage/*.blend1
+/deliverables/art/body-adapted/*.blend1
+
+# Reproducible visual evidence stays local; keep sources and concise reports.
+/docs/workstreams/results/**/frames/
+/docs/workstreams/results/**/*-frames/
+/docs/workstreams/results/**/*-native/
+/docs/workstreams/results/**/poses/
+/docs/workstreams/results/**/inspection/
+/docs/workstreams/results/**/*.avi
+/docs/workstreams/results/**/*.mp4
+/docs/workstreams/results/**/*.mov
+/docs/workstreams/results/**/*.mkv
+/docs/workstreams/results/**/reference-research/*.glb

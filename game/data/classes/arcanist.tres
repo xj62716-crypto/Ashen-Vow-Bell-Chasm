@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ParkourProfile" load_steps=3 format=3]
+[ext_resource type="Script" path="res://scripts/player/parkour_profile.gd" id="1"]
+[ext_resource type="Resource" path="res://data/equipment/arcane_staff.tres" id="2"]
+[resource]
+script = ExtResource("1")
+id = &"arcanist"
+display_name = "咒行者"
+description = "远程法杖 · 风暴 / 塑形 / 封印 · 创造路线，组合火风冰"
+wall_speed = 13.5
+wall_duration = 2.2
+wall_gravity_scale = 0.08
+restore_dash_on_wall_jump = true
+right_hand_item = ExtResource("2")

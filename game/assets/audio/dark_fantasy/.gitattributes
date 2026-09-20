@@ -1,0 +1,5 @@
+# These generated audio assets and recipes are byte-addressed in the delivery manifest.
+* text=auto eol=lf
+licenses/** -text -diff
+*.wav -text -diff
+*.ogg -text -diff

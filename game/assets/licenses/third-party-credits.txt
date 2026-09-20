@@ -1,0 +1,66 @@
+第三方资源署名 / Third-party asset credits
+
+Current v0.12 music and profession sound effects:
+Original score generated and mixed for Fantasy Parkour using tools/compose_v12_score.py.
+Three original 32-bar themes: Citadel Embers (112 BPM), Furnace Pursuit (126 BPM),
+Echoes of the Seal (104 BPM). Each has synchronized exploration and combat stems.
+Seven art_*.wav profession effects are original synthesis for this project.
+No Ghostrunner or Vermintide music, model, animation or texture files are bundled.
+
+Historical background music retained in the source assets, not the active score:
+"The Adventure Begins" by bart (Bart Kelsey)
+Source: https://opengameart.org/content/adventure-begins
+Original filename: little town - orchestral.ogg
+Author: https://opengameart.org/users/bart
+License selected from the author's offered licenses: Creative Commons Attribution 3.0 Unported (CC BY 3.0)
+License: https://creativecommons.org/licenses/by/3.0/
+Legal text: https://creativecommons.org/licenses/by/3.0/legalcode
+Changes: 0.8-second overlap at the loop boundary, gain adjustment and Ogg Vorbis re-encoding.
+No endorsement by the original author is implied.
+
+3D models and original sound samples:
+Kenney — https://kenney.nl/
+Castle Kit 2.0: https://kenney.nl/assets/castle-kit
+Impact Sounds 1.0: https://kenney.nl/assets/impact-sounds
+RPG Audio: https://kenney.nl/assets/rpg-audio
+Interface Sounds 1.0: https://kenney.nl/assets/interface-sounds
+License: Creative Commons Zero (CC0 1.0)
+https://creativecommons.org/publicdomain/zero/1.0/
+Changes: sound samples layered, resampled, pitch/gain adjusted and faded; model palette recolored to slate and teal, models scaled and placed.
+Original Kenney license files are included under game/assets/licenses/.
+
+Verified from the original source pages and archives on 2026-09-12.
+
+First-person arms (v0.3)
+"fps arms (rigged only)" by para; mesh/texture originally based on MakeHuman.
+Source: https://opengameart.org/content/fps-arms-rigged-only
+Download: https://opengameart.org/sites/default/files/fps%20arms.7z
+License: CC0 1.0, https://creativecommons.org/publicdomain/zero/1.0/
+Changes: trimmed shoulder/upper-arm geometry, replaced skin with leather glove material,
+added metal bracers and rivets, procedural finger/arm movement and first-person placement.
+
+PBR materials and scanned boulder (v0.3)
+Poly Haven, https://polyhaven.com/
+Asset pages:
+https://polyhaven.com/a/castle_wall_slates
+https://polyhaven.com/a/stone_floor
+https://polyhaven.com/a/brown_leather
+https://polyhaven.com/a/metal_plate
+https://polyhaven.com/a/rock_face
+https://polyhaven.com/a/boulder_01
+License: CC0 1.0, https://polyhaven.com/license
+https://creativecommons.org/publicdomain/zero/1.0/
+Changes: material tint/roughness/texture scale and model placement/scale.
+Original files verified against checksums from the Poly Haven API.
+Retrieved and verified 2026-09-12.
+
+v0.10 production update (2026-09-14)
+The credited CC0 arm mesh is retargeted to a 48-bone deform rig with 24 authored
+Blender actions. The Godot import adds one root bone. All new character armor,
+weapons, architecture modules, shaders, and tempered_armor / charcoal_weave /
+riven_wood surface maps are produced within this project. Existing Poly Haven
+surface maps remain subject to their CC0 credits above. Combat sounds remix
+the already credited Kenney CC0 source packs; source recipes are documented
+in docs/combat-audio-manifest.json. Music is unchanged.
+Ghostrunner reference frames remain in documentation only. No Ghostrunner
+models, animations, textures, audio, or archive contents are distributed.

@@ -1,0 +1,47 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/run/movement_trial.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/run/integrated_presentation.gd" id="99"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="3"]
+[ext_resource type="Script" path="res://scripts/audio/trial_audio.gd" id="4"]
+[ext_resource type="PackedScene" path="res://scenes/levels/combat_room.tscn" id="5"]
+
+[sub_resource type="Environment" id="Environment"]
+background_mode = 1
+background_color = Color(0.03,0.04,0.05,1)
+ambient_light_source = 3
+ambient_light_color = Color(0.53,0.60,0.65,1)
+tonemap_mode = 2
+glow_enabled = true
+fog_enabled = true
+
+[node name="Causeway" type="Node3D"]
+script = ExtResource("1")
+stage_count = 1
+formal_release = true
+
+[node name="IntegratedPresentation" type="Node" parent="."]
+script = ExtResource("99")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment")
+
+[node name="SpawnPoint" type="Marker3D" parent="."]
+position = Vector3(4.45,0.08,6)
+
+[node name="Triggers" type="Node3D" parent="."]
+
+[node name="Player" parent="." instance=ExtResource("2")]
+position = Vector3(4.45,0.08,6)
+
+[node name="CombatRoom" parent="." instance=ExtResource("5")]
+position = Vector3(0,0,0)
+
+[node name="Audio" type="Node" parent="."]
+script = ExtResource("4")
+
+[node name="UI" type="CanvasLayer" parent="."]
+layer = 2
+
+[node name="HUD" parent="UI" instance=ExtResource("3")]
