@@ -678,7 +678,11 @@ func update_sample_trail(delta:float,combat:PlayerCombat)->void:
 					var center:Vector3=root_point.lerp(tip_point,uv.y)
 					var live:float=1.-clampf(lerpf(previous.age,next.age,uv.x)/lifetime,0.,1.)
 					var speed:float=lerpf(previous.speed,next.speed,uv.x)
-					var width:float=tuning.blade_arc_width*(1.+speed*.045)*(tuning.blade_empowered_width*1.4 if next.powered else 1.)
+					# Speed should sharpen the wake, not inflate it over the weapon.
+					# The old linear multiplier reached 3x at normal slash speed and
+					# hid the actual blade behind a white fan.
+					var speed_gain:float=1.+minf(speed,24.)*.012
+					var width:float=tuning.blade_arc_width*speed_gain*(tuning.blade_empowered_width if next.powered else 1.)
 					width*=(.62+.38*sin(uv.y*PI))
 					width*=(1.+tuning.blade_motion_smear*.35*(1.-live))
 					var arc_phase:float=(float(i-1)+uv.x)/float(trail_samples.size()-1)

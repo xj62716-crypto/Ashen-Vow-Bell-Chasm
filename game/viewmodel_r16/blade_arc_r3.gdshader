@@ -7,7 +7,7 @@ uniform float opacity=.65;
 uniform float clock=0.;
 void fragment(){
  float live=clamp(UV.x,0.,1.);
- float ridge=exp(-pow((UV.y-.50)*3.8,2.));
+ float ridge=exp(-pow((UV.y-.50)*4.6,2.));
  float body=smoothstep(0.,.08,UV.y)*(1.-smoothstep(.96,1.,UV.y));
  float noise=sin(UV.y*49.+UV.x*21.-clock*11.)*sin(UV.y*117.-UV.x*15.);
  float erosion=mix(smoothstep(-.3,.7,noise),1.,smoothstep(.35,.8,live));
@@ -15,5 +15,5 @@ void fragment(){
  vec3 colour=mix(outer_color.rgb,core_color.rgb,ridge);
  ALBEDO=colour;
  EMISSION=(core_color.rgb*ridge+outer_color.rgb*1.15*(1.-ridge))*emission_power*intensity;
- ALPHA=clamp(intensity*(.78+ridge*.65)*opacity,0.,1.);
+ ALPHA=clamp(intensity*(.62+ridge*.38)*opacity,0.,1.);
 }

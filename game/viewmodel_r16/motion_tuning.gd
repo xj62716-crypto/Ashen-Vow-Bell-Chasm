@@ -49,7 +49,7 @@ extends Resource
 @export_group("Compound blade arc")
 @export var blade_compound_arc_enabled:bool = true
 @export_range(.015, .09) var blade_ribbon_width: float = .075
-@export_range(1.0, 2.5) var blade_empowered_width: float = 1.7
+@export_range(1.0, 2.5) var blade_empowered_width: float = 1.35
 @export_range(.04, .14) var blade_empowered_lifetime: float = .09
 @export_range(0.0, 3.0) var blade_camera_yaw_degrees: float = 1.1
 @export_range(0.0, 3.0) var blade_camera_pitch_degrees: float = .7
@@ -64,12 +64,12 @@ extends Resource
 @export_range(0,8) var blade_cut_fov:float=3.5
 @export_range(0,3) var blade_contact_recoil:float=1.2
 @export_group("Compound blade arc appearance")
-@export_range(0,1) var blade_motion_smear:float=.4
+@export_range(0,1) var blade_motion_smear:float=.22
 @export_range(2,16) var blade_curve_samples:int=8
-@export_range(.03,.22) var blade_arc_lifetime:float=.14
-@export_range(.03,.3) var blade_arc_width:float=.18
-@export_range(0,6) var blade_arc_emission:float=5.0
-@export_range(0,1) var blade_arc_opacity:float=.95
+@export_range(.03,.22) var blade_arc_lifetime:float=.11
+@export_range(.03,.3) var blade_arc_width:float=.065
+@export_range(0,6) var blade_arc_emission:float=2.2
+@export_range(0,1) var blade_arc_opacity:float=.52
 @export var blade_arc_outer:Color=Color("d13b6f")
 @export var blade_arc_core:Color=Color("e3efff")
 @export_group("Execution spacing")
