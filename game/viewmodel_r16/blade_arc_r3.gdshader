@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode unshaded, cull_disabled, shadows_disabled, depth_draw_never, blend_mix;
+render_mode unshaded, cull_disabled, shadows_disabled, depth_draw_never, blend_add;
 uniform vec4 core_color:source_color=vec4(.79,.89,1.,1.);
 uniform vec4 outer_color:source_color=vec4(.31,.055,.15,1.);
 uniform float emission_power=2.8;
@@ -15,5 +15,5 @@ void fragment(){
  vec3 colour=mix(outer_color.rgb,core_color.rgb,ridge);
  ALBEDO=colour;
  EMISSION=(core_color.rgb*ridge+outer_color.rgb*1.15*(1.-ridge))*emission_power*intensity;
- ALPHA=clamp(intensity*(.55+ridge*.45)*opacity,0.,.82);
+ ALPHA=clamp(intensity*(.78+ridge*.65)*opacity,0.,1.);
 }

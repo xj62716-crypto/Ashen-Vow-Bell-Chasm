@@ -25,6 +25,9 @@ Thumbs.db
 !.env.example
 /game/override.cfg
 /game/project.mcp-dev.godot
+/release/*
+!/release/AshenVow-Demo.exe
+!/release/README.md
 /tools/blender-portable/
 /tools/mcp/
 /tools/reference-tools/

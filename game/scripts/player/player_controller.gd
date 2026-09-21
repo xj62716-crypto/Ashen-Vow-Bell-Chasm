@@ -382,6 +382,18 @@ func wall_segments_remaining() -> int:
 func apply_profile(profile: ParkourProfile) -> void:
 	if profile == null:
 		return
+	# A class swap is a hard ownership boundary. Cancel every transient
+	# traversal state before the new profile exposes its weapon and VFX.
+	grapple.cancel()
+	_stop_wall(false)
+	velocity = Vector3.ZERO
+	sliding = false
+	crouched = false
+	_dash_left = 0.0
+	_dash_direction = Vector3.ZERO
+	_dash_travel = 0.0
+	airtime_serial += 1
+	_reset_wall_airtime()
 	parkour_profile = profile
 	move_speed = 10.5 if profile.id == &"shade" else 9.0
 	dash_speed = 26.0 if profile.id == &"shade" else 24.0
@@ -427,8 +439,6 @@ func _update_wall_contact(wish: Vector3, stick: Vector2, delta: float) -> void:
 	if _wall_active and wall_time_remaining() <= 0.0:
 		_stop_wall()
 		return
-	if not _wall_active and wall_segments_remaining() <= 0:
-		return
 	var probes: Array = [wall_side] if _wall_active else ([0,-1,1] if _same_wall_reattach_ready else [-1,1])
 	for probe: int in probes:
 		var hinted := probe == 0
@@ -440,6 +450,14 @@ func _update_wall_contact(wish: Vector3, stick: Vector2, delta: float) -> void:
 			continue
 		var normal: Vector3 = hit["normal"]
 		var plane_offset: float = normal.dot(hit["position"])
+		var has_previous_wall: bool = _blocked_wall_normal.length_squared() > 0.5
+		var same_wall_surface: bool = has_previous_wall and normal.dot(_blocked_wall_normal) > 0.95 and absf(plane_offset - _blocked_wall_plane_offset) < 0.25
+		var switched_wall: bool = has_previous_wall and not same_wall_surface
+		# The segment budget limits reattaching to the same wall. Crossing to a
+		# different wall while airborne starts a fresh wall chain, so a route can
+		# intentionally read as wall -> dash -> wall without touching the floor.
+		if not _wall_active and wall_segments_remaining() <= 0 and not switched_wall:
+			continue
 		# Pulling away or moving directly into a face must never become a wall run.
 		var approach: Vector3 = Vector3(velocity.x,0,velocity.z) if hinted else wish
 		if not _wall_active and (approach.normalized().dot(normal) > 0.35 or absf(approach.normalized().dot(normal)) > 0.78):
@@ -461,6 +479,9 @@ func _update_wall_contact(wish: Vector3, stick: Vector2, delta: float) -> void:
 		_wall_tangent = tangent
 		wall_side = side
 		if not _wall_active:
+			if switched_wall and not is_on_floor():
+				wall_chain_count = 0
+				_wall_time_used = 0.0
 			_wall_active = true
 			_wall_look_yaw = 0.0
 			head.rotation.y = 0.0

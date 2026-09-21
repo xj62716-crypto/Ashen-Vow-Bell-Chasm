@@ -18,3 +18,4 @@
 *.mp3 binary
 *.ttf binary
 *.otf binary
+release/*.exe filter=lfs diff=lfs merge=lfs -text

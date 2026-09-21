@@ -42,7 +42,7 @@ func ribbon(a:Vector3,b:Vector3,width:float,colour:Color,emission:float)->MeshIn
 
 func _ready()->void:
 	var local_cut:Vector3=cut_direction.normalized()
-	flash=ribbon(-local_cut*.16+Vector3(0,0,.025),local_cut*.21+Vector3(0,0,.025),.014,tint,1.)
+	flash=ribbon(-local_cut*.16+Vector3(0,0,.025),local_cut*.21+Vector3(0,0,.025),.022,tint,2.4)
 	var contact_material:=ShaderMaterial.new()
 	contact_material.shader=preload("res://viewmodel_r16/blade_contact_flash.gdshader")
 	contact_material.set_shader_parameter("colour",tint)

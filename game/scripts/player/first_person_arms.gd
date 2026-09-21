@@ -266,13 +266,21 @@ func unequip_item(hand: StringName) -> void:
 		return
 	var item: Node3D = _items[hand]
 	item.get_parent().remove_child(item)
-	item.queue_free()
+	# Class swaps happen between gameplay states; free synchronously so an old
+	# mesh, collision proxy, or weapon socket cannot survive into the next pose.
+	item.free()
 	_items.erase(hand)
 	_definitions.erase(hand)
 	item_unequipped.emit(hand)
 
 
 func _apply_class_items(profile: ParkourProfile) -> void:
+	_trail_points.clear()
+	_trail_ages.clear()
+	_previous_bones.clear()
+	_rig_clip = &""
+	_cast_flash = 0.0
+	_pulse_left = 0.0
 	unequip_item(&"left")
 	unequip_item(&"right")
 	if profile.left_hand_item != null:
@@ -434,7 +442,7 @@ func _update_trail(combat: PlayerCombat, delta: float) -> void:
 		return
 	for i in range(_trail_ages.size()):
 		_trail_ages[i] += delta
-	while not _trail_ages.is_empty() and (_trail_ages[0]>.085 or _trail_ages.size()>14):
+	while not _trail_ages.is_empty() and (_trail_ages[0]>.22 or _trail_ages.size()>28):
 		_trail_ages.pop_front()
 		_trail_points.pop_front()
 		_trail_points.pop_front()
@@ -446,12 +454,12 @@ func _update_trail(combat: PlayerCombat, delta: float) -> void:
 		else:
 			_trail_points.append(weapon.to_global(Vector3(0,.52,0)))
 			_trail_points.append(weapon.to_global(Vector3(0,1.09,0)))
-		_trail_ages.append(0)
+		_trail_ages.append(0.0)
 	if _trail_points.size()<4:
 		return
 	_trail_mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLE_STRIP)
 	for i in range(_trail_points.size()):
-		var alpha: float = pow(maxf(0,1-_trail_ages[i/2]/.085),1.35)*.52
+		var alpha: float = pow(maxf(0,1-_trail_ages[int(i/2)]/.22),1.35)*.92
 		var tint := Color("#d4f6ef") if combat.arts.edge>.5 else Color("#c7c5bd")
 		_trail_mesh.surface_set_color(Color(tint.r,tint.g,tint.b,alpha))
 		_trail_mesh.surface_set_uv(Vector2(float(i%2),float(i/2)/maxi(1,_trail_ages.size()-1)))

@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode unshaded,cull_disabled,depth_draw_never,shadows_disabled,blend_mix;
+render_mode unshaded,cull_disabled,depth_draw_never,shadows_disabled,blend_add;
 uniform vec4 tint:source_color=vec4(.18,.12,.21,1);
 uniform vec4 core_color:source_color=vec4(.86,.91,.92,1);
 uniform float age=0.;
@@ -21,7 +21,7 @@ void fragment(){
  float fleck=step(.89,hash21(floor(vec2(UV.x*61.,UV.y*19.))))*(1.-UV.x)*edge;
  vec3 pigment=mix(tint.rgb,vec3(.075,.026,.10),UV.y*.6);
  ALBEDO=mix(pigment,core_color.rgb,core*.93);
- EMISSION=(pigment*(3.4+empowered*1.6)+core_color.rgb*core*(2.7+empowered*2.3))*brightness*(1.+bloom);
- ALPHA=edge*life*erode*strength*(.65+core*.35)*(1.-ghost*.65);
+ EMISSION=(pigment*(4.6+empowered*2.4)+core_color.rgb*core*(4.2+empowered*3.1))*brightness*(1.+bloom);
+ ALPHA=edge*life*erode*strength*(.82+core*.45)*(1.-ghost*.65);
  ALPHA*=1.-fleck*.55;
 }

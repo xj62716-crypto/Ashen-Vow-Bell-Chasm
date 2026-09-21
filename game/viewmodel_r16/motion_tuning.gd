@@ -27,10 +27,10 @@ extends Resource
 @export_range(0.0, 0.08) var blade_kill_stop: float = .052
 @export_range(0.0, 1.5) var blade_camera_impulse: float = .65
 @export_group("Blade magic")
-@export_range(.02, .18) var blade_trail_lifetime: float = .080
-@export_range(.1, 1.0) var blade_trail_width: float = .82
-@export_range(0.0, 2.0) var blade_trail_brightness: float = 1.2
-@export_range(0.0, 1.0) var blade_bloom_contribution: float = .25
+@export_range(.02, .18) var blade_trail_lifetime: float = .12
+@export_range(.1, 1.0) var blade_trail_width: float = .95
+@export_range(0.0, 2.0) var blade_trail_brightness: float = 1.8
+@export_range(0.0, 1.0) var blade_bloom_contribution: float = .55
 @export_range(0.0, 1.0) var blade_trail_breakup: float = .4
 @export_range(0, 3) var blade_afterimage_count: int = 1
 @export var blade_core_color: Color = Color("dce7e8")
@@ -41,11 +41,11 @@ extends Resource
 @export_range(.03, .06) var blade_impact_flash_seconds: float = .045
 @export_range(0.0, 2.0) var blade_impact_burst: float = .7
 @export_group("Blade contact mist")
-@export_range(0.0, 1.0) var blade_contact_mist_opacity: float = .68
-@export var blade_contact_mist_size: Vector2 = Vector2(.62, .48)
-@export_range(.18, .5) var blade_contact_mist_lifetime: float = .32
-@export_range(0.0, 2.0) var blade_contact_mist_speed: float = .9
-@export_range(0.0, 8.0) var blade_contact_mist_expansion: float = 4.8
+@export_range(0.0, 1.0) var blade_contact_mist_opacity: float = .96
+@export var blade_contact_mist_size: Vector2 = Vector2(.84, .64)
+@export_range(.18, .5) var blade_contact_mist_lifetime: float = .45
+@export_range(0.0, 2.0) var blade_contact_mist_speed: float = 1.2
+@export_range(0.0, 8.0) var blade_contact_mist_expansion: float = 5.8
 @export_group("Compound blade arc")
 @export var blade_compound_arc_enabled:bool = true
 @export_range(.015, .09) var blade_ribbon_width: float = .075
@@ -66,11 +66,11 @@ extends Resource
 @export_group("Compound blade arc appearance")
 @export_range(0,1) var blade_motion_smear:float=.4
 @export_range(2,16) var blade_curve_samples:int=8
-@export_range(.03,.22) var blade_arc_lifetime:float=.085
-@export_range(.03,.3) var blade_arc_width:float=.11
-@export_range(0,6) var blade_arc_emission:float=2.8
-@export_range(0,1) var blade_arc_opacity:float=.65
-@export var blade_arc_outer:Color=Color("922952")
+@export_range(.03,.22) var blade_arc_lifetime:float=.14
+@export_range(.03,.3) var blade_arc_width:float=.18
+@export_range(0,6) var blade_arc_emission:float=5.0
+@export_range(0,1) var blade_arc_opacity:float=.95
+@export var blade_arc_outer:Color=Color("d13b6f")
 @export var blade_arc_core:Color=Color("e3efff")
 @export_group("Execution spacing")
 @export_range(1.6,2.6) var blade_execution_distance:float=1.95
