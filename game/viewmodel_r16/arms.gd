@@ -618,10 +618,10 @@ func update_blade_trail(delta:float,combat:PlayerCombat) -> void:
 					var u:float=1.-clampf(row.age/lifetime,0.,1.)
 					var along:Vector3=(row.b-row.a).normalized()
 					var width:float=tuning.blade_ribbon_width*(1.+row.speed/35.)*(tuning.blade_empowered_width if row.powered else 1.)
-					var start:Vector3=row.a.lerp(row.b,.24)
-					# Sweep the actual edge in depth. Shader limits the luminous rim
-					# to the newest sample and erodes the translucent wake.
-					start=start.lerp(row.b,clampf(.28-width,0.,.24))
+					# Keep the whole cutting edge in the ribbon. The previous offset
+					# collapsed the wake toward the tip and made the blade read like a
+					# glowing cursor instead of a physical cut.
+					var start:Vector3=row.a
 					mesh.surface_set_uv(Vector2(u,v))
 					mesh.surface_set_color(Color(1,1,1,1))
 					mesh.surface_add_vertex(start.lerp(row.b,v))
@@ -669,25 +669,26 @@ func update_sample_trail(delta:float,combat:PlayerCombat)->void:
 		var divisions:int=tuning.blade_curve_samples
 		for step_index in range(divisions):
 			var t0:float=step_index/float(divisions);var t1:float=(step_index+1)/float(divisions)
-			for strip in range(4):
-				var v0:float=strip/4.;var v1:float=(strip+1)/4.
+			for strip in range(8):
+				var v0:float=strip/8.;var v1:float=(strip+1)/8.
 				for uv:Vector2 in [Vector2(t0,v0),Vector2(t1,v0),Vector2(t1,v1),Vector2(t0,v0),Vector2(t1,v1),Vector2(t0,v1)]:
 					var root_point:Vector3=previous.a.lerp(next.a,uv.x)
-					var old_edge:Vector3=previous.b-previous.a;var edge:Vector3=next.b-next.a
-					var direction:Vector3=old_edge.normalized().slerp(edge.normalized(),uv.x)
-					var length:float=lerpf(old_edge.length(),edge.length(),uv.x)
+					var tip_point:Vector3=previous.b.lerp(next.b,uv.x)
+					var blade_axis:Vector3=(tip_point-root_point).normalized()
+					var center:Vector3=root_point.lerp(tip_point,uv.y)
 					var live:float=1.-clampf(lerpf(previous.age,next.age,uv.x)/lifetime,0.,1.)
 					var speed:float=lerpf(previous.speed,next.speed,uv.x)
 					var width:float=tuning.blade_arc_width*(1.+speed*.045)*(tuning.blade_empowered_width*1.4 if next.powered else 1.)
-					width=minf(length*.68,width)*(1.+tuning.blade_motion_smear*.35*(1.-live))
+					width*=(.62+.38*sin(uv.y*PI))
+					width*=(1.+tuning.blade_motion_smear*.35*(1.-live))
 					var arc_phase:float=(float(i-1)+uv.x)/float(trail_samples.size()-1)
 					width*=pow(maxf(0.,sin(arc_phase*PI)),.65)
-					var tip:Vector3=root_point+direction*length
-					var tangent:Vector3=(next.b-previous.b).normalized()
-					var across:Vector3=tangent.cross((camera.global_position-tip).normalized()).normalized()
-					if across.dot(direction)<0:across=-across
-					var normal:Vector3=tangent.cross(across).normalized()
-					var point:Vector3=tip-direction*.04+across*(uv.y-.5)*width*.65
+					var view_direction:Vector3=(camera.global_position-center).normalized()
+					var across:Vector3=blade_axis.cross(view_direction)
+					if across.length_squared()<.0001:across=blade_axis.cross(Vector3.UP)
+					across=across.normalized()
+					var normal:Vector3=blade_axis.cross(across).normalized()
+					var point:Vector3=center+across*(uv.y-.5)*width
 					point+=normal*sin(uv.y*PI)*width*.16*tuning.blade_motion_smear
 					mesh.surface_set_uv(Vector2(live,uv.y));mesh.surface_add_vertex(point)
 	# The empowered cutting edge briefly ignites along its actual length. This

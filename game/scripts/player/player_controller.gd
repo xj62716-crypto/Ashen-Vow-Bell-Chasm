@@ -35,6 +35,7 @@ signal slide_jumped
 @export_range(0.4, 1.2, 0.05) var wall_probe_reach: float = 0.8
 @export var wall_minimum_speed: float = 4.0
 @export var wall_jump_grace: float = 0.12
+@export_range(0.12, 0.6, 0.01) var wall_jump_transfer_window: float = 0.5
 @export_range(2, 4, 1) var wall_chain_limit: int = 2
 @export_range(15.0, 100.0, 1.0) var wall_look_limit_degrees: float = 75.0
 @export_group("Camera and recovery")
@@ -70,6 +71,7 @@ var wall_chain_count: int = 0
 var _wall_time_used: float = 0.0
 var _wall_look_yaw: float = 0.0
 var _wall_coyote_left: float = 0.0
+var _wall_jump_transfer_left: float = 0.0
 var _wall_bonus_used: bool = false
 var _momentum_left: float = 0.0
 var _coyote_left: float = 0.0
@@ -153,6 +155,7 @@ func _physics_process(delta: float) -> void:
 	if not control_enabled:
 		if grapple.active:grapple.cancel()
 		return
+	_wall_jump_transfer_left = maxf(0.0, _wall_jump_transfer_left - delta)
 	if blade_approach_active:return # ProfessionArts owns the brief swept approach.
 	if grapple.active:
 		grapple.advance(delta)
@@ -458,10 +461,16 @@ func _update_wall_contact(wish: Vector3, stick: Vector2, delta: float) -> void:
 		# intentionally read as wall -> dash -> wall without touching the floor.
 		if not _wall_active and wall_segments_remaining() <= 0 and not switched_wall:
 			continue
-		# Pulling away or moving directly into a face must never become a wall run.
+		# Normal wall re-entry is intentionally glancing, which prevents a floor
+		# jump straight into a wall from stealing control. A kick toward another
+		# surface is different: preserve the short transfer window so a second
+		# wall can be caught in mid-air after two segments on the first wall.
 		var approach: Vector3 = Vector3(velocity.x,0,velocity.z) if hinted else wish
-		if not _wall_active and (approach.normalized().dot(normal) > 0.35 or absf(approach.normalized().dot(normal)) > 0.78):
-			continue
+		var allow_wall_jump_transfer: bool = _wall_jump_transfer_left > 0.0 and switched_wall
+		if not _wall_active and not allow_wall_jump_transfer:
+			var approach_direction := approach.normalized()
+			if approach_direction.length_squared() > 0.0 and (approach_direction.dot(normal) > 0.35 or absf(approach_direction.dot(normal)) > 0.78):
+				continue
 		# A parallel wall elsewhere is a new surface; coplanar modules remain one wall.
 		if not _wall_active and normal.dot(_blocked_wall_normal) > 0.95 and absf(plane_offset - _blocked_wall_plane_offset) < 0.25 and not _same_wall_reattach_ready:
 			continue
@@ -530,6 +539,9 @@ func _perform_wall_jump() -> void:
 	_coyote_left = 0.0
 	velocity = tangent * carry + normal * parkour_profile.wall_jump_push
 	velocity.y = sqrt(2.0 * gravity * parkour_profile.wall_jump_height)
+	# The next wall is allowed to be approached head-on. This is deliberately
+	# short-lived, so ordinary jumps still require a glancing wall entry.
+	_wall_jump_transfer_left = wall_jump_transfer_window
 	jump_count += 1
 	wall_jump_count += 1
 	_wall_kick_feedback = 1.0
@@ -553,6 +565,7 @@ func _reset_wall_airtime() -> void:
 	_dash_wall_normal = Vector3.ZERO
 	_wall_bonus_used = false
 	_wall_coyote_left = 0.0
+	_wall_jump_transfer_left = 0.0
 	_momentum_left = 0.0
 
 
