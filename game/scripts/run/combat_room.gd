@@ -600,7 +600,8 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not enabled or not event.is_action_pressed("interact"):
 		return
 	if is_instance_valid(altar.player) and altar.player.grapple.active:
-		altar.player.grapple.release()
+		# The interaction press commits the whole grapple traversal. E is not a
+		# second manual-release control while the route handoff is in progress.
 		return
 	var target := interaction_target()
 	if target is RunAltar:

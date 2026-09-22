@@ -14,6 +14,11 @@ var _launch_lock: float=0
 # while leaving braking room on the receiving platform.
 @export_range(8.0,24.0,.5) var grapple_exit_speed: float = 24.0
 @export_range(0.0,6.0,.5) var grapple_exit_lift: float = 6.0
+## Distance from the anchor at which the automatic route handoff happens.
+## This is deliberately a route-entry shell, rather than the old anchor-center
+## release. It leaves room for the player to carry speed into a landing, wall,
+## slide or construct continuation.
+@export_range(1.5,10.0,.25) var grapple_release_distance: float = 5.5
 var permanent: bool=false
 var _used: bool=false
 signal expiring(construct: RiftConstruct)

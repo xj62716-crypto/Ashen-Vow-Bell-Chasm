@@ -81,6 +81,10 @@ static func build(room: CombatRoom) -> void:
 		anchor.kind=&"anchor"
 		anchor.grapple_exit_speed=12.0
 		anchor.grapple_exit_lift=1.5
+		# These branch anchors sit just beyond a narrow receiving edge. Release
+		# into the pad's approach lane, with enough separation to keep the anchor
+		# readable without making the player overshoot the next platform.
+		anchor.grapple_release_distance=4.5
 		anchor.permanent=true
 		room.geometry.add_child(anchor)
 		anchor.position=point

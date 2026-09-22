@@ -86,6 +86,10 @@ func prepare_air_route() -> void:
 		var anchor := RiftConstruct.new()
 		anchor.kind = &"anchor"
 		anchor.permanent = true
+		# The anchor is suspended just off the moving wall face. Keep a compact
+		# exit shell so the automatic release hands the player into that real
+		# collision surface, while still staying outside the old 1.65 m face hit.
+		anchor.grapple_release_distance = 2.25
 		anchor.player = controller.actor.player
 		wall.add_child(anchor)
 		anchor.position = Vector3(0,3.6,-1.4)

@@ -610,7 +610,7 @@ func update_run(player: ParkourPlayer, seconds: float, checkpoint: int, falls: i
 				interaction_label.text="E · 改变通路"
 			elif target is RiftConstruct and target.kind==&"anchor":
 				interaction_label.text="E · 抛出钩锁"
-			if player.grapple.active:interaction_label.text="空格 / E · 松钩"
+			if player.grapple.active:interaction_label.text="牵引中 · 到达路线出口自动松钩"
 		var names := combat.runes.map(func(id: StringName):return RuneCatalog.title(id))
 		build_label.text=" · ".join(names.slice(maxi(0,names.size()-3)))
 		var ready: String = combat.build_status()

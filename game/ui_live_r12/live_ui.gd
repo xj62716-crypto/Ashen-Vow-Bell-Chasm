@@ -519,7 +519,7 @@ func _update_hud(dt: float) -> void:
 	else: labels.interaction.modulate = _ivory
 	if player.grapple.has_method("status") and player.grapple.active:
 		var tether:Dictionary=player.grapple.status()
-		labels.interaction.text=("符链出手" if str(tether.phase)=="launch" else "牵引中 · 接近悬锚自动松开")+"\nE / Space 松开 · Shift 松开并尝试冲刺"
+		labels.interaction.text=("符链出手" if str(tether.phase)=="launch" else "牵引中 · 到达路线出口自动松钩")
 		labels.interaction.modulate=_ivory
 	labels.boss.text = ""
 	for enemy in room.enemies:

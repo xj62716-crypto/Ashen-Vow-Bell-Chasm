@@ -7,13 +7,14 @@ signal released
 signal state_changed(phase: StringName, reason: StringName)
 const RANGE: float = 34.0
 const LAUNCH_TIME: float = .06
-const RELEASE_DISTANCE: float = 1.65
+const DEFAULT_ROUTE_EXIT_DISTANCE: float = 5.5
+const MIN_ROUTE_EXIT_DISTANCE: float = 1.5
+const MAX_ROUTE_EXIT_DISTANCE: float = 10.0
 const MAX_DURATION: float = 1.6
 const REGRAB_DELAY: float = .35
 var phase: StringName = &"idle"
 var exit_reason: StringName = &""
 var progress: float = 0.0
-var _dash_requested: bool = false
 var _exit_forward := Vector3.FORWARD
 var _initial_distance: float = 0.0
 var _last_anchor_id: int = 0
@@ -26,10 +27,9 @@ var speed: float = 0.0
 var rope_length: float = 0.0
 var tension: float = 0.0
 var peak_speed: float = 0.0
-var _launch_held: bool = false
-var _detach_requested: bool = false
 var _start_position := Vector3.ZERO
 var _traversed: bool = false
+var route_exit_distance: float = DEFAULT_ROUTE_EXIT_DISTANCE
 var _cable := ImmediateMesh.new()
 var _visual: MeshInstance3D
 var _hook: MeshInstance3D
@@ -98,11 +98,9 @@ func begin(target: Node3D) -> bool:
 	speed = maxf(10.0,minf(player.parkour_profile.grapple_pull_speed,player.velocity.length()))
 	_initial_distance = target.global_position.distance_to(player.global_position+Vector3.UP*1.1)
 	rope_length = _initial_distance
+	route_exit_distance = _authored_route_exit_distance(target)
 	peak_speed = player.velocity.length()
 	tension = 0.0
-	_launch_held = Input.is_action_pressed("jump")
-	_detach_requested = false
-	_dash_requested = false
 	_start_position = player.global_position
 	_traversed = false
 	var approach := target.global_position-player.global_position
@@ -130,7 +128,7 @@ func _set_phase(value: StringName, reason: StringName = &"") -> void:
 	state_changed.emit(phase,reason)
 
 func status() -> Dictionary:
-	return {"phase":phase,"reason":exit_reason,"progress":progress,"elapsed":age,"active":active,"speed":speed,"peak_speed":peak_speed}
+	return {"phase":phase,"reason":exit_reason,"progress":progress,"elapsed":age,"active":active,"speed":speed,"peak_speed":peak_speed,"route_exit_distance":route_exit_distance,"automatic_release":true}
 
 func cancel() -> void:
 	var changed := active or phase != &"idle"
@@ -143,8 +141,6 @@ func _clear() -> void:
 	active = false
 	anchor = null
 	tension = 0.0
-	_detach_requested = false
-	_dash_requested = false
 	_cable.clear_surfaces()
 	if is_instance_valid(_hook): _hook.hide()
 
@@ -160,11 +156,31 @@ func _finish(reason: StringName) -> void:
 	# the authored landing without retaining the old 36 m/s pull velocity.
 	var flat := Vector3(player.velocity.x,0,player.velocity.z)
 	var direction := flat.normalized() if flat.length() > 2 else _exit_forward
+	if reason == &"arrived":
+		var route_direction := _authored_route_direction(target)
+		if route_direction.length_squared() > .25:
+			direction = route_direction
 	var speed_cap := player.parkour_profile.grapple_exit_speed
 	var lift_cap := player.parkour_profile.grapple_exit_lift
-	if target is RiftConstruct:
+	if is_instance_valid(target) and target is RiftConstruct:
 		speed_cap = minf(speed_cap,target.grapple_exit_speed)
 		lift_cap = minf(lift_cap,target.grapple_exit_lift)
+	if reason == &"manual":
+		# Manual release is reserved for system teardown and keeps the exact
+		# velocity already produced by the pull. Gameplay never asks the player
+		# to use this path; the authored route handoff below is automatic.
+		speed = player.velocity.length()
+		player._momentum_left = player.parkour_profile.grapple_exit_momentum_seconds
+		player._coyote_left = 0.0
+		player._jump_buffer_left = 0.0
+		player._jump_held = Input.is_action_pressed("jump")
+		player._ignore_floor_once = not player.is_on_floor()
+		if is_instance_valid(target): _last_anchor_id = target.get_instance_id()
+		_regrab_left = REGRAB_DELAY
+		_clear()
+		_set_phase(&"detached",reason)
+		released.emit()
+		return
 	var exit_speed := minf(flat.length(),speed_cap)
 	if reason == &"arrived":
 		# High anchors become nearly vertical inside the release shell, so their
@@ -210,31 +226,24 @@ func advance(delta: float) -> void:
 		_finish(&"blocked")
 		return
 	age += delta
-	var jump_held := Input.is_action_pressed("jump")
-	_detach_requested = _detach_requested or (jump_held and not _launch_held)
-	_dash_requested = _dash_requested or Input.is_action_just_pressed("dash")
-	_launch_held = jump_held
-	if age >= LAUNCH_TIME and (_detach_requested or _dash_requested):
-		var dash := _dash_requested
-		_finish(&"dash" if dash else &"jump")
-		if dash and player.dash_available and not player.is_on_floor():
-			var stick := Input.get_vector("move_left","move_right","move_forward","move_backward")
-			player._start_dash(player.global_basis*Vector3(stick.x,0,stick.y))
-		return
+	# A grapple is committed on the single interaction press. Jump, dash and
+	# releasing E are movement inputs during the flight; they must not turn a
+	# route traversal into a second timing task. System-level calls to release()
+	# remain available for respawn, room teardown and authored interrupts.
 	if age > MAX_DURATION:
 		_finish(&"timeout")
 		return
 	if age >= LAUNCH_TIME:
 		if phase != &"pull": _set_phase(&"pull")
-		if offset.length() <= RELEASE_DISTANCE:
+		if offset.length() <= route_exit_distance:
 			_finish(&"arrived")
 			return
 		speed = move_toward(speed,player.parkour_profile.grapple_pull_speed,player.parkour_profile.grapple_pull_acceleration*delta)
-		# Capping this step at the release shell prevents low-FPS overshoot and
+		# Capping this step at the route exit shell prevents low-FPS overshoot and
 		# repeated reversals around a moving target. A limited tangent preserves
 		# controllable swing input without letting it overwhelm forward traction.
 		var tether_direction := offset.normalized()
-		var pull_step := minf(speed,maxf(0,offset.length()-RELEASE_DISTANCE+.02)/delta)
+		var pull_step := minf(speed,maxf(0,offset.length()-route_exit_distance+.02)/delta)
 		var pull_velocity := tether_direction*pull_step
 		pull_velocity.y = clampf(pull_velocity.y*player.parkour_profile.grapple_vertical_scale,-player.parkour_profile.grapple_vertical_speed,player.parkour_profile.grapple_vertical_speed)
 		var tangent_velocity := player.velocity-tether_direction*player.velocity.dot(tether_direction)
@@ -268,12 +277,31 @@ func advance(delta: float) -> void:
 		if player.get_slide_collision(index).get_normal().dot(commanded.normalized()) < -.45:
 			_finish(&"blocked")
 			return
-	if rope_length <= RELEASE_DISTANCE+.025:
+	if rope_length <= route_exit_distance+.025:
 		# Restore the approach velocity after the final fractional physical step.
 		player.velocity = commanded.normalized()*speed
 		_finish(&"arrived")
 	elif age > LAUNCH_TIME+.12 and player.global_position.distance_to(before) < .015:
 		_finish(&"blocked")
+func _authored_route_exit_distance(target: Node3D) -> float:
+	if target is RiftConstruct:
+		return clampf(target.grapple_release_distance,MIN_ROUTE_EXIT_DISTANCE,MAX_ROUTE_EXIT_DISTANCE)
+	return DEFAULT_ROUTE_EXIT_DISTANCE
+
+func _authored_route_direction(target: Node3D) -> Vector3:
+	if not is_instance_valid(target): return Vector3.ZERO
+	var followup: Variant = target.get_meta("followup_wall", {})
+	if followup is Dictionary and followup.has("point"):
+		var point: Vector3 = followup["point"] as Vector3
+		var direction := point-player.global_position
+		direction.y = 0.0
+		if direction.length_squared() > .25: return direction.normalized()
+	var route_exit: Variant = target.get_meta("grapple_exit", {})
+	if route_exit is Dictionary and route_exit.has("direction"):
+		var authored: Vector3 = route_exit["direction"] as Vector3
+		authored.y = 0.0
+		if authored.length_squared() > .25: return authored.normalized()
+	return Vector3.ZERO
 
 func _cable_blocked(origin: Vector3,target: Node3D) -> bool:
 	var exclusions: Array[RID] = [player.get_rid()]
