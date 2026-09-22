@@ -157,26 +157,28 @@ func _enter_shield() -> void:
 	_clear_objectives()
 	actor.cooldown = 1.25
 	var count: int = FORGE_COUNTS[stage-1] if kind == &"forge" else (4 if stage==3 else 3)
+	# Every shield phase is now a traversal phase. The targets live on moving
+	# wall faces and broken decks at different elevations; the boss body remains
+	# sealed until the player has physically reached and shattered all of them.
+	arena.prepare_air_route()
+	if arena.surfaces.size() < 6:
+		mechanic_event.emit(&"arena_binding_failed",origin,0)
+		cancel_encounter()
+		return
+	var route_heights := [1.05, 1.75, 1.2, 2.15, 1.35]
 	for index in range(count):
-		var ground_point := Vector3.ZERO
-		if not aerial:
-			ground_point = _objective_position(index,count)
-			if not ground_point.is_finite():
-				mechanic_event.emit(&"arena_binding_failed",origin,0)
-				cancel_encounter()
-				return
 		var objective := BossObjective.new()
 		objective.controller = self
 		objective.kind = &"core" if kind==&"forge" else &"chain"
 		objective.ordinal = index
+		var wall: BossOrbitSurface = arena.surfaces[index*6/count]
+		objective.route_role = wall.route_role
+		objective.route_index = wall.route_index
+		wall.add_child(objective)
+		objective.position = Vector3(0,route_heights[index%route_heights.size()],-.38)
+		objective.set_meta("route_role",wall.route_role)
+		objective.set_meta("route_index",wall.route_index)
 		objectives.append(objective)
-		if aerial:
-			var wall: BossOrbitSurface = arena.surfaces[index*6/count]
-			wall.add_child(objective)
-			objective.position = Vector3(0,1.0,-1.3)
-		else:
-			arena.add_child(objective)
-			objective.global_position = ground_point
 		objective.shattered.connect(_objective_shattered)
 	_set_state(&"shielded")
 	mechanic_event.emit(&"shield_raised",actor.get_hit_point(),0)

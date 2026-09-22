@@ -213,6 +213,10 @@ func _forge() -> void:
 	DemoGeometry.box(geometry,Vector3(0,2.05,1),Vector3(6,1.7,3),_iron,true)
 	DemoGeometry.box(geometry,Vector3(-3.35,1.5,1),Vector3(.7,3,3),_stone,true)
 	DemoGeometry.box(geometry,Vector3(3.35,1.5,1),Vector3(.7,3,3),_stone,true)
+	# Keep the throat's exit readable under normal-input timing. The old two metre
+	# seam between the entry slab and the first deck turned a valid slide-jump
+	# into an accidental fall when the jump was buffered a few frames early.
+	_platform(Vector3(0,-.02,-3),Vector2(5.5,2.2))
 	_route_marker(Vector3(0,.08,4),Color("#d48f63"),&"slide")
 	_wall(Vector3(8,2,-16),Vector3(.7,6,23))
 	_mechanism(Vector3(4,1.0,-20),&"launch")
@@ -318,9 +322,11 @@ func _build_checkpoints() -> void:
 		# The first marker sits on the mandatory same-wall chain's real landing,
 		# before the opposed-wall transfer. The old platform-centre marker at
 		# x=0 was four metres off the natural line and silently failed to save.
-		1:points=[Vector3(4.1,.08,-46),Vector3(-3,2.08,-113),Vector3(-3,2.08,-157)]
-		2:points=[route_nodes[0]+Vector3.UP*.08,route_nodes[2]+Vector3.UP*.08,route_nodes[4]+Vector3.UP*.08]
-		3:points=[route_nodes[0]+Vector3.UP*.08,route_nodes[2]+Vector3.UP*.08,route_nodes[5]+Vector3.UP*.08]
+		1:points=[Vector3(4.1,.08,-46),Vector3(-3,2.08,-113),Vector3(4,7.08,-235)]
+		# Place recovery before the first hard gap and before the final vertical
+		# transfer. A marker after a failed gap cannot restore the intended route.
+		2:points=[route_nodes[0]+Vector3.UP*.08,route_nodes[1]+Vector3.UP*.08,route_nodes[3]+Vector3.UP*.08]
+		3:points=[route_nodes[0]+Vector3.UP*.08,route_nodes[1]+Vector3.UP*.08,route_nodes[4]+Vector3.UP*.08]
 	for index in points.size():
 		var area:=Area3D.new()
 		area.name="Checkpoint_%d_%d"%[stage,index+1]
@@ -518,6 +524,15 @@ func _enemy_defeated(_enemy: LanternAcolyte) -> void:
 func _refresh_exit() -> void:
 	if exit_unlocked or (stage == 1 and not _bridge_open):
 		return
+	# Every formal route is built around a movement/combat core. The altar is
+	# intentionally a hard gate: a run that skips its first build cannot clear
+	# the room by flattening enemies with the base weapon alone.
+	if not is_instance_valid(altar) or not altar.used:
+		if is_instance_valid(_exit_title): _exit_title.text = "先在祭坛选择职业构筑"
+		return
+	if not _has_core_build():
+		if is_instance_valid(_exit_title): _exit_title.text = "需要职业核心构筑"
+		return
 	for enemy in _required_enemies:
 		if enemy.health > 0:
 			return
@@ -528,9 +543,22 @@ func _refresh_exit() -> void:
 		_exit_title.text = "封印已解"
 		cleared.emit()
 
+func _has_core_build() -> bool:
+	if not is_instance_valid(altar) or not is_instance_valid(altar.player):
+		return false
+	var combat_node := altar.player.get_node_or_null("Combat") as PlayerCombat
+	if combat_node == null or combat_node.runes.is_empty():
+		return false
+	for id: StringName in combat_node.runes:
+		if bool(RuneCatalog.definition(id).get("core", false)):
+			return true
+	return false
+
 func objective_text() -> String:
 	if not altar.used:
 		return "起点祭坛 · E 选择职业循环"
+	if not _has_core_build():
+		return "回到祭坛选择一枚职业核心构筑"
 	if exit_unlocked:
 		return "封印已解 · 前往出口"
 	var discovered: int=0
@@ -548,6 +576,9 @@ func objective_text() -> String:
 			if z> -88:return "绕开盾面，击破庭院守卫"
 			if z> -108:return "滑过低拱，起跳越过断桥"
 			if z> -150:return "瞄准悬锚按 E · 牵引后自动松开，飞向对岸"
+			if z> -205:return "沿断桥残壁冲刺 · 抓住高处锚点"
+			if z> -240:return "牵引后对准右墙 · 蹬墙接上层平台"
+			if z> -272:return "换向左墙 · 钩锁后继续墙跑"
 		return "抵达钟塔，处决契印守卫"+progress
 	return ("执刑官 · 封印锚" if stage == 2 else "守门者 · 双封印锚")+progress
 

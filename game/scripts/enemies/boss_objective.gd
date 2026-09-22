@@ -7,6 +7,8 @@ var controller: BossPhaseController
 var kind: StringName = &"core"
 var health: int = 1
 var ordinal: int = 0
+var route_role: StringName = &"wall_face"
+var route_index: int = 0
 
 func _ready() -> void:
 	process_mode = PROCESS_MODE_PAUSABLE
@@ -21,7 +23,8 @@ func _ready() -> void:
 	# Functional markers use existing materials; final assets bind to the signals.
 	var tint := Color("#dc8a42") if kind == &"core" else Color("#a38dbb")
 	DemoGeometry.sphere(self, Vector3.ZERO, .38, DemoGeometry.material(tint, .65))
-	DemoGeometry.label(self, Vector3.UP*.85, ("熔炉核心" if kind == &"core" else "束缚锁链")+" %d" % (ordinal+1), 22)
+	var route_hint := " · 墙跑/蹬墙" if route_role == &"wall_face" else " · 滑铲跳/牵引"
+	DemoGeometry.label(self, Vector3.UP*.85, ("熔炉核心" if kind == &"core" else "束缚锁链")+" %d" % (ordinal+1)+route_hint, 22)
 
 func get_hit_point() -> Vector3:
 	return global_position

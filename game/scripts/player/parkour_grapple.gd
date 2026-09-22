@@ -167,7 +167,9 @@ func _finish(reason: StringName) -> void:
 		lift_cap = minf(lift_cap,target.grapple_exit_lift)
 	var exit_speed := minf(flat.length(),speed_cap)
 	if reason == &"arrived":
-		exit_speed = maxf(minf(10.0,speed_cap),exit_speed)
+		# High anchors become nearly vertical inside the release shell, so their
+		# instantaneous flat pull speed cannot define the landing trajectory.
+		exit_speed = speed_cap
 		progress = 1.0
 	player.velocity = direction*exit_speed+Vector3.UP*clampf(player.velocity.y,-8.0,lift_cap)
 	speed = player.velocity.length()

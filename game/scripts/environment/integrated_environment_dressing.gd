@@ -105,8 +105,10 @@ static func _edge_landmark(room: CombatRoom, point: Vector3, size: Vector2, inde
 	if index>0:travel=(point-route[index-1])*Vector3(1,0,1)
 	elif route.size()>1:travel=(route[1]-point)*Vector3(1,0,1)
 	travel=travel.normalized()
-	var edge_distance:=minf(size.x*.5/maxf(.001,absf(travel.x)),size.y*.5/maxf(.001,absf(travel.z)))
-	var edge:=point-travel*(edge_distance-.55)
+	# Keep both piers over the receiving slab. An edge inset makes the outer
+	# pier leave narrow diagonal landings, so the arch is centered on the route
+	# beat and its opening remains the traversable lane between the piers.
+	var edge:=point
 	var rotation:=atan2(-travel.x,-travel.z)
 	var arch:=_module(room.geometry,&"arch",edge,Vector3(1.1,1.25,1.1),rotation)
 	var body:=StaticBody3D.new();body.name="ArchPiers";body.collision_layer=1;body.collision_mask=0;arch.add_child(body)

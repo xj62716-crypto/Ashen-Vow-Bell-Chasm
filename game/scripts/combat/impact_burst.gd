@@ -55,8 +55,8 @@ static func spawn(parent: Node3D, point: Vector3, tint: Color, power: float = 1.
 	burst.add_child(sparks)
 	sparks.emitting = true
 	if style == &"blade":
-		# A short, dense crimson cloud separates flesh feedback from the pale
-		# blade trail and leaves visible residue for the hit confirmation beat.
+		# A short, desaturated oxblood cloud separates flesh feedback from the
+		# pale blade trail without turning the hit into a glowing red overlay.
 		var blood := CPUParticles3D.new()
 		blood.amount = 46
 		blood.lifetime = 1.05
@@ -74,8 +74,8 @@ static func spawn(parent: Node3D, point: Vector3, tint: Color, power: float = 1.
 		blood.scale_amount_min = .15*power
 		blood.scale_amount_max = .32*power
 		var blood_gradient := Gradient.new()
-		blood_gradient.set_color(0,Color(0.78,0.055,0.065,0.94))
-		blood_gradient.set_color(1,Color(0.16,0.008,0.012,0.0))
+		blood_gradient.set_color(0,Color(0.34,0.075,0.055,0.82))
+		blood_gradient.set_color(1,Color(0.08,0.018,0.014,0.0))
 		blood.color_ramp = blood_gradient
 		var blood_mesh := SphereMesh.new()
 		blood_mesh.radius = .055
@@ -83,10 +83,10 @@ static func spawn(parent: Node3D, point: Vector3, tint: Color, power: float = 1.
 		blood_mesh.radial_segments = 6
 		blood_mesh.rings = 3
 		var blood_material := StandardMaterial3D.new()
-		blood_material.albedo_color = Color("#741019")
+		blood_material.albedo_color = Color("#4e211d")
 		blood_material.emission_enabled = true
-		blood_material.emission = Color("#3a0508")
-		blood_material.emission_energy_multiplier = 2.0
+		blood_material.emission = Color("#1b0908")
+		blood_material.emission_energy_multiplier = .28
 		blood_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		blood_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		blood_mesh.material = blood_material
@@ -96,10 +96,10 @@ static func spawn(parent: Node3D, point: Vector3, tint: Color, power: float = 1.
 		blood.emitting = true
 		# A billboarded cloud gives the hit a readable silhouette at gameplay
 		# distance; the particles above remain the fine spray and residue.
-		burst._blood_cloud_material = FxMaterials.glow(Color("#d6253b", 0.88), 2.1)
+		burst._blood_cloud_material = FxMaterials.glow(Color("#5d2726", 0.78), .46)
 		burst._blood_cloud = FxMaterials.sprite(burst, .78 * power, burst._blood_cloud_material)
 		burst._blood_cloud.scale = Vector3.ONE * .55
-		burst._blood_core_material = FxMaterials.glow(Color("#ff4050", 0.94), 2.4)
+		burst._blood_core_material = FxMaterials.glow(Color("#7b3b35", 0.85), .62)
 		burst._blood_core = FxMaterials.sprite(burst, .30 * power, burst._blood_core_material)
 		burst._blood_core.scale = Vector3.ONE * .45
 	burst._light = OmniLight3D.new()
@@ -122,12 +122,12 @@ func _process(delta: float) -> void:
 		FxMaterials.face_camera(_blood_cloud)
 		var cloud_t: float = clampf(_age / .48, 0.0, 1.0)
 		_blood_cloud.scale = Vector3.ONE * lerpf(.55, 1.35, smoothstep(0.0, 1.0, cloud_t))
-		_blood_cloud_material.set_shader_parameter("strength", maxf(0.0, 1.0 - cloud_t) * 2.1)
+		_blood_cloud_material.set_shader_parameter("strength", maxf(0.0, 1.0 - cloud_t) * .46)
 	if is_instance_valid(_blood_core):
 		FxMaterials.face_camera(_blood_core)
 		var core_t: float = clampf(_age / .20, 0.0, 1.0)
 		_blood_core.scale = Vector3.ONE * lerpf(.45, .82, core_t)
-		_blood_core_material.set_shader_parameter("strength", maxf(0.0, 1.0 - core_t) * 2.4)
+		_blood_core_material.set_shader_parameter("strength", maxf(0.0, 1.0 - core_t) * .62)
 	(_flash.material_override as ShaderMaterial).set_shader_parameter("strength",maxf(0,1-_age/.055)*1.3)
 	_ring.scale = Vector3.ONE*(1+_age*4)
 	(_ring.material_override as ShaderMaterial).set_shader_parameter("strength",maxf(0,1-_age/.18)*.25)

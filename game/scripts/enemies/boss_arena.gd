@@ -16,6 +16,11 @@ var anchors: Array[RiftConstruct] = []
 var wells: Array[RiftConstruct] = []
 var _foundation_parts: Array[Node3D] = []
 
+# The boss route alternates low broken decks and higher wall faces. Keeping the
+# recipe here makes both boss types consume the same parkour language instead
+# of falling back to flat orbiting targets around the actor.
+const ROUTE_ELEVATIONS := [0.25, 2.15, 0.75, 2.9, 0.55, 2.45]
+
 func _ready() -> void:
 	process_mode = PROCESS_MODE_PAUSABLE
 	add_to_group("boss_arenas")
@@ -72,6 +77,9 @@ func prepare_air_route() -> void:
 		wall.controller = controller
 		wall.center = origin+Vector3.UP*1.6
 		wall.angle = TAU*index/6.0
+		wall.vertical_offset = ROUTE_ELEVATIONS[index]
+		wall.route_role = &"broken_deck" if index%2==0 else &"wall_face"
+		wall.route_index = index
 		wall.player = controller.actor.player
 		add_child(wall)
 		surfaces.append(wall)

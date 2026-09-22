@@ -68,9 +68,10 @@ extends Resource
 @export_range(2,16) var blade_curve_samples:int=8
 @export_range(.03,.22) var blade_arc_lifetime:float=.11
 @export_range(.03,.3) var blade_arc_width:float=.065
-@export_range(0,6) var blade_arc_emission:float=2.2
-@export_range(0,1) var blade_arc_opacity:float=.52
-@export var blade_arc_outer:Color=Color("d13b6f")
+@export_range(0,6) var blade_arc_emission:float=2.45
+@export_range(0,1) var blade_arc_opacity:float=.56
+@export_range(0,1) var blade_arc_rune_gain:float=.28
+@export var blade_arc_outer:Color=Color("a84368")
 @export var blade_arc_core:Color=Color("e3efff")
 @export_group("Execution spacing")
 @export_range(1.6,2.6) var blade_execution_distance:float=1.95
@@ -78,7 +79,7 @@ extends Resource
 
 func validation_errors() -> PackedStringArray:
 	var errors := PackedStringArray()
-	var sample_ranges:Dictionary={"blade_left_release_seconds":Vector2(.02,.18),"blade_cut_yaw":Vector2(0,8),"blade_cut_roll":Vector2(0,10),"blade_cut_camera_travel":Vector2(0,.12),"blade_cut_fov":Vector2(0,8),"blade_contact_recoil":Vector2(0,3),"blade_motion_smear":Vector2(0,1),"blade_curve_samples":Vector2(2,16),"blade_arc_lifetime":Vector2(.03,.22),"blade_arc_width":Vector2(.03,.3),"blade_arc_emission":Vector2(0,6),"blade_arc_opacity":Vector2(0,1),"blade_execution_distance":Vector2(1.6,2.6),"blade_execution_camera_seconds":Vector2(.12,.32)}
+	var sample_ranges:Dictionary={"blade_left_release_seconds":Vector2(.02,.18),"blade_cut_yaw":Vector2(0,8),"blade_cut_roll":Vector2(0,10),"blade_cut_camera_travel":Vector2(0,.12),"blade_cut_fov":Vector2(0,8),"blade_contact_recoil":Vector2(0,3),"blade_motion_smear":Vector2(0,1),"blade_curve_samples":Vector2(2,16),"blade_arc_lifetime":Vector2(.03,.22),"blade_arc_width":Vector2(.03,.3),"blade_arc_emission":Vector2(0,6),"blade_arc_opacity":Vector2(0,1),"blade_arc_rune_gain":Vector2(0,1),"blade_execution_distance":Vector2(1.6,2.6),"blade_execution_camera_seconds":Vector2(.12,.32)}
 	for key:String in sample_ranges:
 		var value:float=get(key);var bounds:Vector2=sample_ranges[key]
 		if not is_finite(value) or value<bounds.x or value>bounds.y:errors.append(key)

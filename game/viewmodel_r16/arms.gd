@@ -656,9 +656,24 @@ func update_sample_trail(delta:float,combat:PlayerCombat)->void:
 			trail_samples.append({"a":a,"b":b,"age":0.,"speed":minf(velocity.length(),55.),"powered":blade_powered})
 		previous_edge_tip=b
 	if trail_samples.size()<2:return
+	# The current blade branch tints the arc's outer edge while the authored
+	# cutting edge stays visible. Readiness adds only a small pulse; it never
+	# changes the physical ribbon width or hides the weapon.
+	var style:int=blade_style()
+	var rune_color:Color=tuning.blade_arc_outer
+	match style:
+		1:rune_color=tuning.blade_echo_color
+		2:rune_color=tuning.blade_duel_color
+		3:rune_color=tuning.blade_slide_color
+		4:rune_color=tuning.blade_hunt_color
+	var rune_strength:float=tuning.blade_arc_rune_gain if style>0 else 0.0
+	rune_strength*=.55+.45*weapon_readiness
+	var readiness_gain:float=1.+minf(weapon_readiness,.85)*.08
 	r3_arc_shader.set_shader_parameter("core_color",tuning.blade_arc_core)
 	r3_arc_shader.set_shader_parameter("outer_color",tuning.blade_arc_outer)
-	r3_arc_shader.set_shader_parameter("emission_power",tuning.blade_arc_emission)
+	r3_arc_shader.set_shader_parameter("rune_color",rune_color)
+	r3_arc_shader.set_shader_parameter("rune_strength",rune_strength)
+	r3_arc_shader.set_shader_parameter("emission_power",tuning.blade_arc_emission*readiness_gain)
 	r3_arc_shader.set_shader_parameter("opacity",tuning.blade_arc_opacity)
 	r3_arc_shader.set_shader_parameter("clock",motion_clock)
 	# Sweep the real cutting edge in its 3D trajectory. Interpolate its direction

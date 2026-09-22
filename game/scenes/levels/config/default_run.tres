@@ -99,7 +99,7 @@ position_m = Vector3(0.0, 0.04, -10.0)
 archetype = "normal"
 role = "crossbow"
 required_guardian = false
-initial_delay_seconds = 1.1
+initial_delay_seconds = 12.0
 attack_range_m = 18.0
 
 [sub_resource type="Resource" id="stage_2_spawn_02"]

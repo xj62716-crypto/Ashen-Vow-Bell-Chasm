@@ -51,8 +51,9 @@ func unlocked() -> bool:
 
 
 func _can_run() -> bool:
+	if not is_instance_valid(player) or not is_instance_valid(combat):
+		return false
 	return player.control_enabled and combat.enabled and combat.health > 0 and not get_tree().paused
-
 
 func _process(_delta: float) -> void:
 	var now := Time.get_ticks_usec()

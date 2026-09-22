@@ -127,9 +127,36 @@ static func build(parent: Node3D, stage: int) -> void:
 		asset(parent,"gothic_bay",Vector3(0,1,-44),Vector3(2.5,2.5,1))
 
 static func brazier(parent: Node3D, point: Vector3) -> void:
-	asset(parent,"iron_brazier",point)
+	var anchored := point
+	# Props are authored next to route beats, but some beats are deliberately
+	# voids. Refuse to spawn a brazier without a real collision surface below it.
+	var supported := false
+	for body: Node in parent.find_children("*","StaticBody3D",true,false):
+		for child: Node in body.get_children():
+			if not child is CollisionShape3D or not child.shape is BoxShape3D: continue
+			var bounds: Vector3=(child.shape as BoxShape3D).size
+			var local: Vector3=body.to_local(parent.to_global(point))
+			if absf(local.x)<=bounds.x*.5 and absf(local.z)<=bounds.z*.5 and absf(local.y-bounds.y*.5)<1.0:
+				anchored.y=body.global_position.y+bounds.y*.5+.03
+				supported=true
+				break
+		if supported: break
+	if parent.is_inside_tree():
+		var query := PhysicsRayQueryParameters3D.create(point+Vector3.UP*5.0,point-Vector3.UP*30.0,1)
+		var hit := parent.get_world_3d().direct_space_state.intersect_ray(query)
+		if not hit.is_empty():
+			anchored.y=float(hit.position.y)+.03
+			supported=true
+	if not supported: return
+	# Every flame is grounded by a visible plinth and a short iron bracket.
+	# The support is deliberately separate from the imported brazier origin so
+	# Blender pivot changes cannot leave a floating prop in a route screenshot.
+	var stone := load("res://assets/materials/pbr/rock.tres") as Material
+	DemoGeometry.cylinder(parent,anchored-Vector3.UP*.48,.42,.18,stone,.34)
+	DemoGeometry.cylinder(parent,anchored-Vector3.UP*.28,.18,.38,load("res://assets/materials/pbr/iron.tres"),.14)
+	asset(parent,"iron_brazier",anchored)
 	var light := OmniLight3D.new()
-	light.position = point+Vector3.UP*1.5
+	light.position = anchored+Vector3.UP*1.5
 	light.light_color = Color("#ffb371")
 	light.light_energy = 2.6
 	light.omni_range = 7

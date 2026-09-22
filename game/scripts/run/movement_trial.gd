@@ -162,7 +162,12 @@ func _notification(what: int) -> void:
 
 
 func start_run() -> void:
-	if phase==Phase.DEFEATED and combat_mode:
+	# A defeat-menu restart is a checkpoint retry only when the selected class
+	# still owns the current run. Changing class must rebuild the whole room so
+	# the old weapon, profile and checkpoint state cannot leak into the new run.
+	var selected_profile_id: StringName = PROFILES[clampi(hud.class_choice.selected, 0, PROFILES.size() - 1)].id
+	var class_changed := is_instance_valid(player) and player.parkour_profile.id != selected_profile_id
+	if phase==Phase.DEFEATED and combat_mode and not class_changed:
 		_retry_combat_checkpoint()
 		return
 	var retrying := phase == Phase.DEFEATED
@@ -240,6 +245,14 @@ func pause_run() -> void:
 
 func resume_run() -> void:
 	if phase != Phase.PAUSED:
+		return
+	var selected_profile_id: StringName = PROFILES[clampi(hud.class_choice.selected, 0, PROFILES.size() - 1)].id
+	if is_instance_valid(player) and player.parkour_profile.id != selected_profile_id:
+		# The pause menu can leave the class selector focused. Treat that as a
+		# deliberate new run instead of resuming with a mismatched checkpoint.
+		get_tree().paused = false
+		phase = Phase.DEFEATED
+		start_run()
 		return
 	_save_settings()
 	hud.hide_menu()

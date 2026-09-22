@@ -18,7 +18,7 @@ fog_enabled = true
 
 [node name="Causeway" type="Node3D"]
 script = ExtResource("1")
-stage_count = 1
+stage_count = 3
 formal_release = true
 
 [node name="IntegratedPresentation" type="Node" parent="."]

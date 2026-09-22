@@ -62,8 +62,25 @@ func _ready() -> void:
 
 func _hook_arrived(target: Node3D) -> void:
 	if target!=self:return
-	var arts := player.get_node("Combat").arts as ProfessionArts
-	if not _used and arts.has(&"arcane_shape_refund"):arts.mana=minf(100,arts.mana+15)
+	if not is_instance_valid(player):return
+	var combat := player.get_node_or_null("Combat") as PlayerCombat
+	var arts: ProfessionArts = null
+	if combat != null:
+		arts = combat.arts as ProfessionArts
+	if not _used and arts != null and arts.has(&"arcane_shape_refund"):arts.mana=minf(100,arts.mana+15)
+	# Authored anchors can hand off to a real wall. The follow-up is expressed
+	# as world-space plane data so it remains valid when a route section is
+	# rotated or moved by the level builder.
+	var followup: Variant = get_meta("followup_wall", {})
+	if followup is Dictionary and followup.has("normal") and followup.has("point"):
+		var normal: Vector3 = (followup["normal"] as Vector3).normalized()
+		var point: Vector3 = followup["point"] as Vector3
+		if normal.length_squared() > 0.5:
+			player._same_wall_reattach_ready = true
+			player._blocked_wall_normal = normal
+			player._blocked_wall_plane_offset = normal.dot(point)
+			player._wall_coyote_left = maxf(player._wall_coyote_left, player.wall_jump_grace)
+			player._momentum_left = maxf(player._momentum_left, 0.65)
 	_used=true
 
 func get_hit_point() -> Vector3:
