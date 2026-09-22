@@ -396,9 +396,17 @@ func choose_rune(index: int) -> void:
 	if phase != Phase.REWARD or index<0 or index>=reward_options.size():
 		return
 	var id: StringName = reward_options[index].id
-	if not is_instance_valid(_active_altar) or not combat.apply_rune(id):
+	var chosen_altar:=_active_altar
+	if not is_instance_valid(chosen_altar) or not combat.apply_rune(id):
 		return
-	_active_altar.consume()
+	chosen_altar.consume()
+	if combat_mode:
+		# An altar is both the reward and the only formal recovery point. Store a
+		# safe offset beside it, never the altar/brazier origin itself.
+		_checkpoint=combat_room.altar_checkpoint_pose(chosen_altar,player.global_position)
+		combat_checkpoint_index=combat_room.altar_checkpoint_index(chosen_altar)
+		_capture_combat_checkpoint(combat_checkpoint_index)
+		combat.health=combat.maximum_health
 	_active_altar = null
 	reward_options.clear()
 	hud.hide_rewards()
@@ -457,7 +465,7 @@ func _combat_checkpoint_reached(_id:StringName,pose:Transform3D,index:int)->void
 	combat_checkpoint_index=index
 	_capture_combat_checkpoint(index)
 	combat.health=combat.maximum_health
-	hud.toast("归火界标 %d / 3 · 生命恢复"%index)
+	hud.toast("祭坛 %d · 生命恢复，已记录存档"%index)
 	_play("checkpoint")
 
 func _capture_combat_checkpoint(_index:int)->void:
@@ -482,7 +490,7 @@ func _retry_combat_checkpoint()->void:
 	audio.reset_steps(player.global_position)
 	audio.set_phase("retry" if gameplay_audio.supported() else "running")
 	Input.mouse_mode=Input.MOUSE_MODE_CAPTURED
-	hud.toast("从归火界标继续")
+	hud.toast("从祭坛存档继续")
 
 func _suspend_gameplay(reason: StringName, clear_arts: bool = false) -> void:
 	player.grapple.cancel()

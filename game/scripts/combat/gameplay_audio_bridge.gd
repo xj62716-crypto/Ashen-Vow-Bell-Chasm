@@ -30,9 +30,9 @@ func _grapple_changed(phase: StringName, _reason: StringName) -> void:
 		&"pull":
 			if is_instance_valid(player.grapple.anchor):
 				audio.play_at("grapple_attach",player.grapple.anchor.global_position,.8,"player_hook")
-			# The traversal is a short zip, so the old looping swing bed reads as
-			# a long pendulum and is deliberately not started.
-			audio.end_loop("chain")
+			# Keep the authored traction bed only for the brief committed zip. It
+			# ends automatically on detach and never becomes a pendulum loop.
+			audio.begin_loop("chain","grapple_swing")
 		&"detached":
 			audio.end_loop("chain")
 			audio.play_event("grapple_release")

@@ -118,12 +118,14 @@ func _build(number: int) -> bool:
 			3: _tower()
 		CitadelExpansion.build(self)
 	_spawn_configured_encounters()
-	_build_checkpoints()
 	altar = RunAltar.new()
 	altar.position = Vector3(2.4,0,5.0) if stage == 1 else Vector3(-1.6,0,4.5)
 	geometry.add_child(altar)
 	altar.requested.connect(func(device: RunAltar): altar_requested.emit(device))
 	altars.push_front(altar)
+	# Formal recovery is owned by the same altar objects that award runes. The
+	# old free-standing marker route is intentionally not generated.
+	_build_checkpoints()
 	_scenery()
 	if stage!=1:CitadelDressing.build(geometry,stage)
 	IntegratedEnvironmentDressing.decorate(self)
@@ -318,44 +320,53 @@ func _route_marker(point: Vector3, color: Color, kind: StringName) -> void:
 			arrow.rotation.y = PI/4.0
 
 func _build_checkpoints() -> void:
-	var points:Array[Vector3]
-	match stage:
-		# The first marker sits on the mandatory same-wall chain's real landing,
-		# before the opposed-wall transfer. The old platform-centre marker at
-		# x=0 was four metres off the natural line and silently failed to save.
-		1:points=[Vector3(4.1,.08,-46),Vector3(-3,2.08,-113),Vector3(4,7.08,-235)]
-		# Place recovery before the first hard gap and before the final vertical
-		# transfer. A marker after a failed gap cannot restore the intended route.
-		2:points=[route_nodes[0]+Vector3.UP*.08,route_nodes[1]+Vector3.UP*.08,route_nodes[3]+Vector3.UP*.08]
-		3:points=[route_nodes[0]+Vector3.UP*.08,route_nodes[1]+Vector3.UP*.08,route_nodes[4]+Vector3.UP*.08]
-	for index in points.size():
+	# Checkpoint triggers are children of the actual altars. They have no
+	# separate mesh, label, or location in the route, so a player can only save
+	# at a real altar and never at an invisible mid-course marker.
+	for index in altars.size():
+		var altar_device:RunAltar=altars[index]
 		var area:=Area3D.new()
-		area.name="Checkpoint_%d_%d"%[stage,index+1]
-		area.position=points[index]
+		area.name="AltarCheckpoint_%d_%d"%[stage,index+1]
+		area.position=Vector3.ZERO
 		area.collision_layer=0
 		area.collision_mask=2
-		area.set_meta("checkpoint_id",StringName("stage_%d_checkpoint_%d"%[stage,index+1]))
+		area.set_meta("checkpoint_id",StringName("stage_%d_altar_%d"%[stage,index+1]))
 		area.set_meta("checkpoint_index",index+1)
-		geometry.add_child(area)
+		altar_device.add_child(area)
 		var shape:=CollisionShape3D.new()
 		var bounds:=BoxShape3D.new()
-		bounds.size=Vector3(4,2.6,4)
+		bounds.size=Vector3(3.8,2.6,3.8)
 		shape.shape=bounds
 		shape.position.y=1.3
 		area.add_child(shape)
-		var marker:=DemoGeometry.cylinder(area,Vector3(0,.035,0),1.15,.07,DemoGeometry.material(Color("#9ec8b2"),.65))
-		marker.set_meta("interactive_visual",true)
-		DemoGeometry.label(area,Vector3.UP*.65,"归火界标",21)
 		area.body_entered.connect(_checkpoint_body_entered.bind(area))
 		checkpoint_areas.append(area)
 
 func _checkpoint_body_entered(body:Node3D,area:Area3D)->void:
 	if not enabled or not body is ParkourPlayer:return
+	var altar_device:=area.get_parent() as RunAltar
+	if not is_instance_valid(altar_device):return
+	# Reaching an unclaimed altar is not enough to create a recovery snapshot;
+	# the checkpoint is committed when its rune choice is completed.
+	if not altar_device.used:return
 	var id:StringName=area.get_meta("checkpoint_id",&"")
 	if reached_checkpoints.has(id):return
 	reached_checkpoints[id]=true
 	var index:int=area.get_meta("checkpoint_index",0)
-	checkpoint_reached.emit(id,Transform3D(Basis.IDENTITY,area.global_position),index)
+	checkpoint_reached.emit(id,altar_checkpoint_pose(altar_device,body.global_position),index)
+
+func altar_checkpoint_pose(device:RunAltar,from_position:Vector3=Vector3.ZERO)->Transform3D:
+	if not is_instance_valid(device):return Transform3D(Basis.IDENTITY,global_position)
+	var away:=from_position-device.global_position
+	away.y=0.0
+	if away.length_squared()<.04:away=Vector3.FORWARD
+	away=away.normalized()
+	# Respawn just outside the altar collision footprint so the player never
+	# reappears inside the brazier or clips through the offering mesh.
+	return Transform3D(Basis.IDENTITY,device.global_position+away*2.25+Vector3.UP*.08)
+
+func altar_checkpoint_index(device:RunAltar)->int:
+	return altars.find(device)+1 if is_instance_valid(device) else 0
 
 func checkpoint_defeated_ids()->Array[StringName]:
 	var ids:Array[StringName]=[]

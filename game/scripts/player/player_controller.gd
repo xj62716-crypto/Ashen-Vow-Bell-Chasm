@@ -43,6 +43,10 @@ signal slide_jumped
 @export_range(65.0, 100.0, 1.0) var field_of_view: float = 80.0
 @export var camera_feedback: bool = true
 @export var fall_limit: float = -14.0
+@export_group("Grapple camera feedback")
+@export_range(0.0, 0.25, 0.01) var grapple_camera_lurch: float = 0.11
+@export_range(0.0, 15.0, 0.5) var grapple_camera_fov: float = 7.0
+@export_range(0.0, 6.0, 0.5) var grapple_camera_roll_degrees: float = 2.5
 
 @onready var head: Node3D = $Head
 @onready var camera: Camera3D = $Head/Camera3D
@@ -120,6 +124,9 @@ var blade_arrival_left:float=0.
 var blade_arrival_duration:float=.18
 var _movement_camera_roll:float=0.
 var blade_approach_active:bool=false
+var _grapple_camera_blend: float = 0.0
+var _grapple_camera_punch: float = 0.0
+var _grapple_camera_direction := Vector3.FORWARD
 @onready var body_shape: CollisionShape3D = $CollisionShape3D
 
 
@@ -127,6 +134,7 @@ func _ready() -> void:
 	grapple = ParkourGrapple.new()
 	grapple.name = "Grapple"
 	add_child(grapple)
+	grapple.state_changed.connect(_grapple_camera_state)
 	var avatar := PlayerAvatar.new()
 	avatar.name = "CharacterBodyVisual"
 	add_child(avatar)
@@ -300,6 +308,13 @@ func _physics_process(delta: float) -> void:
 
 func _process(delta: float) -> void:
 	var visual_delta: float = minf(delta,.033)
+	var grapple_active: bool = is_instance_valid(grapple) and grapple.active
+	_grapple_camera_blend = lerpf(_grapple_camera_blend,1.0 if grapple_active else 0.0,1.0-exp(-24.0*visual_delta))
+	_grapple_camera_punch = move_toward(_grapple_camera_punch,0.0,visual_delta*8.5)
+	if grapple_active and is_instance_valid(grapple.anchor):
+		var hook_offset := grapple.anchor.global_position-camera.global_position
+		if hook_offset.length_squared()>.04:
+			_grapple_camera_direction = hook_offset.normalized()
 	_stride_phase = fmod(_stride_phase+horizontal_speed()*delta*TAU/2.75,TAU)
 	_stride_weight = lerpf(_stride_weight,minf(1.0,horizontal_speed()/move_speed) if is_on_floor() and not crouched and control_enabled else 0.0,1-exp(-12*delta))
 	_camera_recoil_velocity += (-150*_camera_recoil-21*_camera_recoil_velocity)*visual_delta
@@ -317,6 +332,11 @@ func _process(delta: float) -> void:
 		camera.position.x = 0
 		camera.position.z = 0
 	var target_fov: float = field_of_view + (3.0 if camera_feedback and is_dashing() else 0.0)
+	if camera_feedback and _grapple_camera_blend>.001:
+		var hook_local := global_basis.inverse()*_grapple_camera_direction
+		camera.position.z -= grapple_camera_lurch*_grapple_camera_blend
+		camera.position.x += clampf(hook_local.x,-1.0,1.0)*grapple_camera_lurch*.16*_grapple_camera_blend
+		target_fov += grapple_camera_fov*_grapple_camera_blend + _grapple_camera_punch*2.0
 	if blade_arrival_left>0:
 		blade_arrival_left=maxf(0,blade_arrival_left-delta)
 		var arrival_weight:float=smoothstep(0.,1.,blade_arrival_left/maxf(.001,blade_arrival_duration))
@@ -331,6 +351,9 @@ func _process(delta: float) -> void:
 	var kick_roll: float = deg_to_rad(5.0 * _wall_kick_side) * _wall_kick_feedback if camera_feedback else 0.0
 	var target_roll: float = wall_roll + kick_roll
 	if camera_feedback:
+		if _grapple_camera_blend>.001:
+			var hook_local := global_basis.inverse()*_grapple_camera_direction
+			target_roll += deg_to_rad(clampf(hook_local.x,-1.0,1.0)*grapple_camera_roll_degrees)*_grapple_camera_blend
 		target_roll += sin(_impact_left*80.0)*_impact_left*_impact_strength*.18
 		target_roll += attack_body_turn*.19
 		if sliding:
@@ -339,8 +362,20 @@ func _process(delta: float) -> void:
 	_movement_camera_roll=lerp_angle(_movement_camera_roll,target_roll,1.0-exp(-10.0*delta))
 	camera.rotation.z = _movement_camera_roll+(blade_camera_angles.z if camera_feedback else 0.)
 	camera.rotation.y = attack_body_turn*.10+blade_camera_angles.y if camera_feedback else 0.0
-	camera.rotation.x = blade_camera_angles.x if camera_feedback else 0.0
+	var grapple_pitch: float = 0.0
+	if camera_feedback and _grapple_camera_blend>.001:
+		var hook_local := global_basis.inverse()*_grapple_camera_direction
+		grapple_pitch = -deg_to_rad(clampf(hook_local.y,-.8,.8)*1.8)*_grapple_camera_blend
+	camera.rotation.x = (blade_camera_angles.x if camera_feedback else 0.0)+grapple_pitch
 	camera.fov = lerpf(camera.fov, target_fov, 1.0 - exp(-12.0 * delta))
+
+
+func _grapple_camera_state(phase: StringName, _reason: StringName) -> void:
+	if phase == &"launch":
+		_grapple_camera_punch = 1.0
+		if is_instance_valid(grapple.anchor):
+			var hook_offset := grapple.anchor.global_position-camera.global_position
+			if hook_offset.length_squared()>.04:_grapple_camera_direction=hook_offset.normalized()
 
 
 func _start_dash(direction: Vector3) -> void:

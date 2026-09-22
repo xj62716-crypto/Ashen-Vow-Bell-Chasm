@@ -596,7 +596,8 @@ func update_run(player: ParkourPlayer, seconds: float, checkpoint: int, falls: i
 		var trial := get_tree().current_scene as MovementTrial
 		health_label.text = "◆  ◆" if combat.health>=2 else ("◆  ◇" if combat.health==1 else "◇  ◇")
 		health_bar.value = 100.0 * combat.health / combat.maximum_health
-		status_label.text = "%s · 界标 %d / 3 · 击杀 %d" % [player.parkour_profile.display_name,trial.combat_checkpoint_index if trial!=null else 0,combat.kills]
+		var altar_total:int=trial.combat_room.altars.size() if trial!=null else 0
+		status_label.text = "%s · 祭坛 %d / %d · 击杀 %d" % [player.parkour_profile.display_name,trial.combat_checkpoint_index if trial!=null else 0,altar_total,combat.kills]
 		if trial != null:
 			stage_label.text = "%02d / %02d  %s" % [trial.stage_number,trial.stage_count,trial.combat_room.stage_title]
 			objective_label.text = trial.combat_room.objective_text()
