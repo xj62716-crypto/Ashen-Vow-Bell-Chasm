@@ -6,11 +6,11 @@ signal traversed(anchor: Node3D)
 signal released
 signal state_changed(phase: StringName, reason: StringName)
 const RANGE: float = 34.0
-const LAUNCH_TIME: float = .04
+const LAUNCH_TIME: float = .025
 const DEFAULT_ROUTE_EXIT_DISTANCE: float = 2.8
 const MIN_ROUTE_EXIT_DISTANCE: float = 1.5
 const MAX_ROUTE_EXIT_DISTANCE: float = 6.0
-const MAX_DURATION: float = .95
+const MAX_DURATION: float = .70
 const REGRAB_DELAY: float = .35
 var phase: StringName = &"idle"
 var exit_reason: StringName = &""
@@ -96,7 +96,9 @@ func begin(target: Node3D) -> bool:
 	active = true
 	age = 0.0
 	progress = 0.0
-	speed = maxf(10.0,minf(player.parkour_profile.grapple_pull_speed,player.velocity.length()))
+	# Ghostrunner-style traversal commits to a short, high-speed zip on the
+	# single press. There is no low-speed wind-up that reads as a hanging pull.
+	speed = player.parkour_profile.grapple_pull_speed
 	_initial_distance = target.global_position.distance_to(player.global_position+Vector3.UP*1.1)
 	rope_length = _initial_distance
 	route_exit_distance = _authored_route_exit_distance(target)
@@ -260,13 +262,13 @@ func advance(delta: float) -> void:
 		# Preserve only a small amount of the entry line. This keeps a lateral
 		# hook readable without turning the route into a long swing.
 		tangent_velocity += _entry_tangent * minf(1.0, delta * 8.0)
-		tangent_velocity *= exp(-12.0*delta)
+		tangent_velocity *= exp(-20.0*delta)
 		var stick := Input.get_vector("move_left","move_right","move_forward","move_backward")
 		var steer_world := player.global_basis*Vector3(stick.x,0,stick.y)
 		var steer_tangent := steer_world-tether_direction*steer_world.dot(tether_direction)
 		if steer_tangent.length_squared()>.001:
 			tangent_velocity += steer_tangent.normalized()*player.parkour_profile.grapple_steer_acceleration*delta
-		tangent_velocity=tangent_velocity.limit_length(6.0)
+		tangent_velocity=tangent_velocity.limit_length(4.0)
 		player.velocity=(pull_velocity+tangent_velocity).limit_length(player.parkour_profile.grapple_max_speed)
 		player.velocity.y=clampf(player.velocity.y,-player.parkour_profile.grapple_vertical_speed,player.parkour_profile.grapple_vertical_speed)
 	else:

@@ -108,7 +108,10 @@ static func build(room: CombatRoom) -> void:
 	room._extra_altar(secret+Vector3(1,0,-2))
 	CitadelExpansion._device(room,Vector3(-8,3,-84),&"breakable")
 	CitadelExpansion._device(room,Vector3(1,3,-155),&"pulse")
-	room._exit(Vector3(-2,12,-300))
+	# The final platform ends at z=-294. Keep the exit gate on its landing
+	# surface so the next-stage trigger is reachable on foot, rather than
+	# floating six metres beyond the deck in the void.
+	room._exit(Vector3(-2,12,-291))
 	for p: Vector3 in [Vector3(-10,2,-86),Vector3(4,4,-188)]:
 		CitadelDressing.asset(room.geometry,"gothic_statue",p,Vector3(1.3,1.3,1.3))
 	CitadelDressing.asset(room.geometry,"large_castle_door",Vector3(-2,12,-302),Vector3(2.2,2.2,2.2))

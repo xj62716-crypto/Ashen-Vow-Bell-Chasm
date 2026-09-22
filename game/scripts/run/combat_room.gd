@@ -305,7 +305,8 @@ func _scenery() -> void:
 			lamp.omni_range = 10
 			geometry.add_child(lamp)
 	for point: Vector3 in ([Vector3(-3.8,0,6),Vector3(3.8,0,-16),Vector3(-4.8,0,-42)] if stage==1 else ([Vector3(2.8,0,5),Vector3(5.8,0,-17),Vector3(4.6,3,-35)] if stage==2 else [Vector3(2.8,0,6),Vector3(-6.5,1,-12),Vector3(7,1,-28)])):
-		CitadelDressing.brazier(geometry,point)
+		var entry_brazier_offset := Vector3(0,0,-2) if stage > 1 and point.z > -5 else Vector3.ZERO
+		CitadelDressing.brazier(geometry,point+entry_brazier_offset)
 
 func _route_marker(point: Vector3, color: Color, kind: StringName) -> void:
 	var surface := DemoGeometry.material(color, .7)
