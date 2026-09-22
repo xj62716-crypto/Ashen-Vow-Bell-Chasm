@@ -1,6 +1,6 @@
 class_name RefinedCauseway
 extends RefCounted
-## Authored route: genuine voids, separated encounters, one overhead swing anchor.
+## Authored route: genuine voids, separated encounters, one overhead zip anchor.
 
 static func build(room: CombatRoom) -> void:
 	room.stage_title = "钟渊城垣"

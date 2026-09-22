@@ -6,11 +6,11 @@ signal traversed(anchor: Node3D)
 signal released
 signal state_changed(phase: StringName, reason: StringName)
 const RANGE: float = 34.0
-const LAUNCH_TIME: float = .06
-const DEFAULT_ROUTE_EXIT_DISTANCE: float = 5.5
+const LAUNCH_TIME: float = .04
+const DEFAULT_ROUTE_EXIT_DISTANCE: float = 2.8
 const MIN_ROUTE_EXIT_DISTANCE: float = 1.5
-const MAX_ROUTE_EXIT_DISTANCE: float = 10.0
-const MAX_DURATION: float = 1.6
+const MAX_ROUTE_EXIT_DISTANCE: float = 6.0
+const MAX_DURATION: float = .95
 const REGRAB_DELAY: float = .35
 var phase: StringName = &"idle"
 var exit_reason: StringName = &""
@@ -30,6 +30,7 @@ var peak_speed: float = 0.0
 var _start_position := Vector3.ZERO
 var _traversed: bool = false
 var route_exit_distance: float = DEFAULT_ROUTE_EXIT_DISTANCE
+var _entry_tangent := Vector3.ZERO
 var _cable := ImmediateMesh.new()
 var _visual: MeshInstance3D
 var _hook: MeshInstance3D
@@ -105,8 +106,10 @@ func begin(target: Node3D) -> bool:
 	_traversed = false
 	var approach := target.global_position-player.global_position
 	approach.y = 0
-	_exit_forward = approach.normalized() if approach.length() > .2 else Vector3(player.velocity.x,0,player.velocity.z).normalized()
+	var incoming := Vector3(player.velocity.x,0,player.velocity.z)
+	_exit_forward = incoming.normalized() if incoming.length() > 4.0 else (approach.normalized() if approach.length() > .2 else incoming.normalized())
 	if _exit_forward.length_squared() < .5: _exit_forward = -player.global_basis.z
+	_entry_tangent = incoming - approach.normalized() * incoming.dot(approach.normalized()) if approach.length_squared() > .04 else Vector3.ZERO
 	player._stop_wall(false)
 	player._same_wall_reattach_ready = false
 	player._dash_wall_normal = Vector3.ZERO
@@ -153,9 +156,13 @@ func _finish(reason: StringName) -> void:
 	var useful := reason in [&"arrived",&"manual",&"jump",&"dash"] and player.global_position.distance_to(_start_position) >= 6 and progress*_initial_distance >= 4
 	# Every exit is bounded. Manual release keeps the player's chosen timing and
 	# tangent, while automatic arrival guarantees enough forward speed to reach
-	# the authored landing without retaining the old 36 m/s pull velocity.
+	# the authored landing without retaining the high pull velocity.
 	var flat := Vector3(player.velocity.x,0,player.velocity.z)
 	var direction := flat.normalized() if flat.length() > 2 else _exit_forward
+	if reason == &"arrived":
+		# Looking around during the pull never rotates the authored route. The
+		# locked approach heading is the base; only a real tangent can bias it.
+		direction = _exit_forward
 	if reason == &"arrived":
 		var route_direction := _authored_route_direction(target)
 		if route_direction.length_squared() > .25:
@@ -235,25 +242,31 @@ func advance(delta: float) -> void:
 		return
 	if age >= LAUNCH_TIME:
 		if phase != &"pull": _set_phase(&"pull")
-		if offset.length() <= route_exit_distance:
+		var route_distance := Vector2(offset.x,offset.z).length()
+		var vertical_ready := absf(offset.y) <= player.parkour_profile.grapple_vertical_exit_gap
+		if (route_distance <= route_exit_distance and vertical_ready) or offset.length() <= route_exit_distance:
 			_finish(&"arrived")
 			return
 		speed = move_toward(speed,player.parkour_profile.grapple_pull_speed,player.parkour_profile.grapple_pull_acceleration*delta)
-		# Capping this step at the route exit shell prevents low-FPS overshoot and
-		# repeated reversals around a moving target. A limited tangent preserves
-		# controllable swing input without letting it overwhelm forward traction.
+		# Capping this step at the route exit shell prevents low-FPS overshoot.
+		# The pull is a short, authored zip rather than a pendulum: no gravity is
+		# accumulated along the cable and the incoming tangent fades within a few
+		# frames.
 		var tether_direction := offset.normalized()
 		var pull_step := minf(speed,maxf(0,offset.length()-route_exit_distance+.02)/delta)
 		var pull_velocity := tether_direction*pull_step
 		pull_velocity.y = clampf(pull_velocity.y*player.parkour_profile.grapple_vertical_scale,-player.parkour_profile.grapple_vertical_speed,player.parkour_profile.grapple_vertical_speed)
 		var tangent_velocity := player.velocity-tether_direction*player.velocity.dot(tether_direction)
+		# Preserve only a small amount of the entry line. This keeps a lateral
+		# hook readable without turning the route into a long swing.
+		tangent_velocity += _entry_tangent * minf(1.0, delta * 8.0)
+		tangent_velocity *= exp(-12.0*delta)
 		var stick := Input.get_vector("move_left","move_right","move_forward","move_backward")
 		var steer_world := player.global_basis*Vector3(stick.x,0,stick.y)
 		var steer_tangent := steer_world-tether_direction*steer_world.dot(tether_direction)
-		var target_tangent := Vector3.ZERO
 		if steer_tangent.length_squared()>.001:
-			target_tangent=steer_tangent.normalized()*player.parkour_profile.grapple_steer_speed
-		tangent_velocity=tangent_velocity.move_toward(target_tangent,player.parkour_profile.grapple_steer_acceleration*delta).limit_length(player.parkour_profile.grapple_steer_speed)
+			tangent_velocity += steer_tangent.normalized()*player.parkour_profile.grapple_steer_acceleration*delta
+		tangent_velocity=tangent_velocity.limit_length(6.0)
 		player.velocity=(pull_velocity+tangent_velocity).limit_length(player.parkour_profile.grapple_max_speed)
 		player.velocity.y=clampf(player.velocity.y,-player.parkour_profile.grapple_vertical_speed,player.parkour_profile.grapple_vertical_speed)
 	else:
@@ -277,7 +290,9 @@ func advance(delta: float) -> void:
 		if player.get_slide_collision(index).get_normal().dot(commanded.normalized()) < -.45:
 			_finish(&"blocked")
 			return
-	if rope_length <= route_exit_distance+.025:
+	var route_distance := Vector2(offset.x,offset.z).length()
+	var vertical_ready := absf(offset.y) <= player.parkour_profile.grapple_vertical_exit_gap + .05
+	if (route_distance <= route_exit_distance+.025 and vertical_ready) or rope_length <= route_exit_distance+.025:
 		# Restore the approach velocity after the final fractional physical step.
 		player.velocity = commanded.normalized()*speed
 		_finish(&"arrived")

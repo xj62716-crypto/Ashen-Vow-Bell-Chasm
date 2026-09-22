@@ -18,7 +18,7 @@ var _launch_lock: float=0
 ## This is deliberately a route-entry shell, rather than the old anchor-center
 ## release. It leaves room for the player to carry speed into a landing, wall,
 ## slide or construct continuation.
-@export_range(1.5,10.0,.25) var grapple_release_distance: float = 5.5
+@export_range(1.5,6.0,.25) var grapple_release_distance: float = 2.8
 var permanent: bool=false
 var _used: bool=false
 signal expiring(construct: RiftConstruct)
