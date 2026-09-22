@@ -227,7 +227,12 @@ func update_left_hand(delta:float,state:String,combat:PlayerCombat) -> void:
 	var required:bool=combat.attacking or combat.parry_left>0 or interaction_left>0 or (player.grapple and player.grapple.active)
 	required=required or state in ["parry_hit","parry_exit","grapple_release","shape","seal","detonate","storm","charge","execute","blink","rewind"]
 	required=required or (ability_kind!="" and ability_age<.4 and state==ability_kind)
-	if tuning.left_special_parkour:required=required or state in ["wall_left","wall_right","kick_left","kick_right","slide","slide_jump"]
+	# During a wall-run the left hand is only visible when the character is
+	# actually bracing against the left-side wall. A right-side wall-run keeps
+	# the support hand stowed, matching the first-person movement silhouette.
+	if tuning.left_special_parkour:
+		required=required or state=="wall_left"
+		required=required or state in ["kick_left","kick_right","slide","slide_jump"]
 	# Withdraw during the end of recovery so pure locomotion does not inherit a
 	# hand parked on the lower screen edge. A buffered next cut retains its grip.
 	var recovering:bool=combat.attacking and combat.attack_buffer<=0 and combat.attack_age>=combat.duration()-tuning.left_exit_seconds
