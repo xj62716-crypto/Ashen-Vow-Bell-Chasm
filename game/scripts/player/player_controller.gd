@@ -102,6 +102,12 @@ var _impact_left: float = 0.0
 var _impact_strength: float = 0.0
 var _stride_phase: float = 0.0
 var _stride_weight: float = 0.0
+## A short-lived traversal receipt used by authored encounter gates.  It is not
+## a global combo counter: a route action only creates a nearby attack window.
+## This prevents the main guardian from being cleared by walking up and
+## holding the attack button while preserving a forgiving recovery route.
+var traversal_receipt_left: float = 0.0
+var last_traversal_action: StringName = &""
 var _camera_recoil: float = 0.0
 var _camera_recoil_velocity: float = 0.0
 var grapple: ParkourGrapple
@@ -150,8 +156,18 @@ func _unhandled_input(event: InputEvent) -> void:
 			rotate_y(yaw_delta)
 		head.rotation.x = clampf(head.rotation.x - deg_to_rad(motion.screen_relative.y * mouse_sensitivity), deg_to_rad(-80.0), deg_to_rad(80.0))
 
+func mark_traversal_action(kind: StringName, seconds: float = 2.2) -> void:
+	## Gives a nearby authored guardian a fair, readable attack window. The
+	## receipt expires quickly so it cannot be banked before a later room.
+	last_traversal_action = kind
+	traversal_receipt_left = maxf(traversal_receipt_left, seconds)
+
+func has_recent_traversal_action() -> bool:
+	return traversal_receipt_left > 0.0
+
 
 func _physics_process(delta: float) -> void:
+	traversal_receipt_left = maxf(0.0, traversal_receipt_left - delta)
 	if not control_enabled:
 		if grapple.active:grapple.cancel()
 		return
@@ -200,6 +216,7 @@ func _physics_process(delta: float) -> void:
 			velocity.z = _slide_direction.z * carry_speed
 			_momentum_left = 0.85
 			slide_jump_count += 1
+			mark_traversal_action(&"slide_jump")
 			slide_jumped.emit()
 			_end_slide()
 			_slide_jump_left = 0.0
@@ -349,6 +366,7 @@ func _start_dash(direction: Vector3) -> void:
 	dash_available = false
 	_coyote_left = 0.0
 	dash_count += 1
+	mark_traversal_action(&"air_dash")
 	dashed.emit()
 
 
@@ -501,6 +519,7 @@ func _update_wall_contact(wish: Vector3, stick: Vector2, delta: float) -> void:
 			_wall_coyote_left = 0.0
 			velocity.y = clampf(velocity.y, -0.8, 5.0)
 			wall_run_count += 1
+			mark_traversal_action(&"wall_run")
 			wall_run_started.emit(side)
 		_wall_time_used = minf(parkour_profile.wall_duration, _wall_time_used + delta)
 		return
@@ -544,6 +563,7 @@ func _perform_wall_jump() -> void:
 	_wall_jump_transfer_left = wall_jump_transfer_window
 	jump_count += 1
 	wall_jump_count += 1
+	mark_traversal_action(&"wall_jump")
 	_wall_kick_feedback = 1.0
 	if parkour_profile.restore_dash_on_wall_jump and not _wall_bonus_used and not dash_available:
 		dash_available = true

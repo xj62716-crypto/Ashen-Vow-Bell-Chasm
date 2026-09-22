@@ -30,8 +30,9 @@ func _grapple_changed(phase: StringName, _reason: StringName) -> void:
 		&"pull":
 			if is_instance_valid(player.grapple.anchor):
 				audio.play_at("grapple_attach",player.grapple.anchor.global_position,.8,"player_hook")
-			# Legacy resource key names the texture; lifetime is the short pull.
-			audio.begin_loop("chain","grapple_swing",{"strength":.65})
+			# The traversal is a short zip, so the old looping swing bed reads as
+			# a long pendulum and is deliberately not started.
+			audio.end_loop("chain")
 		&"detached":
 			audio.end_loop("chain")
 			audio.play_event("grapple_release")

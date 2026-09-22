@@ -211,6 +211,7 @@ func _finish(reason: StringName) -> void:
 	# can safely delete constructs / transition the room.
 	if useful and not _traversed and is_instance_valid(target) and not target.is_queued_for_deletion():
 		_traversed = true
+		player.mark_traversal_action(&"grapple")
 		traversed.emit(target)
 	if reason == &"arrived" and is_instance_valid(target) and not target.is_queued_for_deletion(): arrived.emit(target)
 	released.emit()
@@ -249,19 +250,17 @@ func advance(delta: float) -> void:
 		if (route_distance <= route_exit_distance and vertical_ready) or offset.length() <= route_exit_distance:
 			_finish(&"arrived")
 			return
-		speed = move_toward(speed,player.parkour_profile.grapple_pull_speed,player.parkour_profile.grapple_pull_acceleration*delta)
-		# Capping this step at the route exit shell prevents low-FPS overshoot.
-		# The pull is a short, authored zip rather than a pendulum: no gravity is
-		# accumulated along the cable and the incoming tangent fades within a few
-		# frames.
+		# The reference is a committed zip. The line pulls the body along the
+		# locked aim ray immediately; there is no pendulum or spring phase.
 		var tether_direction := offset.normalized()
-		var pull_step := minf(speed,maxf(0,offset.length()-route_exit_distance+.02)/delta)
+		speed = move_toward(speed,player.parkour_profile.grapple_pull_speed,player.parkour_profile.grapple_pull_acceleration*delta)
+		var pull_step := minf(speed,maxf(0.0,offset.length()-route_exit_distance+.02)/delta)
 		var pull_velocity := tether_direction*pull_step
 		pull_velocity.y = clampf(pull_velocity.y*player.parkour_profile.grapple_vertical_scale,-player.parkour_profile.grapple_vertical_speed,player.parkour_profile.grapple_vertical_speed)
+		# Keep only a short trace of the entry motion so the handoff does not
+		# feel like a teleport, while preventing any swing around the anchor.
 		var tangent_velocity := player.velocity-tether_direction*player.velocity.dot(tether_direction)
-		# Preserve only a small amount of the entry line. This keeps a lateral
-		# hook readable without turning the route into a long swing.
-		tangent_velocity += _entry_tangent * minf(1.0, delta * 8.0)
+		tangent_velocity += _entry_tangent * minf(1.0,delta*8.0)
 		tangent_velocity *= exp(-20.0*delta)
 		var stick := Input.get_vector("move_left","move_right","move_forward","move_backward")
 		var steer_world := player.global_basis*Vector3(stick.x,0,stick.y)
@@ -278,8 +277,10 @@ func advance(delta: float) -> void:
 	player.move_and_slide()
 	peak_speed = maxf(peak_speed,player.velocity.length())
 	harness = player.global_position+Vector3.UP*1.1
-	rope_length = harness.distance_to(anchor.global_position) # compatibility telemetry only
+	var post_offset := anchor.global_position-harness
+	rope_length = post_offset.length() # compatibility telemetry only
 	progress = clampf(1.0-rope_length/maxf(_initial_distance,.01),0.0,1.0)
+	tension = 0.0 if phase == &"launch" else clampf(speed/maxf(player.parkour_profile.grapple_pull_speed,1.0),0.0,1.0)
 	if player.global_position.y < player.fall_limit:
 		cancel()
 		player.fell_out.emit()
@@ -292,8 +293,8 @@ func advance(delta: float) -> void:
 		if player.get_slide_collision(index).get_normal().dot(commanded.normalized()) < -.45:
 			_finish(&"blocked")
 			return
-	var route_distance := Vector2(offset.x,offset.z).length()
-	var vertical_ready := absf(offset.y) <= player.parkour_profile.grapple_vertical_exit_gap + .05
+	var route_distance := Vector2(post_offset.x,post_offset.z).length()
+	var vertical_ready := absf(post_offset.y) <= player.parkour_profile.grapple_vertical_exit_gap + .05
 	if (route_distance <= route_exit_distance+.025 and vertical_ready) or rope_length <= route_exit_distance+.025:
 		# Restore the approach velocity after the final fractional physical step.
 		player.velocity = commanded.normalized()*speed
@@ -307,6 +308,14 @@ func _authored_route_exit_distance(target: Node3D) -> float:
 
 func _authored_route_direction(target: Node3D) -> Vector3:
 	if not is_instance_valid(target): return Vector3.ZERO
+	# Boss evacuation anchors are mounted just outside a moving wall. On the
+	# automatic one-press release, bias toward the wall centre so the next frame
+	# can acquire the physical wall-run surface as it rotates.
+	if target is RiftConstruct and target.get_parent() is BossOrbitSurface:
+		var wall := target.get_parent() as BossOrbitSurface
+		var inward := wall.global_position-target.global_position
+		inward.y = 0.0
+		if inward.length_squared() > .25: return inward.normalized()
 	var followup: Variant = target.get_meta("followup_wall", {})
 	if followup is Dictionary and followup.has("point"):
 		var point: Vector3 = followup["point"] as Vector3
@@ -331,15 +340,16 @@ func _process(_delta: float) -> void:
 	if not active or not is_instance_valid(anchor):return
 	var arms := player.get_node_or_null("FirstPersonArms") as FirstPersonArms
 	var start := arms.grapple_world_position() if arms!=null else player.camera.global_transform*Vector3(-.25,-.23,-.38)
-	var finish := start.lerp(anchor.global_position,minf(1.0,age/LAUNCH_TIME))
+	var finish := anchor.global_position
 	var direction := (finish-start).normalized()
 	var side := direction.cross(player.camera.global_basis.z)
 	if side.length_squared()<.01:side=player.camera.global_basis.x
 	side=side.normalized()*.009
+	var slack := lerpf(.22,.035,clampf(tension,0.0,1.0)) if phase == &"launch" else .035
 	_cable.surface_begin(Mesh.PRIMITIVE_TRIANGLE_STRIP)
 	for i in range(25):
 		var t := i/24.0
-		var point := start.lerp(finish,t)+Vector3.DOWN*sin(t*PI)*.08*(1-minf(age*5,1))
+		var point := start.lerp(finish,t)+Vector3.DOWN*sin(t*PI)*slack
 		_cable.surface_add_vertex(to_local(point-side))
 		_cable.surface_add_vertex(to_local(point+side))
 	_cable.surface_end()
