@@ -16,7 +16,12 @@ var _airtime: int = -1
 var _parry_refunds: int = 0
 var _kill_refunds: int = 0
 var _wall_refunds: int = 0
-var _last_wall_segment: int = 1
+## `wall_chain_count` is intentionally reset when a route transfers to a new
+## surface.  Focus refunds need the airborne traversal serial instead of that
+## local chain number, otherwise the first segment on the second wall is
+## mistaken for a duplicate of the first segment.
+var _last_wall_run_count: int = 0
+var _observed_wall_run_count: int = 0
 var _defeated_ids: Dictionary = {}
 var _last_parry_tick: int = -1000000
 var phase: StringName = &"idle"
@@ -54,6 +59,16 @@ func _process(_delta: float) -> void:
 		_set_phase(&"active")
 	elif phase == &"exiting" and _phase_age >= 0.10:
 		_set_phase(&"idle", exit_reason)
+	# The contact signal is emitted from the player's physics callback. Poll the
+	# monotonic counter too so the refund is visible in the same frame as a
+	# route handoff to systems sampling focus after physics.
+	_sync_airtime()
+	if _can_refund() and player.wall_run_count > _observed_wall_run_count:
+		_observed_wall_run_count = player.wall_run_count
+		if player.wall_run_count > _last_wall_run_count and _wall_refunds < 2:
+			_last_wall_run_count = player.wall_run_count
+			_wall_refunds += 1
+			reserve = minf(capacity, reserve + 0.12)
 	var held := Input.is_action_pressed("focus")
 	if not held:
 		_release_required = false
@@ -150,7 +165,10 @@ func _sync_airtime() -> void:
 	_wall_refunds = 0
 	_air_hit_refunds = 0
 	_air_hit_ids.clear()
-	_last_wall_segment = 1
+	# The first wall contact starts the traversal; the refund belongs to a
+	# subsequent segment completed during the same airborne sequence.
+	_last_wall_run_count = player.wall_run_count + 1
+	_observed_wall_run_count = player.wall_run_count
 
 
 func _parried() -> void:
@@ -187,10 +205,11 @@ func _wall_started(_side: int) -> void:
 	if not _can_refund():
 		return
 	_sync_airtime()
-	var segment := player.wall_chain_count
-	if segment <= _last_wall_segment or _wall_refunds >= 2:
+	var segment := player.wall_run_count
+	_observed_wall_run_count = maxi(_observed_wall_run_count, segment)
+	if segment <= _last_wall_run_count or _wall_refunds >= 2:
 		return
-	_last_wall_segment = segment
+	_last_wall_run_count = segment
 	_wall_refunds += 1
 	reserve = minf(capacity, reserve + 0.12)
 

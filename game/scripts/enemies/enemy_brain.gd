@@ -94,7 +94,7 @@ func _perceive(delta: float) -> void:
 	if seen != target:
 		# Enemies that have been idle offscreen must still telegraph their first
 		# attack after acquiring the player during a traversal sequence.
-		if target == null and seen != null:
+		if target == null and seen != null and actor.cooldown > 0.0:
 			actor.cooldown = maxf(actor.cooldown, .65)
 		target = seen
 		target_changed.emit(target)

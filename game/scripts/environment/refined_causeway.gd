@@ -45,9 +45,6 @@ static func build(room: CombatRoom) -> void:
 	remnant_wall.set_meta("timeline_phase",&"remnant")
 	for z: float in [-68.0,-64.0,-60.0,-56.0]:
 		DemoGeometry.box(remnant_wall,Vector3(0.38,1.1,z+62.0),Vector3(.08,1.4,.22),DemoGeometry.material(Color("#9a6fc2"),1.4))
-	var remnant_enemy := room._enemy(Vector3(-3.9,5.25,-63),&"normal",&"sentinel")
-	remnant_enemy.set_meta("timeline_phase",&"remnant")
-	remnant_enemy.set_meta("phase_route_node",true)
 	room._route_marker(Vector3(4.4,.08,.8),Color("#b49c71"),&"wall")
 	# Combat begins only after the transfer's safe landing.
 	room._wall(Vector3(-3,3.8,-79),Vector3(2,3.6,2))
@@ -106,9 +103,6 @@ static func build(room: CombatRoom) -> void:
 	room._route_marker(Vector3(-3,4.08,-207),Color("#75c5de"),&"air")
 	room._route_marker(Vector3(4.4,7.08,-232),Color("#dd987d"),&"wall")
 	room._route_marker(Vector3(-4.4,10.08,-257),Color("#dd987d"),&"wall")
-	room._enemy(Vector3(4,7.04,-233),&"normal",&"crossbow")
-	room._enemy(Vector3(-4,10.04,-258),&"elite",&"pursuer")
-	room._enemy(Vector3(-2,12.04,-284),&"normal",&"caster")
 	# Visible bonus ledge: reachable using acquired shaping/enemy-node abilities.
 	var secret := Vector3(16,7,-80)
 	room._platform(secret,Vector2(7,8))

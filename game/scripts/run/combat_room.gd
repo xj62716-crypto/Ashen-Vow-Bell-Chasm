@@ -451,7 +451,13 @@ func restore_checkpoint(defeated_ids:Array[StringName])->Array[LanternAcolyte]:
 func _spawn_configured_encounters() -> void:
 	for entry: LevelEncounterEntry in _configuration.encounters:
 		if entry.stage!=stage:continue
-		_enemy(entry.position_m,StringName(entry.archetype),StringName(entry.role),entry.required_guardian,entry)
+		var enemy := _enemy(entry.position_m,StringName(entry.archetype),StringName(entry.role),entry.required_guardian,entry)
+		# The first route's high sentinel belongs to the remnant timeline. Keeping
+		# this authored phase tag in the same data entry as its spawn position
+		# prevents a second hand-built enemy from diverging during room rebuilds.
+		if stage == 1 and entry.id == &"stage_1_spawn_05":
+			enemy.set_meta("timeline_phase", &"remnant")
+			enemy.set_meta("phase_route_node", true)
 
 func _enemy(point: Vector3, kind: StringName, role: StringName = &"crossbow", required: bool = false, entry: LevelEncounterEntry = null) -> LanternAcolyte:
 	var enemy := LanternAcolyte.new()

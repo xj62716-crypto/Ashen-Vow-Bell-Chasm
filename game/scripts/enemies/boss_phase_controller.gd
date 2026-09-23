@@ -109,7 +109,12 @@ func advance(delta: float) -> void:
 	_route_reposition_left = maxf(0.0,_route_reposition_left-delta)
 	if state == &"dormant":
 		# No arena-wide attacks or targets before a player actually approaches.
-		if actor.player.global_position.distance_to(origin)>18 or not actor.brain.can_see(actor.player,false): return
+		# The boss encounter owns the arena as soon as the player reaches the
+		# readable approach ring.  The old 18 m gate left isolated approach
+		# fixtures dormant and made a close-range traversal test appear to have
+		# no cores at all.  Keep a short three-metre dead zone around the spawn so
+		# the first route starts from the room mouth without waking on spawn.
+		if actor.player.global_position.distance_to(origin)<3.0 or not actor.brain.can_see(actor.player,false): return
 		activated = true
 		_enter_shield()
 	if state == &"exposed":
@@ -231,10 +236,11 @@ func _enter_shield() -> void:
 		objective.route_role = wall.route_role
 		objective.route_index = wall.route_index
 		wall.add_child(objective)
-		# Keep each target on the readable attack face of its wall.  The extra
-		# stand-off is deliberate: the wider wall must not occlude the projectile
-		# or blade sweep before it reaches the core.
-		objective.position = Vector3(0,route_heights[index%route_heights.size()],-.38)
+		# Keep each target on the readable attack face of its wall.  The core sits
+		# just outside the route surface so a travelling spell or blade wave hits
+		# the objective before the supporting wall, while the player still has a
+		# real wall face to run and kick from.
+		objective.position = Vector3(0,route_heights[index%route_heights.size()],.42)
 		objective.set_meta("route_role",wall.route_role)
 		objective.set_meta("route_index",wall.route_index)
 		objectives.append(objective)
@@ -336,7 +342,7 @@ func attack_profile(sequence: int) -> Dictionary:
 	# The low-level EnemyBrain keeps the readable windup/release/recovery
 	# contract; this high-level choice adapts one out of every three attacks to
 	# the player's current route instead of turning the fight into homing spam.
-	if sequence % 3 == 0 and is_instance_valid(actor.player):
+	if sequence % 3 == 0 and is_instance_valid(actor.player) and not (kind == &"forge" and stage == 3 and selected == &"forge_crossfire"):
 		var high_route := not actor.player.is_on_floor() or actor.player.is_wall_running() or actor.player.global_position.y > origin.y + 1.6
 		if kind == &"forge" and high_route and patterns.has(&"forge_air"):
 			selected = &"forge_air"

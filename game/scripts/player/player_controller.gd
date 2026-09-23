@@ -526,9 +526,9 @@ func _update_wall_contact(wish: Vector3, stick: Vector2, delta: float) -> void:
 		var has_previous_wall: bool = _blocked_wall_normal.length_squared() > 0.5
 		var same_wall_surface: bool = has_previous_wall and normal.dot(_blocked_wall_normal) > 0.95 and absf(plane_offset - _blocked_wall_plane_offset) < 0.25
 		var switched_wall: bool = has_previous_wall and not same_wall_surface
-		# The segment budget limits reattaching to the same wall. Crossing to a
-		# different wall while airborne starts a fresh wall chain, so a route can
-		# intentionally read as wall -> dash -> wall without touching the floor.
+		# The segment budget is airborne-wide. Both a same-plane reattach and a
+		# transfer to a different wall consume the next segment, so the route can
+		# read as wall -> dash -> wall without requiring a ground reset.
 		if not _wall_active and wall_segments_remaining() <= 0 and not switched_wall:
 			continue
 		# Normal wall re-entry is intentionally glancing, which prevents a floor
@@ -558,9 +558,6 @@ func _update_wall_contact(wish: Vector3, stick: Vector2, delta: float) -> void:
 		_wall_tangent = tangent
 		wall_side = side
 		if not _wall_active:
-			if switched_wall and not is_on_floor():
-				wall_chain_count = 0
-				_wall_time_used = 0.0
 			_wall_active = true
 			_wall_look_yaw = 0.0
 			head.rotation.y = 0.0
