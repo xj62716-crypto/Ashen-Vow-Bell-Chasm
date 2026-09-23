@@ -13,6 +13,7 @@ signal spell_contact(element: StringName)
 signal temporal_reset_requested
 signal rune_applied(id: StringName)
 signal runes_reset
+signal flow_changed(value: float, capacity: float)
 
 @export var maximum_health: int = 2
 @export var reach: float = 2.7
@@ -60,6 +61,9 @@ var _attack_airtime: int = -1
 var arts: ProfessionArts
 var last_parried_enemy: LanternAcolyte
 var _primary_element: StringName = &"arcane"
+@export_range(20.0, 100.0, 1.0) var flow_capacity: float = 100.0
+@export_range(0.0, 100.0, 1.0) var flow_decay_per_second: float = 28.0
+var flow: float = 0.0
 var echo_cuts: Array[Dictionary] = []
 var _confirmed_defeats: Dictionary = {}
 var riposte_ready: bool = false
@@ -90,6 +94,11 @@ func _ready() -> void:
 	player.slide_jumped.connect(func():
 		if &"shade_slide_chain" in runes:
 			player.dash_available = true)
+	player.wall_run_started.connect(func(_side: int): add_flow(18.0))
+	player.slide_jumped.connect(func(): add_flow(22.0))
+	player.dashed.connect(func(): add_flow(12.0))
+	player.landed.connect(func(_impact: float): flow = maxf(0.0, flow - 8.0); _emit_flow())
+	hit_confirmed.connect(func(_target: Node3D, _point: Vector3, defeated: bool): add_flow(25.0 if defeated else 12.0))
 
 
 func reset_state() -> void:
@@ -110,6 +119,8 @@ func reset_state() -> void:
 	charge_progress = 0.0
 	charge_ready = false
 	_charge_spent = false
+	flow = 0.0
+	_emit_flow()
 	echo_cuts.clear()
 	riposte_ready=false
 	last_parried_enemy = null
@@ -127,12 +138,28 @@ func reset_run() -> void:
 	runes.clear()
 	_primary_element = &"arcane"
 	_confirmed_defeats.clear()
+	flow = 0.0
+	_emit_flow()
 	damage_multiplier = 1.0
 	shield = false
 	ability_cooldown = 0.0
 	reach = 2.7
 	_chain_range = 5.0
 	runes_reset.emit()
+
+func add_flow(amount: float) -> void:
+	if amount <= 0.0 or not enabled:
+		return
+	var before := flow
+	flow = clampf(flow + amount, 0.0, flow_capacity)
+	if not is_equal_approx(before, flow):
+		_emit_flow()
+
+func movement_advantage() -> bool:
+	return flow >= 20.0 or player.has_recent_traversal_action()
+
+func _emit_flow() -> void:
+	flow_changed.emit(flow, flow_capacity)
 
 func allow_repeat_defeat(target:Node)->void:
 	if is_instance_valid(target):_confirmed_defeats.erase(target.get_instance_id())
@@ -218,7 +245,11 @@ func try_attack() -> bool:
 	_attack_charged = definition.ranged and charge_ready
 	_attack_airtime = player.airtime_serial
 	_attack_slide = not definition.ranged and &"shade_slide" in runes and _slide_buff_left > 0.0
-	_attack_break_guard = _attack_slide or (not definition.ranged and &"shade_wall" in runes and _wall_buff_left > 0.0)
+	var flow_break := not definition.ranged and flow >= 35.0
+	_attack_break_guard = flow_break or _attack_slide or (not definition.ranged and &"shade_wall" in runes and _wall_buff_left > 0.0)
+	if flow_break:
+		flow = maxf(0.0, flow - 35.0)
+		_emit_flow()
 	if not definition.ranged and &"shade_cleave_break" in runes and (attacks+1)%3==0:
 		_attack_break_guard = true
 	if not definition.ranged:
@@ -233,6 +264,9 @@ func try_attack() -> bool:
 
 
 func _physics_process(delta: float) -> void:
+	if player.is_on_floor() and flow > 0.0:
+		flow = move_toward(flow, 0.0, flow_decay_per_second * delta)
+		_emit_flow()
 	ability_cooldown = maxf(0.0,ability_cooldown-delta)
 	parry_left = maxf(0.0,parry_left-delta)
 	_slide_buff_left = maxf(0.0,_slide_buff_left-delta)
@@ -516,10 +550,11 @@ func confirm_parry(enemy: LanternAcolyte) -> void:
 	parried.emit()
 
 func build_status() -> String:
+	var flow_text := "流势 %.0f" % flow if flow > 0.5 else ""
 	if player.floating:
-		return "漂浮 · %.1f" % player.float_left
+		return flow_text + (" · " if not flow_text.is_empty() else "") + "漂浮 · %.1f" % player.float_left
 	if charge_ready:
-		return "雷行 · 已充能"
+		return flow_text + (" · " if not flow_text.is_empty() else "") + "雷行 · 已充能"
 	if &"arcane_charge" in runes and not _charge_spent:
 		return "雷行 · %d%%" % roundi(charge_progress/charge_duration()*100)
 	if _wall_buff_left > 0.0 and &"shade_wall" in runes:
@@ -534,7 +569,7 @@ func build_status() -> String:
 		return "火 · 范围爆裂" if &"arcane_fire" in runes else "冰 · 冻结破盾"
 	if &"shade_arc" in runes: return "离刃 · 远程剑气"
 	if &"shade_cleave" in runes: return "断月 · 宽幅横扫"
-	return ""
+	return flow_text
 
 func charge_duration() -> float:
 	return .45 if &"arcane_conduit" in runes else .7

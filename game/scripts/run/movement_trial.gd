@@ -40,6 +40,7 @@ var _active_altar: RunAltar
 var gameplay_audio: Node
 var _combat_checkpoint_defeated:Array[StringName]=[]
 var _combat_checkpoint_kills:int=0
+var timeline_runtime: TimelineRuntime
 
 
 func _ready() -> void:
@@ -76,6 +77,16 @@ func _ready() -> void:
 	combat_room.altar_requested.connect(_open_altar)
 	combat_room.mechanism_used.connect(func(): _play("checkpoint",.8))
 	combat_room.checkpoint_reached.connect(_combat_checkpoint_reached)
+	timeline_runtime = TimelineRuntime.new()
+	timeline_runtime.name = "TimelineRuntime"
+	add_child(timeline_runtime)
+	timeline_runtime.bind(self, player, combat_room)
+	timeline_runtime.shifted.connect(_timeline_shifted)
+	timeline_runtime.blocked.connect(func(reason: StringName):
+		if reason == &"empty": hud.toast("相位资源耗尽 · 用墙跑或击杀返还")
+	)
+	player.wall_run_started.connect(func(_side: int): timeline_runtime.refund(1))
+	player.slide_jumped.connect(func(): timeline_runtime.refund(1))
 	combat.ability_used.connect(func():
 		# Raising the blade to guard is neither a slash nor a contact.
 		# Real parry/contact signals own their sounds.
@@ -210,6 +221,8 @@ func start_run() -> void:
 	if combat_mode:
 		_configure_encounter()
 		_checkpoint = combat_room.spawn.global_transform
+	if is_instance_valid(timeline_runtime):
+		timeline_runtime.reset_state()
 	player.respawn_at(_checkpoint)
 	combat.enabled = true
 	combat.reset_run()
@@ -307,6 +320,7 @@ func _update_stage(index: int) -> void:
 
 func _recover() -> void:
 	if combat_mode and not _load_combat_room(stage_number): return
+	if is_instance_valid(timeline_runtime): timeline_runtime.reset_state()
 	_practice_jump_done = false
 	player.respawn_at(_checkpoint)
 	if combat_mode:
@@ -358,6 +372,8 @@ func _combat_hit(target: Node3D, point: Vector3, defeated: bool) -> void:
 	if melee and not player.get_node("FirstPersonArms").has_method("blade_contact_accent"):
 		ImpactBurst.spawn(target.get_parent(), point, Color("#f2c590"),1.15 if defeated else .8,&"blade",player.camera.global_basis.x+Vector3.UP*.4)
 	if combat_mode:
+		if defeated and is_instance_valid(timeline_runtime):
+			timeline_runtime.refund(1)
 		hud.objective_label.text = "敌人 %d / %d" % [combat_room.defeated_count,combat_room.enemies.size()]
 		if target is LanternAcolyte and is_instance_valid(target.boss_controller):
 			hud.objective_label.text = target.boss_controller.objective_text()
@@ -424,6 +440,7 @@ func _next_stage() -> void:
 		return
 	var completed_time:=stage_elapsed
 	if not _load_combat_room(stage_number+1): return
+	if is_instance_valid(timeline_runtime): timeline_runtime.reset_state()
 	stage_splits.append(completed_time)
 	stage_elapsed=0.0
 	stage_number += 1
@@ -517,6 +534,8 @@ func _try_build_room(number: int) -> bool:
 	var result: Variant = combat_room.call("reset_room",player,number)
 	var accepted: bool = not (result is bool) or result
 	if accepted:
+		if is_instance_valid(timeline_runtime):
+			timeline_runtime.set_room(combat_room)
 		# Room lighting is rebuilt per stage; retain the user's exposure setting.
 		_set_brightness(brightness)
 	return accepted
@@ -534,6 +553,13 @@ func _load_combat_room(number: int) -> bool:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	hud.show_menu("ready","关卡暂时无法载入，已停止运行。请重试。")
 	return false
+
+func _timeline_shifted(previous: StringName, current: StringName) -> void:
+	if gameplay_audio != null and gameplay_audio.supported():
+		_play("phase_shift", .9)
+	else:
+		_play("rewind_start", .65)
+	hud.toast("残世" if current == &"remnant" else "现世")
 
 func _configure_encounter() -> void:
 	# Compatibility adapter for the existing level's legacy enemy labels. The

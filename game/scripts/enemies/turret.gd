@@ -232,9 +232,12 @@ func receive_hit(amount: int, direction: Vector3) -> bool:
 	# must arrive through a wall run, dash, slide-jump, wall kick or grapple
 	# before the guardian can be converted into a kill window; this closes the
 	# old walk-up-and-spam loophole without changing optional enemies.
-	if bool(get_meta("required_guardian",false)) and threat_rank in [&"normal",&"elite"] and is_instance_valid(player) and not player.has_recent_traversal_action():
-		_title.text = _name() + "  · 先用跑酷制造破绽"
-		return _report_hit(point,false,&"movement_required")
+	if bool(get_meta("required_guardian",false)) and threat_rank in [&"normal",&"elite"] and is_instance_valid(player):
+		var combat := player.get_node_or_null("Combat") as PlayerCombat
+		var movement_ready := player.has_recent_traversal_action() or (combat != null and combat.movement_advantage())
+		if not movement_ready:
+			_title.text = _name() + "  · 先用跑酷制造破绽"
+			return _report_hit(point,false,&"movement_required")
 	if is_instance_valid(boss_controller):
 		# Capture the gate before resolving: an accepted phase hit immediately
 		# closes the shield/starts a transition, which cannot label that hit blocked.

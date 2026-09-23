@@ -37,6 +37,17 @@ static func build(room: CombatRoom) -> void:
 	# Transfer between opposed faces. Looking away from a latched wall is allowed.
 	room._wall(Vector3(5.4,4,-51),Vector3(.8,10,10))
 	room._wall(Vector3(.4,5,-62),Vector3(.8,10,24))
+	# The remnant line adds a real high-side transfer at the first timeline
+	# teaching beat. It is a separate collision surface, not a recoloured copy
+	# of the present wall, and is enabled only while the player is in the
+	# remnant. The low route remains available as the recovery line.
+	var remnant_wall := DemoGeometry.box(room.geometry,Vector3(-4.8,5.2,-62),Vector3(.7,8.4,16),DemoGeometry.material(Color("#433855"),.35),true)
+	remnant_wall.set_meta("timeline_phase",&"remnant")
+	for z: float in [-68.0,-64.0,-60.0,-56.0]:
+		DemoGeometry.box(remnant_wall,Vector3(0.38,1.1,z+62.0),Vector3(.08,1.4,.22),DemoGeometry.material(Color("#9a6fc2"),1.4))
+	var remnant_enemy := room._enemy(Vector3(-3.9,5.25,-63),&"normal",&"sentinel")
+	remnant_enemy.set_meta("timeline_phase",&"remnant")
+	remnant_enemy.set_meta("phase_route_node",true)
 	room._route_marker(Vector3(4.4,.08,.8),Color("#b49c71"),&"wall")
 	# Combat begins only after the transfer's safe landing.
 	room._wall(Vector3(-3,3.8,-79),Vector3(2,3.6,2))

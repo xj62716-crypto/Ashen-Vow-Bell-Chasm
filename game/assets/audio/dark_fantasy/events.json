@@ -1050,6 +1050,7 @@
     "kill": "execution",
     "bolt": "cast_arcane",
     "shape": "shape_wall",
+    "phase_shift": "rewind_start",
     "footstep": "step_stone"
   }
 }

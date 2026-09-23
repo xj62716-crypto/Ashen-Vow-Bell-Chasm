@@ -52,6 +52,8 @@ var build_label: Label
 var interaction_label: Label
 var profession_label: Label
 var focus_label: Label
+var focus_state_label: Label
+var phase_label: Label
 var _focus_amount: float = 1.0
 var _focus_active: bool = false
 var _focus_visible: bool = false
@@ -190,6 +192,24 @@ func _build_gameplay() -> void:
 	focus_label.offset_top = -53
 	focus_label.offset_bottom = -25
 	focus_label.hide()
+	focus_state_label = _label("", 17, PAPER)
+	focus_state_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	gameplay.add_child(focus_state_label)
+	focus_state_label.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
+	focus_state_label.offset_left = -150
+	focus_state_label.offset_right = 150
+	focus_state_label.offset_top = 58
+	focus_state_label.offset_bottom = 88
+	focus_state_label.hide()
+	phase_label = _label("现世  ·  V 相位切换", 13, MINT)
+	phase_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	gameplay.add_child(phase_label)
+	phase_label.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
+	phase_label.offset_left = -125
+	phase_label.offset_right = 125
+	phase_label.offset_top = 25
+	phase_label.offset_bottom = 50
+	phase_label.hide()
 	var crosshair := _label("·", 40, PAPER)
 	gameplay.add_child(crosshair)
 	crosshair.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
@@ -582,11 +602,17 @@ func update_run(player: ParkourPlayer, seconds: float, checkpoint: int, falls: i
 	var focus := player.get_node_or_null("TemporalFocus") as TemporalFocus
 	_focus_visible = combat_mode and focus != null
 	focus_label.visible = _focus_visible
+	phase_label.visible = combat_mode
 	if _focus_visible:
 		_focus_amount = clampf(focus.reserve / maxf(0.001, focus.capacity), 0.0, 1.0)
 		_focus_active = focus.active
 		focus_label.text = "凝神" if focus.active else ("专注耗尽" if focus.reserve <= 0.001 else "F · 空中专注")
 		focus_label.modulate = PAPER if focus.active else GOLD
+		focus_state_label.visible = focus.active
+		focus_state_label.text = "专注 · 时流减速"
+		focus_state_label.modulate = PAPER
+	else:
+		focus_state_label.hide()
 	status_label.text = "检查点  %d / 2  ·  失足 %d" % [checkpoint, falls]
 	if practice_mode:
 		status_label.text = "%s · 失足 %d" % [player.parkour_profile.display_name, falls]
@@ -594,6 +620,11 @@ func update_run(player: ParkourPlayer, seconds: float, checkpoint: int, falls: i
 		var combat := player.get_node("Combat") as PlayerCombat
 		profession_label.text=combat.arts.status()
 		var trial := get_tree().current_scene as MovementTrial
+		if trial != null and is_instance_valid(trial.timeline_runtime):
+			var timeline_status := trial.timeline_runtime.status()
+			var phase_name := "残世" if timeline_status.phase == &"remnant" else "现世"
+			phase_label.text = "%s  ·  V 切换  ·  相位 %d/%d" % [phase_name, timeline_status.charges, timeline_status.maximum]
+			phase_label.modulate = Color("#c69be7") if timeline_status.phase == &"remnant" else MINT
 		health_label.text = "◆  ◆" if combat.health>=2 else ("◆  ◇" if combat.health==1 else "◇  ◇")
 		health_bar.value = 100.0 * combat.health / combat.maximum_health
 		var altar_total:int=trial.combat_room.altars.size() if trial!=null else 0
@@ -686,7 +717,7 @@ func _draw() -> void:
 			rune[index] += focus_center
 		draw_polyline(rune, GOLD, 1.0, true)
 		if _focus_active:
-			var gold := Color(GOLD, 0.35)
+			var gold := Color(GOLD, 0.72)
 			for side: float in [-1.0, 1.0]:
 				var x: float = 14.0 if side < 0.0 else size.x - 14.0
 				draw_line(Vector2(x, size.y * 0.34), Vector2(x, size.y * 0.66), gold, 1.0, true)
@@ -694,6 +725,16 @@ func _draw() -> void:
 					var point := Vector2(x, size.y * fraction)
 					draw_line(point + Vector2(-4, 0), point + Vector2(0, -6), gold, 1.0, true)
 					draw_line(point + Vector2(0, -6), point + Vector2(4, 0), gold, 1.0, true)
+			# Four restrained corner marks make activation readable without a
+			# full-screen flash or hiding projectiles and landing surfaces.
+			var edge := Color("#d9c28f", 0.48)
+			var inset := 42.0
+			var span := 38.0
+			for corner in [Vector2(inset,inset),Vector2(size.x-inset,inset),Vector2(inset,size.y-inset),Vector2(size.x-inset,size.y-inset)]:
+				var sx := 1.0 if corner.x < size.x*.5 else -1.0
+				var sy := 1.0 if corner.y < size.y*.5 else -1.0
+				draw_line(corner,corner+Vector2(span*sx,0),edge,1.5,true)
+				draw_line(corner,corner+Vector2(0,span*sy),edge,1.5,true)
 	if _hit_time > 0.0:
 		var center := size * 0.5
 		var color: Color = GOLD if _kill_hit else PAPER

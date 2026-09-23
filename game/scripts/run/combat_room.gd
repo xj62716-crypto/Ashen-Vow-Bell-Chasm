@@ -35,6 +35,10 @@ var platform_extents: Dictionary={}
 ## Named, inspectable sections used by route tests and later encounter tuning.
 ## These are runtime facts about formal geometry, not separate preview cells.
 var signature_sections: Dictionary={}
+## Set by MovementTrial; kept here so authored phase geometry and collision
+## share the same room lifecycle as enemies, altars and checkpoints.
+var timeline_runtime: TimelineRuntime
+var timeline_phase: StringName = &"present"
 ## Built connection graph, including intermediate rest platforms. Coordinates
 ## are room-local floor points; runtime/editor inspection shares this record.
 var route_links: Array[Dictionary]=[]
@@ -147,7 +151,44 @@ func _build(number: int) -> bool:
 		environment.fog_aerial_perspective = .5
 		environment.tonemap_exposure = 1.0
 		environment.glow_intensity = .34
+	apply_timeline_phase(timeline_phase)
 	return true
+
+func apply_timeline_phase(next_phase: StringName) -> void:
+	## Timeline-tagged geometry is real authored route geometry. Toggling a phase
+	## disables its collision shapes as well as its visible mesh, so the player
+	## never receives an invisible wall or a visual-only shortcut.
+	timeline_phase = next_phase if next_phase in [&"present", &"remnant"] else &"present"
+	if is_instance_valid(geometry):
+		for node: Node in geometry.find_children("*", "Node", true, false):
+			if not node.has_meta("timeline_phase"):
+				continue
+			var active := StringName(node.get_meta("timeline_phase")) == timeline_phase
+			if node is CanvasItem or node is Node3D:
+				node.visible = active
+			if node is LanternAcolyte:
+				node.active = active and enabled
+			for shape: CollisionShape3D in node.find_children("*", "CollisionShape3D", true, false):
+				shape.set_deferred("disabled", not active or not enabled)
+	var scene: Node = get_tree().current_scene
+	var environment: Environment = null
+	if scene != null:
+		var world_environment := scene.get_node_or_null("WorldEnvironment") as WorldEnvironment
+		if world_environment != null:
+			environment = world_environment.environment
+	if environment != null:
+		if timeline_phase == &"remnant":
+			environment.ambient_light_energy = .09
+			environment.fog_light_color = Color("#302442")
+			environment.fog_density = .0035
+			environment.volumetric_fog_density = .0042
+			environment.glow_intensity = .48
+		else:
+			environment.ambient_light_energy = .14
+			environment.fog_light_color = Color("#17282c")
+			environment.fog_density = .0027
+			environment.volumetric_fog_density = .0032
+			environment.glow_intensity = .34
 
 func _platform(center: Vector3, size: Vector2) -> Node3D:
 	platform_extents[center]=size
@@ -165,6 +206,14 @@ func _wall(center: Vector3, size: Vector3) -> void:
 		DemoGeometry.box(geometry,Vector3(center.x+side*(size.x/2+.015),1.3,z),Vector3(.025,.035,.45),_accent)
 	for z in range(int(center.z-size.z/2),int(center.z+size.z/2)+1,4):
 		DemoGeometry.box(geometry,Vector3(center.x-side*.32,center.y,z),Vector3(.23,size.y+.35,.3),_iron)
+
+func _timeline_wall(center: Vector3, size: Vector3, material: Material = null) -> Node3D:
+	## A phase-exclusive surface still uses a real StaticBody3D and therefore
+	## participates in wall probes, grapples and collision queries normally.
+	var surface: Material = material if material != null else _stone
+	var body := DemoGeometry.box(geometry, center, size, surface, true)
+	body.set_meta("timeline_phase", &"remnant")
+	return body
 
 func _outer_wall() -> void:
 	spawn.position = Vector3(3.8,.08,7)
@@ -221,6 +270,7 @@ func _forge() -> void:
 	_platform(Vector3(0,-.02,-3),Vector2(5.5,2.2))
 	_route_marker(Vector3(0,.08,4),Color("#d48f63"),&"slide")
 	_wall(Vector3(8,2,-16),Vector3(.7,6,23))
+	_timeline_wall(Vector3(-4.8,4.2,-20),Vector3(.7,7.0,11),DemoGeometry.material(Color("#40344e"),.35))
 	_mechanism(Vector3(4,1.0,-20),&"launch")
 	_mechanism(Vector3(-3,4.1,-29),&"seal")
 	_platform(Vector3(-6,0,1),Vector2(5,3))
@@ -255,6 +305,7 @@ func _tower() -> void:
 	_platform(Vector3(4,0,2),Vector2(4,4))
 	_platform(Vector3(6,1,-12),Vector2(3,6))
 	_wall(Vector3(8.2,3,-7),Vector3(.8,7,21))
+	_timeline_wall(Vector3(5.0,4.0,-35),Vector3(.7,7.0,12),DemoGeometry.material(Color("#40344e"),.35))
 	_route_marker(Vector3(4,.08,2),Color("#b9d39b"),&"air")
 	# A readable interior nave encloses the last safe platforms. Beyond z=-44
 	# the roof and side arcade stop together, revealing the floating tower route.
@@ -500,6 +551,7 @@ func set_enabled(value: bool) -> void:
 	if is_instance_valid(_gate_shape):_gate_shape.set_deferred("disabled",not value or exit_unlocked)
 	_set_bridge(_bridge_open)
 	for device in terrain_devices:device.sync_collision_state(value)
+	apply_timeline_phase(timeline_phase)
 
 func reset_room(player: ParkourPlayer, number: int = 1) -> bool:
 	# Validate and snapshot before discarding the existing room or progress.
