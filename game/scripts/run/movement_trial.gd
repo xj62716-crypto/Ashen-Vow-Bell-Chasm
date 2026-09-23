@@ -594,10 +594,18 @@ func _configure_encounter() -> void:
 			device.queue_free()
 
 func _boss_mechanic_event(event: StringName, _point: Vector3, _seconds: float) -> void:
+	var message := ""
 	match event:
-		&"terrain_warning": hud.toast("地台将在 4 秒后崩塌 · 借风井升空，E 牵引浮墙符文锚")
-		&"shield_broken": hud.toast("护盾破碎 · 抓住窗口攻击本体")
-		&"arena_binding_failed": hud.toast("首领场地绑定异常 · 请重试")
+		&"terrain_warning": message = "地台将在 4 秒后崩塌 · 借风井升空，E 牵引浮墙符文锚"
+		&"shield_broken": message = "护盾破碎 · 抓住窗口攻击本体"
+		&"arena_binding_failed": message = "首领场地绑定异常 · 请重试"
+	if message.is_empty(): return
+	hud.toast(message)
+	var presentation: Node = get_node_or_null("IntegratedPresentation")
+	var live: Node = null
+	if is_instance_valid(presentation): live = presentation.get("live_ui") as Node
+	if is_instance_valid(live) and live.has_method("notify"):
+		live.notify(message)
 
 
 func _set_practice_geometry(enabled: bool) -> void:

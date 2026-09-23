@@ -135,6 +135,10 @@ func _build(number: int) -> bool:
 	IntegratedEnvironmentDressing.decorate(self)
 	CitadelDressing.batch_static(geometry)
 	CitadelDressing.batch_primitives(geometry)
+	# Timeline architecture is added after batching so phase-exclusive meshes,
+	# lights and collisions cannot be folded into a static batch and lose their
+	# present/remnant visibility boundary.
+	TimelineArchitecture.build(self)
 	var environment: Environment = get_tree().current_scene.get_node("WorldEnvironment").environment if get_tree().current_scene != null else null
 	if environment != null:
 		var sky := Sky.new()
@@ -178,21 +182,60 @@ func apply_timeline_phase(next_phase: StringName) -> void:
 			environment = world_environment.environment
 	if environment != null:
 		if timeline_phase == &"remnant":
-			environment.ambient_light_energy = .09
+			# The remnant is darker and colder, but its architecture must remain
+			# readable during a fast traversal. Keep enough fill for stone edges,
+			# enemy silhouettes and the next wall surface to separate from the void.
+			environment.ambient_light_energy = .16
+			environment.ambient_light_color = Color("#78658c")
+			environment.ambient_light_sky_contribution = .34
 			environment.fog_light_color = Color("#302442")
-			environment.fog_density = .0035
-			environment.volumetric_fog_density = .0042
+			environment.fog_density = .0046
+			environment.volumetric_fog_density = .0052
+			environment.fog_aerial_perspective = .65
 			environment.glow_intensity = .48
+			environment.adjustment_enabled = true
+			environment.adjustment_brightness = .95
+			environment.adjustment_contrast = 1.08
+			environment.adjustment_saturation = .86
 		else:
 			environment.ambient_light_energy = .14
+			environment.ambient_light_color = Color("#b3c0bd")
+			environment.ambient_light_sky_contribution = .65
 			environment.fog_light_color = Color("#17282c")
 			environment.fog_density = .0027
 			environment.volumetric_fog_density = .0032
+			environment.fog_aerial_perspective = .5
 			environment.glow_intensity = .34
+			environment.adjustment_enabled = true
+			environment.adjustment_brightness = 1.0
+			environment.adjustment_contrast = 1.0
+			environment.adjustment_saturation = .92
+		var sky := environment.sky
+		if sky != null and sky.sky_material is ShaderMaterial:
+			var sky_material := sky.sky_material as ShaderMaterial
+			if timeline_phase == &"remnant":
+				sky_material.set_shader_parameter("zenith", Vector3(.018,.014,.032))
+				sky_material.set_shader_parameter("horizon", Vector3(.22,.07,.20))
+			else:
+				sky_material.set_shader_parameter("zenith", Vector3(.025,.055,.082))
+				sky_material.set_shader_parameter("horizon", Vector3(.19,.25,.26))
+	# Existing lights are the stable-line network. In the remnant they become
+	# emergency embers; the phase-specific cold lights above provide the new
+	# illumination pattern. Cache the authored energy on first application.
+	if is_instance_valid(geometry):
+		for light: Light3D in geometry.find_children("*", "Light3D", true, false):
+			if light.has_meta("timeline_authored"):
+				continue
+			if not light.has_meta("present_energy"):
+				light.set_meta("present_energy", light.light_energy)
+			var base_energy := float(light.get_meta("present_energy"))
+			light.light_energy = base_energy * (.50 if timeline_phase == &"remnant" else 1.0)
 
 func _platform(center: Vector3, size: Vector2) -> Node3D:
 	platform_extents[center]=size
 	var body := DemoGeometry.box(geometry,center-Vector3.UP*0.6,Vector3(size.x,1.2,size.y),_floor,true)
+	body.set_meta("route_platform_center", center)
+	body.set_meta("route_platform_size", size)
 	CitadelDressing.paving(body,Vector3.UP*.6,size)
 	for end: float in [-1,1]:
 		DemoGeometry.box(geometry,center+Vector3(0,.055,end*(size.y/2-.07)),Vector3(size.x,.025,.055),_accent)
@@ -309,7 +352,10 @@ func _tower() -> void:
 	_route_marker(Vector3(4,.08,2),Color("#b9d39b"),&"air")
 	# A readable interior nave encloses the last safe platforms. Beyond z=-44
 	# the roof and side arcade stop together, revealing the floating tower route.
-	DemoGeometry.box(geometry,Vector3(0,5.2,-31.5),Vector3(17,.8,25),_stone,true)
+	# This is a visual nave roof, not a hidden recovery floor. Keeping it
+	# visual-only prevents the reverse wall link from landing on the roof and
+	# walking around the authored void, which would defeat the wall-run beat.
+	DemoGeometry.box(geometry,Vector3(0,5.2,-31.5),Vector3(17,.8,25),_stone,false)
 	for side: float in [-1,1]:
 		DemoGeometry.box(geometry,Vector3(side*8.1,3.1,-31.5),Vector3(.65,4.2,25),_stone,true)
 	signature_sections[&"nave_to_void"]={

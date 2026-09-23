@@ -12,6 +12,22 @@ const DESIGN = Vector2(1920,1080)
 const PHASE_NAMES = {0:"title",1:"hud",2:"pause",3:"result",4:"death",5:"altar"}
 const REASONS = {"no_history":"尚未留下可返回的足迹","insufficient_history":"尚未留下可返回的足迹","path_blocked":"返回路径受阻","occupied":"返回落点被占据","destination_blocked":"返回落点被占据","anchor_blocked":"返回落点被占据","cooldown":"回溯正在恢复","controls_disabled":"当前无法回溯","locked":"尚未获得残影契印","binding_conflict":"按键发生冲突","no_anchor":"尚未留下可返回的足迹","too_fast":"当前速度超出回溯范围","no_displacement":"尚未离开残影位置"}
 const CORE_ICONS = {"shade_parry":"flow_blade","shade_wall":"sky_hunter","shade_slide":"ground_raider","shade_echo":"afterimage","arcane_storm":"storm_walker","arcane_shape":"rift_shaper","arcane_seal":"seal_binder","arcane_element":"elementalist"}
+const RUNE_SLOTS = {
+	&"shade_wall":"动作槽", &"shade_slide":"动作槽", &"shade_parry":"动作槽", &"shade_echo":"路线槽",
+	&"shade_cleave":"武器槽", &"shade_arc":"武器槽", &"shade_duel_riposte":"武器槽", &"shade_slide_wind":"武器槽",
+	&"arcane_storm":"动作槽", &"arcane_shape":"路线槽", &"arcane_seal":"武器槽", &"arcane_element":"武器槽",
+	&"arcane_charge":"动作槽", &"arcane_float":"动作槽", &"arcane_stride":"路线槽", &"arcane_fire":"武器槽", &"arcane_ice":"武器槽"
+}
+const RUNE_CONTRACTS = {
+	&"shade_wall":{"move":"墙跑 / 蹬墙","attack":"空中 Q 追身处决","refund":"击杀返还冲刺","route":"夺取高线锚点"},
+	&"shade_slide":{"move":"滑铲穿过低线","attack":"滑铲跳后横斩核心","refund":"击杀刷新滑铲势","route":"开启低线捷径"},
+	&"shade_parry":{"move":"迎弹体进入窗口","attack":"弹反后 Q 追射手","refund":"弹反返还时流","route":"夺取射手高位"},
+	&"shade_echo":{"move":"记录高速轨迹","attack":"G 回溯并补幻斩","refund":"回溯不回滚生命","route":"返回失误落点"},
+	&"arcane_storm":{"move":"滞空 / 墙跑","attack":"空中命中连锁法弹","refund":"命中返还冲刺","route":"风压连接高线"},
+	&"arcane_shape":{"move":"瞄准表面蓄 Q","attack":"松开生成跑酷面","refund":"使用后回复法力","route":"创造墙 / 风井 / 锚"},
+	&"arcane_seal":{"move":"高速经过符印","attack":"Q 引爆标记核心","refund":"连爆返还时流","route":"开启封印机关"},
+	&"arcane_element":{"move":"按路线选择元素","attack":"元素改变破盾条件","refund":"命中返还法力","route":"反应不同材质"}
+}
 
 var trial: Node
 var legacy: Control
@@ -54,6 +70,10 @@ var _muted: Color
 var _danger: Color
 var preview_offer_id: StringName = &""
 var _appearance_index: Dictionary = {}
+var _timeline_state: Dictionary = {}
+var _flow_value: float = 0.0
+var _flow_capacity: float = 100.0
+var _last_resource_notice: String = ""
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -111,7 +131,19 @@ func attach(manager: Node) -> bool:
 	_connect(player.get_node("PositionRewind"),"rewound",_rewound)
 	_connect(combat,"hurt",_hurt)
 	_connect(combat,"hit_confirmed",_hit)
+	_connect(combat,"flow_changed",_flow_changed)
+	_connect(combat,"rune_applied",_rune_applied)
 	_connect(combat,"temporal_reset_requested",_clear_feedback)
+	_connect(player.grapple,"state_changed",_grapple_state)
+	_connect(player.grapple,"arrived",func(_anchor: Node3D): notify("牵引落点确认 · 可继续接墙跑"))
+	_connect(player.grapple,"traversed",func(_anchor: Node3D): notify("锚点已兑现 · 路线动量保留"))
+	_connect(player,"wall_bonus_triggered",func(_bonus: StringName): notify("移动收益 · 空中冲刺已恢复"))
+	_connect(player,"slide_jumped",func(): notify("低线兑现 · 滑铲跳已接入下一段"))
+	var timeline = trial.get("timeline_runtime")
+	if is_instance_valid(timeline):
+		_connect(timeline,"shifted",_timeline_shifted)
+		_connect(timeline,"blocked",_timeline_blocked)
+		_connect(timeline,"resource_changed",_timeline_resource_changed)
 	_connect(trial,"tree_exiting",_host_exiting)
 	_sync_state()
 	return true
@@ -177,14 +209,20 @@ func _build_hud() -> void:
 	_text(hud_layer,"wall","",Rect2(64,789,540,65),20)
 	_text(hud_layer,"skill","",Rect2(1280,868,570,65),25,true,HORIZONTAL_ALIGNMENT_RIGHT)
 	_text(hud_layer,"skill_detail","",Rect2(1240,929,610,64),18,false,HORIZONTAL_ALIGNMENT_RIGHT)
+	_text(hud_layer,"flow","",Rect2(1420,704,430,48),20,true,HORIZONTAL_ALIGNMENT_RIGHT)
 	_text(hud_layer,"focus_hint","",Rect2(1390,1006,460,32),19,false,HORIZONTAL_ALIGNMENT_RIGHT)
+	_text(hud_layer,"resource","",Rect2(620,1004,600,32),18,false,HORIZONTAL_ALIGNMENT_LEFT)
 	_text(hud_layer,"rewind","",Rect2(1310,794,540,64),20,false,HORIZONTAL_ALIGNMENT_RIGHT)
 	_text(hud_layer,"interaction","",Rect2(615,618,690,72),24,true,HORIZONTAL_ALIGNMENT_CENTER)
 	_text(hud_layer,"notice","",Rect2(520,710,880,70),23,true,HORIZONTAL_ALIGNMENT_CENTER)
 	_text(hud_layer,"boss","",Rect2(610,150,700,52),25,true,HORIZONTAL_ALIGNMENT_CENTER)
+	_text(hud_layer,"boss_detail","",Rect2(610,200,700,38),16,false,HORIZONTAL_ALIGNMENT_CENTER)
+	_text(hud_layer,"timeline","",Rect2(1330,40,520,42),20,true,HORIZONTAL_ALIGNMENT_RIGHT)
+	_text(hud_layer,"timeline_detail","",Rect2(1330,82,520,30),14,false,HORIZONTAL_ALIGNMENT_RIGHT)
 	_text(hud_layer,"time","",Rect2(1690,46,160,40),20,false,HORIZONTAL_ALIGNMENT_RIGHT)
 	_text(hud_layer,"diagnostics","",Rect2(67,190,700,280),18)
 	labels.objective.modulate = _muted; labels.skill_detail.modulate = _muted; labels.build.modulate = _muted
+	labels.timeline_detail.modulate = _muted; labels.boss_detail.modulate = _muted; labels.resource.modulate = _muted
 
 func _process(_delta: float) -> void:
 	var now := Time.get_ticks_usec()
@@ -278,7 +316,7 @@ func start_class(index: int) -> void:
 
 func _altar() -> void:
 	_text(page_layer,"altar_title","铭刻契印",Rect2(480,82,960,84),54,true,HORIZONTAL_ALIGNMENT_CENTER)
-	_text(page_layer,"altar_subtitle","第 %d 域 · 选择一枚契印，继续前方的远征。"%trial.get("stage_number"),Rect2(430,184,1060,55),23,false,HORIZONTAL_ALIGNMENT_CENTER).modulate = _muted
+	_text(page_layer,"altar_subtitle","第 %d 域 · 动作 / 武器 / 路线三类槽位会改变下一段循环。"%trial.get("stage_number"),Rect2(330,184,1260,55),23,false,HORIZONTAL_ALIGNMENT_CENTER).modulate = _muted
 	var options: Array = trial.get("reward_options")
 	var width := 400.0
 	var left := (DESIGN.x-options.size()*width-maxi(0,options.size()-1)*26)/2
@@ -289,10 +327,10 @@ func _altar() -> void:
 		if rune.is_empty(): rune = options[index]
 		selection_ids.append(id)
 		var card = CHOICE.new(); card.name = "rune_%d"%index; card.position = Vector2(left+index*426,280); card.size = Vector2(width,612)
-		card.number = index+1; card.title = str(rune.get("name",id)); card.eyebrow = str(rune.get("path","契印"))+ (" · 核心" if rune.get("core",false) else " · 联动")
+		var contract := _rune_contract(rune,id)
+		card.number = index+1; card.title = str(rune.get("name",id)); card.eyebrow = str(contract.get("slot","武器槽"))+" · "+_rune_stage(rune)
 		card.description = str(rune.get("effect",""))
-		var parent_id: StringName = rune.get("requires",&"")
-		card.synergy = "开启一种新的战斗与路线选择" if parent_id==&"" else "承接契印 · "+CATALOG.title(parent_id)
+		card.synergy = "要求：%s\n攻击：%s\n返还：%s · 路线：%s" % [contract.get("move","移动兑现"),contract.get("attack","改变攻击窗口"),contract.get("refund","击杀返还资源"),contract.get("route","开启下一段路线")]
 		var core: StringName = id
 		var seen: Array[StringName] = []
 		while not CORE_ICONS.has(str(core)) and core!=&"" and core not in seen:
@@ -307,6 +345,26 @@ func _altar() -> void:
 	_text(page_layer,"altar_controls","1 / 2 / 3 铭刻 · 方向键切换 · P 查看外观",Rect2(340,974,900,44),20)
 	_button("appearance","外观变化",Vector2(1290,951),open_appearance,330)
 	_focus_first()
+
+func _rune_stage(rune: Dictionary) -> String:
+	if bool(rune.get("core",false)): return "核心契印"
+	var parent: StringName = rune.get("requires",&"")
+	if parent == &"": return "基础契印"
+	var parent_def := CATALOG.definition(parent)
+	return "核心联动" if bool(parent_def.get("core",false)) else "关键联动"
+
+func _rune_contract(rune: Dictionary,id: StringName) -> Dictionary:
+	var result: Dictionary = RUNE_CONTRACTS.get(id,{})
+	var inferred_slot := str(RUNE_SLOTS.get(id,"武器槽"))
+	if result.is_empty():
+		var path := str(rune.get("path","契印"))
+		if path.contains("墙") or path.contains("滑铲") or path.contains("漂浮") or path.contains("牵引") or path.contains("回溯"):
+			inferred_slot = "动作槽" if not path.contains("路线") else "路线槽"
+		result={"move":"按%s完成移动" % path,"attack":"让攻击条件发生变化","refund":"击杀返还移动资源","route":"打开对应高线或捷径"}
+	else:
+		result=result.duplicate(true)
+	result.slot = inferred_slot
+	return result
 
 func open_appearance() -> bool:
 	if not is_instance_valid(trial) or int(trial.get("phase")) != 5 or preview_offer_id not in selection_ids: return false
@@ -497,6 +555,9 @@ func _update_hud(dt: float) -> void:
 	labels.stage.text = "%02d / %02d  %s" % [trial.get("stage_number"),trial.get("stage_count"),room.stage_title]
 	labels.objective.text = room.objective_text()
 	labels["class"].text = player.parkour_profile.display_name
+	var runtime = trial.get("timeline_runtime")
+	_timeline_state = runtime.status() if is_instance_valid(runtime) else {}
+	_update_timeline()
 	var names: PackedStringArray = []
 	for id in combat.runes:
 		var rune: Dictionary = CATALOG.definition(id)
@@ -505,11 +566,22 @@ func _update_hud(dt: float) -> void:
 	labels.dash.text = "冲刺就绪" if player.dash_available else "冲刺已消耗"
 	labels.wall.text = "沿墙疾行 · %.1f 秒 · 余 %d 段"%[player.wall_time_remaining(),player.wall_segments_remaining()] if player.is_wall_running() else ""
 	var focus_key: String = binding_label(&"focus")
-	labels.focus_hint.text = "%s · 空中专注"%focus_key
-	if float(focus_state.reserve)<=.001: labels.focus_hint.text = "%s · 专注耗尽"%focus_key
-	if focus_state.release_required: labels.focus_hint.text = "松开 %s 后可再次专注"%focus_key
+	var focus_phase := str(focus_state.get("phase","idle"))
+	var focus_reserve := clampf(float(focus_state.get("reserve",0.0))/maxf(.001,float(focus_state.get("capacity",1.0))),0.0,1.0)
+	if active:
+		labels.focus_hint.text = "%s · 专注中 · 时流 %d%%" % [focus_key,roundi(focus_reserve*100.0)]
+	elif focus_phase in ["exiting","entering"]:
+		labels.focus_hint.text = "%s · 时流回响" % focus_key
+	elif bool(focus_state.get("release_required",false)):
+		labels.focus_hint.text = "松开 %s · 等待时流复归" % focus_key
+	elif focus_reserve <= .001:
+		labels.focus_hint.text = "%s · 时流耗尽 · 紧急切换仍可用" % focus_key
+	else:
+		labels.focus_hint.text = "%s · 时流 %d%% · 空中可用" % [focus_key,roundi(focus_reserve*100.0)]
+	labels.focus_hint.modulate = _ivory if active or focus_reserve > .001 else _muted
 	labels.time.text = _time(trial.get("elapsed"))
 	_update_skill(arts)
+	_update_resources(combat,arts,player)
 	_update_rewind()
 	labels.interaction.text = legacy.interaction_label.text
 	if arts._held>0 and arts._skill_intent in [&"wall",&"well",&"platform",&"anchor"]:
@@ -522,11 +594,43 @@ func _update_hud(dt: float) -> void:
 		labels.interaction.text=("符链出手" if str(tether.phase)=="launch" else "牵引中 · 到达路线出口自动松钩")
 		labels.interaction.modulate=_ivory
 	labels.boss.text = ""
+	labels.boss_detail.text = ""
 	for enemy in room.enemies:
 		if is_instance_valid(enemy) and enemy.health>0 and str(enemy.get("threat_rank")) in ["boss","miniboss"]:
-			labels.boss.text = enemy._name()+ (" · 核心暴露" if enemy.vulnerable else " · 破解封印")
+			var controller = enemy.boss_controller
+			if is_instance_valid(controller):
+				labels.boss.text = enemy._name()+" · 第 %d 阶段" % controller.stage
+				labels.boss_detail.text = controller.objective_text()
+			else:
+				labels.boss.text = enemy._name()+ (" · 核心暴露" if enemy.vulnerable else " · 破解封印")
 			break
+	var boss_panel: Node = null
+	if is_instance_valid(get_parent()): boss_panel = get_parent().get_node_or_null("IntegratedBossHUD")
+	var has_authoritative_boss_panel := is_instance_valid(boss_panel)
+	labels.boss.visible = not has_authoritative_boss_panel
+	labels.boss_detail.visible = not has_authoritative_boss_panel
 	labels.diagnostics.text = legacy.telemetry_label.text if legacy.telemetry_label.visible else ""
+
+func _update_timeline() -> void:
+	if _timeline_state.is_empty():
+		labels.timeline.text = ""
+		labels.timeline_detail.text = ""
+		return
+	var phase_name := "残世" if _timeline_state.get("phase",&"present") == &"remnant" else "现世"
+	var charges := int(_timeline_state.get("charges",0)); var maximum := int(_timeline_state.get("maximum",0))
+	labels.timeline.text = "%s  ·  V 相位切换" % phase_name
+	var cooldown := float(_timeline_state.get("cooldown",0.0))
+	var readiness := "可切换" if bool(_timeline_state.get("ready",false)) else ("冷却 %.1fs" % cooldown if cooldown>0.0 else "相位耗尽")
+	labels.timeline_detail.text = "相位 %d / %d  ·  %s  ·  独立于时流" % [charges,maximum,readiness]
+	labels.timeline.modulate = Color("c59ce7") if phase_name == "残世" else _gold
+
+func _update_resources(combat: Node,arts: Node,player: Node) -> void:
+	_flow_value = float(combat.flow); _flow_capacity = maxf(1.0,float(combat.flow_capacity))
+	var flow_name := "锋势" if player.parkour_profile.id == &"shade" else "流势"
+	var threshold := "强化攻击就绪" if _flow_value >= 35.0 else "移动继续积累"
+	labels.flow.text = "%s  %d / %d  ·  %s" % [flow_name,roundi(_flow_value),roundi(_flow_capacity),threshold]
+	labels.resource.text = arts.status().split("\n")[0]
+	labels.flow.modulate = _gold if _flow_value >= 35.0 else _ivory
 
 func _update_skill(arts: Node) -> void:
 	var action: StringName = arts.selected()
@@ -554,6 +658,29 @@ func _update_rewind() -> void:
 func _focus_changed(_previous: StringName, _current: StringName, _reason: StringName) -> void:
 	if is_instance_valid(trial): focus_state = trial.get("player").get_node("TemporalFocus").status()
 
+func _timeline_shifted(_previous: StringName, current: StringName) -> void:
+	notify("已切换至%s · 保留当前速度与落点责任" % ("残世" if current == &"remnant" else "现世"))
+
+func _timeline_blocked(reason: StringName) -> void:
+	if reason == &"empty": notify("相位已耗尽 · 通过墙跑、滑铲跳或击杀返还")
+	elif reason == &"cooldown": notify("相位正在冷却")
+
+func _timeline_resource_changed(charges: int, maximum: int) -> void:
+	var signature := "%d/%d" % [charges,maximum]
+	if not _last_resource_notice.is_empty() and signature != _last_resource_notice and charges > int(_last_resource_notice.split("/")[0]):
+		notify("相位返还 · %s" % signature)
+	_last_resource_notice = signature
+
+func _flow_changed(value: float,capacity: float) -> void:
+	_flow_value=value;_flow_capacity=maxf(1.0,capacity)
+
+func _rune_applied(id: StringName) -> void:
+	notify("契印生效 · %s" % CATALOG.title(id))
+
+func _grapple_state(phase: StringName, reason: StringName) -> void:
+	if phase == &"launch": notify("符链命中 · 短促牵引")
+	elif phase == &"detached" and reason in [&"arrived",&"jump",&"dash"]: notify("牵引兑现 · 冲量保留")
+
 func _rewind_changed(state: Dictionary) -> void:
 	rewind_state = state.duplicate(true)
 
@@ -572,6 +699,7 @@ func _hurt(_amount: int) -> void:
 
 func _hit(_target: Node3D,_point: Vector3,defeated: bool) -> void:
 	_hit_left = .19; _kill = defeated
+	if defeated: notify("击杀兑现 · 冲刺与相位资源返还")
 
 func _clear_feedback() -> void:
 	focus_state.clear(); rewind_state.clear(); _notice_left=0; _hurt_left=0; _hit_left=0; _focus_level=0
@@ -601,6 +729,12 @@ func _draw_decals() -> void:
 		for i in range(2): _diamond(Vector2(167+i*35,1020),9,_gold if health>i else Color("51493d"),2)
 		canvas.draw_line(Vector2(65,859),Vector2(452,859),Color(_gold,.65),1,true)
 		canvas.draw_line(Vector2(1600,853),Vector2(1850,853),Color(_gold,.45),1,true)
+		var phase_ratio := float(_timeline_state.get("charges",0))/maxf(1.0,float(_timeline_state.get("maximum",1)))
+		_meter(Rect2(1330,116,520,7),phase_ratio,Color("c59ce7") if _timeline_state.get("phase",&"present")==&"remnant" else _gold)
+		_meter(Rect2(1420,762,430,7),_flow_value/maxf(1.0,_flow_capacity),_gold if _flow_value>=35.0 else _ivory)
+		var arts = trial.get("combat").arts
+		var resource_ratio := float(arts.mana)/100.0 if trial.get("player").parkour_profile.id==&"arcanist" else float(arts.edge)
+		_meter(Rect2(620,1042,600,6),clampf(resource_ratio,0.0,1.0),Color("78dfbf") if trial.get("player").parkour_profile.id==&"arcanist" else Color("dd987d"))
 		if _hurt_left>0: canvas.draw_rect(Rect2(Vector2.ZERO,DESIGN),Color(_danger,minf(.35,_hurt_left)),false,10)
 		if _hit_left>0:
 			for x in [-1,1]:
@@ -611,6 +745,11 @@ func _draw_decals() -> void:
 
 func _diamond(center: Vector2,radius: float,color: Color,width: float) -> void:
 	canvas.draw_polyline(PackedVector2Array([center+Vector2(0,-radius),center+Vector2(radius,0),center+Vector2(0,radius),center+Vector2(-radius,0),center+Vector2(0,-radius)]),color,width,true)
+
+func _meter(rect: Rect2,ratio: float,color: Color) -> void:
+	canvas.draw_rect(rect,Color(0.12,0.11,0.09,.72),true)
+	if ratio>0.001: canvas.draw_rect(Rect2(rect.position,Vector2(rect.size.x*clampf(ratio,0.0,1.0),rect.size.y)),Color(color,.86),true)
+	canvas.draw_line(rect.position,rect.position+Vector2(rect.size.x,0),Color(_gold,.42),1,true)
 
 func snapshot() -> Dictionary:
 	return {"mode":mode,"bound":_has_bound,"focus_level":_focus_level,"focus":focus_state.duplicate(true),"rewind":rewind_state.duplicate(true),"skill":labels.skill.text,"skill_detail":labels.skill_detail.text,"rewind_text":labels.rewind.text,"offers":selection_ids.duplicate(),"connection_count":_connections.size(),"settings_error":_setting_error,"manual_adoption":false}

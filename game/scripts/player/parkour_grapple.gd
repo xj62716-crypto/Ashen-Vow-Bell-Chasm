@@ -62,7 +62,7 @@ func _ready() -> void:
 	player.recovered.connect(cancel)
 
 func can_begin(target: Node3D) -> bool:
-	if active or not is_instance_valid(target) or not target.is_inside_tree() or target.is_queued_for_deletion() or not player.control_enabled or get_tree().paused:
+	if active or not is_instance_valid(target) or not target.is_inside_tree() or target.is_queued_for_deletion() or not target.is_visible_in_tree() or not player.control_enabled or get_tree().paused:
 		return false
 	if _regrab_left > 0 and target.get_instance_id() == _last_anchor_id: return false
 	var distance := target.global_position.distance_to(player.camera.global_position)

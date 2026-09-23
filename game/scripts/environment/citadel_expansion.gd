@@ -9,23 +9,51 @@ static func build(room: CombatRoom) -> void:
 	var main: Array[Vector3]=[]
 	match stage:
 		1:main=[hub,hub+Vector3(-21,2,-33),hub+Vector3(-27,4,-67),hub+Vector3(4,6,-102),hub+Vector3(20,7,-138),hub+Vector3(0,5,-176)]
-		2:main=[hub,hub+Vector3(22,1,-30),hub+Vector3(28,5,-65),hub+Vector3(-3,8,-101),hub+Vector3(-19,11,-139),hub+Vector3(0,8,-180)]
+		2:main=[hub,hub+Vector3(24,1,-30),hub+Vector3(28,5,-65),hub+Vector3(-3,8,-101),hub+Vector3(-19,11,-139),hub+Vector3(0,8,-180)]
 		3:main=[hub,hub+Vector3(-23,3,-31),hub+Vector3(-26,6,-67),hub+Vector3(0,10,-102),hub+Vector3(26,13,-140),hub+Vector3(13,11,-176),hub+Vector3(0,9,-211)]
+	# Wall-commit arrivals use a lower service apron. Lowering the authored node
+	# itself keeps the route graph, collision floor and visual landing at the
+	# same height; the following segment then climbs again as a deliberate beat.
+	for i in range(2,main.size()):
+		if i % 2 == 0 or (stage == 3 and i == 5):
+			main[i].y-=1.0
 	room.route_nodes=main
-	# Register destinations before linking; using a fallback extent put ramps
-	# inside the next platform and left a vertical lip at elevated arrivals.
+	# Register destinations before linking. The hubs are staging landings, not
+	# arenas: their tighter footprint preserves a readable void around the next
+	# traversal beat and prevents a straight-line ground bypass.
 	for i in range(main.size()):
-		room.platform_extents[main[i]]=Vector2(28,24) if i==main.size()-1 else (Vector2(22,20) if i==0 else Vector2(16,18))
+		room.platform_extents[main[i]]=Vector2(24,20) if i==main.size()-1 else (Vector2(16,14) if i==0 else Vector2(12,14))
 	# The earlier small arena is now the entrance quarter of the domain.
 	var entry := Vector3(0,height,[-44.0,-32.0,-39.0][stage-1])
-	if stage==3:_wall_link(room,entry,hub)
+	if stage>=2:_wall_link(room,entry,hub)
 	else:_link(room,entry,hub,false)
 	for i in range(main.size()):
 		var point: Vector3=main[i]
-		var size := Vector2(28,24) if i==main.size()-1 else (Vector2(22,20) if i==0 else Vector2(16,18))
+		var size := Vector2(24,20) if i==main.size()-1 else (Vector2(16,14) if i==0 else Vector2(12,14))
+		# The first expansion beat is already a transfer out of the entrance
+		# quarter. Later beats alternate wall commitments and short recovery pads;
+		# no stage-2/3 critical route can be cleared by holding forward on a deck.
+		var wall_commit := i >= 1 and (i == 1 or i % 2 == 0 or (stage == 3 and i == 5))
+		if wall_commit:
+			# A wall-run landing needs a real receiving apron. Widening the deck in
+			# the travel axis gives the player braking room without filling the void
+			# beneath the critical wall segment.
+			size += Vector2(2.0, 4.0)
 		room._platform(point,size)
 		_foundation(room,point,size)
-		if i>0:_link(room,main[i-1],point,i!=1)
+		if i>0:
+			# Every second expansion beat is a true wall transfer. The intervening
+			# links remain broken decks for recovery, so the player alternates
+			# wall-run/air-dash with a short landing instead of ground-running the
+			# full domain. Wall commits deliberately remove the ground deck: the
+			# high route is the authored critical path, not a decorative shortcut.
+			if wall_commit:
+				_wall_link(room,main[i-1],point)
+				room.signature_sections[&"wall_commit_%d"%i]={
+					"from":main[i-1],"to":point,"mechanic":&"wall_run",
+					"ground_route":false,"critical":true}
+			else:
+				_link(room,main[i-1],point,true if i != 1 else false)
 		# The hub's outside route exits east in the tower, west in the forge.
 		# Keep its framing wall on the opposite flank, clear of the ramp.
 		var flank := Vector3(-9 if i==0 and stage==3 else (9 if i%2==0 else -9),3.4,0)
@@ -136,18 +164,55 @@ static func _wall_link(room: CombatRoom,a: Vector3,b: Vector3) -> void:
 	var b_size:Vector2=room.platform_extents.get(b,Vector2(8,8))
 	var from_edge:=minf(a_size.x*.5/maxf(.001,absf(direction.x)),a_size.y*.5/maxf(.001,absf(direction.z)))
 	var to_edge:=minf(b_size.x*.5/maxf(.001,absf(direction.x)),b_size.y*.5/maxf(.001,absf(direction.z)))
+	# End the wall-run inside the receiving deck rather than at its bevel. The
+	# extra landing margin is part of the authored metric, so both directions
+	# get braking room after the wall surface ends.
+	to_edge=maxf(0.0,to_edge-2.0)
 	var takeoff:=a+direction*from_edge
 	var landing:=b-direction*to_edge
-	var gap:=landing-takeoff
+	var wall_exit := landing
+	var gap:=wall_exit-takeoff
 	var basis:=Basis.looking_at(gap.normalized())
-	var wall_center:=takeoff.lerp(landing,.5)+basis.x*.72+Vector3.UP*3.4
-	var wall:=DemoGeometry.box(room.geometry,wall_center,Vector3(.46,7.2,gap.length()+1.2),room._stone,true)
-	wall.basis=basis
-	wall.add_to_group("floating_route_surface")
-	for fraction:float in [.18,.5,.82]:
-		var rune:=DemoGeometry.box(wall,Vector3(0,0,(fraction-.5)*gap.length()),Vector3(.025,5.4,.12),room._accent)
-		rune.set_meta("interactive_visual",true)
-	room.route_links.append({"from":a,"to":b,"gap":true,"segments":[takeoff,takeoff,landing,landing],"mechanic":&"wall_run"})
+	var legacy_stage3_entry: bool = room.stage == 3 and a.z > -45.0
+	var wall_size:=Vector3(.46,7.2,gap.length()+1.2) if legacy_stage3_entry else Vector3(.46,9.0,gap.length()+1.2)
+	# Two offset faces form a readable stone gorge. Both directions use the same
+	# pair of contact surfaces; the old single-face entrance was valid only in the
+	# authored direction and let a reverse traversal fall onto the nave roof.
+	var wall_sides: Array[float] = [-1.0, 1.0]
+	for side:float in wall_sides:
+		var wall_offset := Vector3.UP*3.4 if legacy_stage3_entry else Vector3.UP*2.0
+		var wall_center:=takeoff.lerp(landing,.5)+basis.x*(side*.72)+wall_offset
+		var wall:=DemoGeometry.box(room.geometry,wall_center,wall_size,room._stone,true)
+		wall.basis=basis
+		wall.set_meta("route_wall_size",wall_size)
+		wall.add_to_group("floating_route_surface")
+		for fraction:float in [.18,.5,.82]:
+			var rune:=DemoGeometry.box(wall,Vector3(0,0,(fraction-.5)*gap.length()),Vector3(.025,5.4,.12),room._accent)
+			rune.set_meta("interactive_visual",true)
+	# A compact receiving apron sits under the wall exit. It is a deliberate
+	# landing asset, not a hidden floor: its own paving and foundation make the
+	# wall-to-platform handoff readable and stop the player being caught on the
+	# platform bevel.
+	if not legacy_stage3_entry:
+		var apron := wall_exit + direction * 1.2
+		room._platform(apron,Vector2(8,8))
+		_foundation(room,apron,Vector2(8,8))
+	# The apron is level with the receiving deck and overlaps its edge by design;
+	# the overlap is the visible stone handoff after the wall-run.
+	room.route_links.append({"from":a,"to":b,"gap":true,"segments":[takeoff,takeoff,wall_exit,wall_exit],"mechanic":&"wall_run"})
+
+static func _pressure_wall(room: CombatRoom,a: Vector3,b: Vector3,index: int) -> void:
+	# A side-mounted traversal face follows the same direction as the deck but
+	# sits beyond the recovery line. Its lower edge is reachable from a
+	# jump/dash and its upper edge is intentionally open to the void; the
+	# recovery deck remains clear instead of being cut by the wall volume.
+	var direction := ((b-a)*Vector3(1,0,1)).normalized()
+	if direction.length_squared() < .25:return
+	var side := Vector3(-direction.z,0,direction.x) * (5.4 if index%2==0 else -5.4)
+	var midpoint := a.lerp(b,.5) + side + Vector3.UP*3.2
+	var length := Vector2(b.x-a.x,b.z-a.z).length()*.58
+	room._wall(midpoint,Vector3(.52,5.8,maxf(7.0,length)))
+	room.signature_sections[&"wall_pressure_%d"%index]={"from":a,"to":b,"high_line":midpoint,"mechanic":&"wall_run"}
 
 static func _link(room: CombatRoom,a: Vector3,b: Vector3,gap: bool) -> void:
 	# Long routes get reachable stepping stations, not proportionally wider gaps.
