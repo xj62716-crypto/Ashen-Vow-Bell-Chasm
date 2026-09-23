@@ -24,6 +24,9 @@ var activated: bool = false
 var _grace_left: float = 0.0
 var _disposed: bool = false
 var _control_lock: float = 0.0
+var _route_target := Vector3.INF
+var _route_reposition_left: float = 0.0
+var _route_cursor: int = -1
 
 static func install(enemy: LanternAcolyte, type: StringName, floor_body: StaticBody3D = null) -> BossPhaseController:
 	if is_instance_valid(enemy.boss_controller): return enemy.boss_controller
@@ -94,12 +97,16 @@ func reset_encounter() -> void:
 	stage = 1
 	_grace_left = 0
 	_control_lock = 0
+	_route_target = Vector3.INF
+	_route_reposition_left = 0.0
+	_route_cursor = -1
 	if is_instance_valid(actor.brain): actor.brain.reset_state()
 	_set_state(&"dormant")
 
 func advance(delta: float) -> void:
 	if not is_running(): return
 	_control_lock = maxf(0,_control_lock-delta)
+	_route_reposition_left = maxf(0.0,_route_reposition_left-delta)
 	if state == &"dormant":
 		# No arena-wide attacks or targets before a player actually approaches.
 		if actor.player.global_position.distance_to(origin)>18 or not actor.brain.can_see(actor.player,false): return
@@ -125,12 +132,61 @@ func advance(delta: float) -> void:
 			_enter_shield()
 	elif state == &"shielded":
 		actor._title.text = "%s · %d 阶段 · %s %d" % [actor._name(),stage,"熔炉核心" if kind==&"forge" else "束缚锁链",objectives.size()]
-	_grace_left = maxf(0,_grace_left-delta)
+		_grace_left = maxf(0,_grace_left-delta)
+	if state == &"shielded":
+		_advance_route_motion(delta)
+
+func _choose_route_target() -> void:
+	if not is_instance_valid(arena) or arena.surfaces.is_empty() or not is_instance_valid(actor.player): return
+	var player_position := actor.player.global_position
+	var best_score := -INF
+	var selected: BossOrbitSurface
+	for index in range(arena.surfaces.size()):
+		var surface := arena.surfaces[index]
+		if not is_instance_valid(surface): continue
+		# Prefer a route on the opposite side of the player. This makes the boss
+		# contest the next traversal node instead of orbiting at the spawn point.
+		var away := (surface.global_position-player_position).normalized()
+		var score := surface.global_position.distance_to(player_position) + absf(surface.global_position.y-player_position.y)*.35
+		if index == _route_cursor: score -= 3.0
+		if away.dot((surface.global_position-origin).normalized()) < .15: score -= 1.0
+		if score > best_score:
+			best_score = score
+			selected = surface
+	if not is_instance_valid(selected): return
+	_route_cursor = selected.route_index
+	var inward := (origin-selected.global_position).normalized()
+	_route_target = selected.global_position + inward*2.8 + Vector3.UP*.75
+	_route_reposition_left = 2.6
+	mechanic_event.emit(&"boss_reposition",_route_target,.35)
+
+func _advance_route_motion(delta: float) -> void:
+	# Isolated mechanics fixtures disable the actor's physics process and advance
+	# the controller manually. Keep those API probes spatially deterministic;
+	# live gameplay uses the actor process and therefore receives the full AI
+	# relocation behaviour.
+	if not actor.is_physics_processing(): return
+	# The first shield teaches the high-wall contract with the boss readable in
+	# the central bay. Later shields use the outer route as the boss's own
+	# relocation language; this prevents the AI from stealing the first lesson's
+	# only safe sightline while still making stage two and three dynamic.
+	if stage == 1 and not aerial: return
+	var brain := actor.brain as EnemyBrain
+	# The attack windup belongs to the LanternAcolyte actor; recovery belongs to
+	# its EnemyBrain. Keeping the ownership explicit avoids silently treating a
+	# missing property as null and moving the boss during a committed attack.
+	if not is_instance_valid(brain) or actor.windup >= 0.0 or brain.recovery_left > 0.0 or _grace_left > 0.0: return
+	if not _route_target.is_finite() or _route_reposition_left <= 0.0:
+		_choose_route_target()
+	if not _route_target.is_finite(): return
+	var destination := _route_target
 	if aerial:
-		# Lift continuously after the telegraph; no teleport and no tracking dash.
-		var destination := origin+Vector3.UP*2.4
-		actor.velocity = (destination-actor.global_position).limit_length(2.4)
-		actor.move_and_slide()
+		# The aerial phase stays above the collapsed floor while still moving
+		# between route nodes; it is not a teleport or a fixed hover in the centre.
+		destination.y = maxf(destination.y,origin.y+2.4)
+	var offset := destination-actor.global_position
+	actor.velocity = offset.limit_length(5.2 if aerial else 3.8)
+	actor.move_and_slide()
 
 func may_attack() -> bool:
 	return state == &"shielded" and _grace_left <= 0
@@ -175,6 +231,9 @@ func _enter_shield() -> void:
 		objective.route_role = wall.route_role
 		objective.route_index = wall.route_index
 		wall.add_child(objective)
+		# Keep each target on the readable attack face of its wall.  The extra
+		# stand-off is deliberate: the wider wall must not occlude the projectile
+		# or blade sweep before it reaches the core.
 		objective.position = Vector3(0,route_heights[index%route_heights.size()],-.38)
 		objective.set_meta("route_role",wall.route_role)
 		objective.set_meta("route_index",wall.route_index)
@@ -273,7 +332,21 @@ func attack_profile(sequence: int) -> Dictionary:
 		if stage == 3: patterns.append(&"forge_crossfire")
 	else:
 		patterns = [&"priest_ground",&"fan"] if not aerial else [&"priest_air",&"fan",&"priest_ground"]
-	return {"kind":patterns[posmod(sequence,patterns.size())],"windup":1.25-.12*(stage-1),"recovery":1.05-.1*(stage-1),"cooldown":1.25-.22*(stage-1),"tail":3.5}
+	var selected := patterns[posmod(sequence,patterns.size())]
+	# The low-level EnemyBrain keeps the readable windup/release/recovery
+	# contract; this high-level choice adapts one out of every three attacks to
+	# the player's current route instead of turning the fight into homing spam.
+	if sequence % 3 == 0 and is_instance_valid(actor.player):
+		var high_route := not actor.player.is_on_floor() or actor.player.is_wall_running() or actor.player.global_position.y > origin.y + 1.6
+		if kind == &"forge" and high_route and patterns.has(&"forge_air"):
+			selected = &"forge_air"
+		elif kind == &"forge" and not high_route and patterns.has(&"forge_ground"):
+			selected = &"forge_ground"
+		elif kind == &"priest" and high_route and patterns.has(&"priest_air"):
+			selected = &"priest_air"
+		elif kind == &"priest" and not high_route and patterns.has(&"priest_ground"):
+			selected = &"priest_ground"
+	return {"kind":selected,"windup":1.25-.12*(stage-1),"recovery":1.05-.1*(stage-1),"cooldown":1.25-.22*(stage-1),"tail":3.5}
 
 func release_attack(attack: StringName, point: Vector3) -> bool:
 	if not attack in [&"forge_ground",&"forge_air",&"forge_crossfire",&"priest_ground",&"priest_air"]: return false

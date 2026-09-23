@@ -18,18 +18,18 @@ func _ready() -> void:
 	collision_mask = 0
 	sync_to_physics = false
 	if route_role == &"broken_deck":
-		# Low route pieces stay below the wall-run line and expose the gap for a
-		# slide-jump or grapple transfer into the next core.
-		_part(Vector3(0,1.5,0),Vector3(4.8,3.0,.45))
+		# Keep the deck low, but give its broken wall face enough vertical
+		# coverage for the player's two wall-run probes after a short grapple.
+		_part(Vector3(0,1.5,0),Vector3(6.4,5.6,.45))
 	else:
-		_part(Vector3(0,2.3,0),Vector3(4.8,4.6,.45))
+		_part(Vector3(0,2.3,0),Vector3(6.4,4.6,.45))
 	# Even route indices are broken decks with a visible centre gap. Odd indices
 	# keep a full wall face for sustained wall running and a clear core approach.
 	if route_role == &"broken_deck":
-		_part(Vector3(-1.35,0,-.65),Vector3(2.0,.28,1.6))
-		_part(Vector3(1.35,0,-.65),Vector3(2.0,.28,1.6))
+		_part(Vector3(-1.8,0,-.65),Vector3(2.7,.28,1.6))
+		_part(Vector3(1.8,0,-.65),Vector3(2.7,.28,1.6))
 	else:
-		_part(Vector3(0,0,-.65),Vector3(4.8,.28,1.6))
+		_part(Vector3(0,0,-.65),Vector3(6.4,.28,1.6))
 	place()
 
 func _part(point: Vector3,size: Vector3) -> void:

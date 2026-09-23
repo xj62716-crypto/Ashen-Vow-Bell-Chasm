@@ -19,7 +19,11 @@ var _foundation_parts: Array[Node3D] = []
 # The boss route alternates low broken decks and higher wall faces. Keeping the
 # recipe here makes both boss types consume the same parkour language instead
 # of falling back to flat orbiting targets around the actor.
-const ROUTE_ELEVATIONS := [0.25, 2.15, 0.75, 2.9, 0.55, 2.45]
+## The arena is deliberately wider than the old six-metre ring.  The boss
+## body owns the centre while the player needs readable high/mid/low lanes,
+## not six overlapping pieces at the actor's feet.
+const ROUTE_ELEVATIONS := [0.35, 3.2, 0.95, 4.35, 0.65, 3.7]
+const ROUTE_RADIUS := 10.5
 
 func _ready() -> void:
 	process_mode = PROCESS_MODE_PAUSABLE
@@ -78,6 +82,7 @@ func prepare_air_route() -> void:
 		wall.center = origin+Vector3.UP*1.6
 		wall.angle = TAU*index/6.0
 		wall.vertical_offset = ROUTE_ELEVATIONS[index]
+		wall.radius = ROUTE_RADIUS
 		wall.route_role = &"broken_deck" if index%2==0 else &"wall_face"
 		wall.route_index = index
 		wall.player = controller.actor.player
@@ -92,7 +97,10 @@ func prepare_air_route() -> void:
 		anchor.grapple_release_distance = 2.25
 		anchor.player = controller.actor.player
 		wall.add_child(anchor)
-		anchor.position = Vector3(0,3.6,-1.4)
+		# Low broken decks expose a lower wall face; hang their anchor at the
+		# upper edge so a half-second zip intersects the usable surface instead
+		# of releasing above it.  Full wall faces keep the higher handoff.
+		anchor.position = Vector3(0,2.9 if wall.route_role == &"broken_deck" else 3.6,-1.4)
 		anchors.append(anchor)
 	for index in range(3):
 		var well := RiftConstruct.new()

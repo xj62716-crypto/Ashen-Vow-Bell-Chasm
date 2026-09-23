@@ -16,7 +16,7 @@ extends Resource
 @export_range(60.0, 420.0, 5.0) var grapple_pull_acceleration: float = 360.0
 @export_range(8.0, 24.0, 0.5) var grapple_vertical_speed: float = 14.0
 @export_range(0.4, 1.0, 0.05) var grapple_vertical_scale: float = 0.72
-@export_range(2.0, 10.0, 0.25) var grapple_vertical_exit_gap: float = 6.0
+@export_range(2.0, 12.0, 0.25) var grapple_vertical_exit_gap: float = 10.0
 @export_range(0.0, 10.0, 0.5) var grapple_steer_speed: float = 5.5
 @export_range(0.0, 40.0, 1.0) var grapple_steer_acceleration: float = 20.0
 @export_range(20.0, 64.0, 0.5) var grapple_max_speed: float = 54.0

@@ -114,7 +114,17 @@ static func build(room: CombatRoom) -> void:
 	room._exit(Vector3(-2,12,-291))
 	for p: Vector3 in [Vector3(-10,2,-86),Vector3(4,4,-188)]:
 		CitadelDressing.asset(room.geometry,"gothic_statue",p,Vector3(1.3,1.3,1.3))
-	CitadelDressing.asset(room.geometry,"large_castle_door",Vector3(-2,12,-302),Vector3(2.2,2.2,2.2))
+	# The door is the physical destination dressing for this route. Keep its
+	# full depth on the final landing instead of placing it beyond the deck in
+	# the void. The authored GLB's lowest mesh point is y=-0.228; at the 2.2x
+	# scale its door leaves sit 0.50 m below the instance origin, so this
+	# offset seats the leaves on the platform top (y=final_platform.y).
+	var final_platform: Vector3 = path[-1]
+	var final_platform_size: Vector2 = room.platform_extents[final_platform]
+	var door_scale := Vector3(2.2,2.2,2.2)
+	var door_y := final_platform.y + 0.50
+	var door_z := final_platform.z - final_platform_size.y*.5 + 0.30
+	CitadelDressing.asset(room.geometry,"large_castle_door",Vector3(final_platform.x,door_y,door_z),door_scale)
 	# Surrounding architecture has no collision: it cannot bridge the authored gaps.
 	CitadelExpansion._city(room,path[0],path[-1])
 	# West now opens onto the chosen D01-D05 city composition, rather than a

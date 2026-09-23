@@ -78,6 +78,10 @@ var _wall_coyote_left: float = 0.0
 var _wall_jump_transfer_left: float = 0.0
 var _wall_bonus_used: bool = false
 var _momentum_left: float = 0.0
+var _grapple_exit_brake_left: float = 0.0
+var _grapple_exit_brake_target_speed: float = 0.0
+var _grapple_exit_brake_direction := Vector3.ZERO
+var _grapple_wall_handoff_left: float = 0.0
 var _coyote_left: float = 0.0
 var _jump_buffer_left: float = 0.0
 var _dash_left: float = 0.0
@@ -201,6 +205,9 @@ func _physics_process(delta: float) -> void:
 	_ignore_floor_once = false
 	_wall_coyote_left = maxf(0.0, _wall_coyote_left - delta)
 	_momentum_left = maxf(0.0, _momentum_left - delta)
+	var grapple_brake_left := _grapple_exit_brake_left
+	_grapple_exit_brake_left = maxf(0.0, _grapple_exit_brake_left - delta)
+	_grapple_wall_handoff_left = maxf(0.0, _grapple_wall_handoff_left - delta)
 	_coyote_left = coyote_time if grounded else maxf(0.0, _coyote_left - delta)
 	_jump_buffer_left = maxf(0.0, _jump_buffer_left - delta)
 	if grounded:
@@ -276,6 +283,13 @@ func _physics_process(delta: float) -> void:
 				flat = flat.move_toward(wish_direction * move_speed, air_acceleration * delta)
 		velocity.x = flat.x
 		velocity.z = flat.z
+		if grapple_brake_left > 0.0 and _grapple_exit_brake_direction.length_squared() > 0.25:
+			# Keep the release burst visible, then hand control back over the
+			# authored receiving speed over the configured momentum window.
+			var brake_target := _grapple_exit_brake_direction * _grapple_exit_brake_target_speed
+			flat = flat.lerp(brake_target,clampf(delta/maxf(grapple_brake_left,delta),0.0,1.0))
+			velocity.x = flat.x
+			velocity.z = flat.z
 	var impact_speed: float = -velocity.y
 	var was_dashing: bool = is_dashing() or _dash_direction != Vector3.ZERO
 	var before_move := global_position
@@ -443,6 +457,8 @@ func apply_profile(profile: ParkourProfile) -> void:
 	grapple.cancel()
 	_stop_wall(false)
 	velocity = Vector3.ZERO
+	_clear_grapple_exit_brake()
+	_grapple_wall_handoff_left = 0.0
 	sliding = false
 	crouched = false
 	_dash_left = 0.0
@@ -483,6 +499,7 @@ func _side_wall(side: int, reattach_hint: bool = false) -> Dictionary:
 
 
 func _update_wall_contact(wish: Vector3, stick: Vector2, delta: float) -> void:
+	var grapple_handoff := _grapple_wall_handoff_left > 0.0
 	if not _wall_active:
 		var foot := global_position+Vector3.UP*.08
 		var ground_query := PhysicsRayQueryParameters3D.create(foot,foot-Vector3.UP*.4,1,[get_rid()])
@@ -520,7 +537,7 @@ func _update_wall_contact(wish: Vector3, stick: Vector2, delta: float) -> void:
 		# wall can be caught in mid-air after two segments on the first wall.
 		var approach: Vector3 = Vector3(velocity.x,0,velocity.z) if hinted else wish
 		var allow_wall_jump_transfer: bool = _wall_jump_transfer_left > 0.0 and switched_wall
-		if not _wall_active and not allow_wall_jump_transfer:
+		if not _wall_active and not allow_wall_jump_transfer and not grapple_handoff:
 			var approach_direction := approach.normalized()
 			if approach_direction.length_squared() > 0.0 and (approach_direction.dot(normal) > 0.35 or absf(approach_direction.dot(normal)) > 0.78):
 				continue
@@ -534,7 +551,7 @@ func _update_wall_contact(wish: Vector3, stick: Vector2, delta: float) -> void:
 			tangent = -tangent
 		var front_origin: Vector3 = global_position + Vector3.UP
 		var front_query := PhysicsRayQueryParameters3D.create(front_origin, front_origin + tangent * 0.7, 1, [get_rid()])
-		if not get_world_3d().direct_space_state.intersect_ray(front_query).is_empty():
+		if not grapple_handoff and not get_world_3d().direct_space_state.intersect_ray(front_query).is_empty():
 			continue
 		_wall_normal = normal
 		_wall_plane_offset = plane_offset
@@ -622,6 +639,23 @@ func _reset_wall_airtime() -> void:
 	_wall_coyote_left = 0.0
 	_wall_jump_transfer_left = 0.0
 	_momentum_left = 0.0
+	_clear_grapple_exit_brake()
+	_grapple_wall_handoff_left = 0.0
+
+
+func arm_grapple_exit_brake(direction: Vector3, target_speed: float, duration: float) -> void:
+	var flat_direction := Vector3(direction.x,0.0,direction.z)
+	if flat_direction.length_squared() < 0.25:
+		flat_direction = Vector3(-global_basis.z.x,0.0,-global_basis.z.z)
+	_grapple_exit_brake_direction = flat_direction.normalized()
+	_grapple_exit_brake_target_speed = maxf(0.0,target_speed)
+	_grapple_exit_brake_left = maxf(0.0,duration)
+
+
+func _clear_grapple_exit_brake() -> void:
+	_grapple_exit_brake_left = 0.0
+	_grapple_exit_brake_target_speed = 0.0
+	_grapple_exit_brake_direction = Vector3.ZERO
 
 
 func horizontal_speed() -> float:
@@ -632,6 +666,8 @@ func respawn_at(spawn: Transform3D) -> void:
 	grapple.cancel()
 	global_transform = spawn
 	velocity = Vector3.ZERO
+	_clear_grapple_exit_brake()
+	_grapple_wall_handoff_left = 0.0
 	_wall_look_yaw = 0.0
 	head.rotation = Vector3.ZERO
 	dash_available = true
@@ -711,6 +747,8 @@ func apply_rewind_state(destination: Vector3, restored_velocity: Vector3, restor
 	global_position = destination
 	_set_crouch(restored_crouch or not _can_stand())
 	velocity = restored_velocity
+	_clear_grapple_exit_brake()
+	_grapple_wall_handoff_left = 0.0
 	_momentum_left = 0.4
 	_ignore_floor_once = true
 	reset_physics_interpolation()
