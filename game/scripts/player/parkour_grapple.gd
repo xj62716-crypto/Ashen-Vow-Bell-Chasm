@@ -62,11 +62,23 @@ func _ready() -> void:
 	player.recovered.connect(cancel)
 
 func can_begin(target: Node3D) -> bool:
-	if active or not is_instance_valid(target) or not target.is_inside_tree() or target.is_queued_for_deletion() or not target.is_visible_in_tree() or not player.control_enabled or get_tree().paused:
+	if active or not is_instance_valid(target) or not target.is_inside_tree() or target.is_queued_for_deletion() or not target_phase_active(target) or not player.control_enabled or get_tree().paused:
 		return false
 	if _regrab_left > 0 and target.get_instance_id() == _last_anchor_id: return false
 	var distance := target.global_position.distance_to(player.camera.global_position)
 	return distance >= 2.0 and distance <= RANGE and not _cable_blocked(player.camera.global_position,target)
+
+func target_phase_active(target: Node3D) -> bool:
+	# A construct's logic root is not required to own its rendered mesh. Generic
+	# `is_visible_in_tree()` therefore rejects valid authored anchors when their
+	# art is supplied by a child or a batched sibling. Only explicit timeline
+	# ownership gates grapple acquisition; ordinary anchors remain interactive.
+	var cursor: Node = target
+	while cursor != null:
+		if cursor.has_meta("timeline_phase") and cursor is Node3D and not (cursor as Node3D).visible:
+			return false
+		cursor = cursor.get_parent()
+	return true
 
 ## Small aim tolerance for high-speed acquisition. The room keeps nearby altar /
 ## device priority and calls this only when its exact interaction ray missed.
@@ -219,6 +231,11 @@ func _finish(reason: StringName) -> void:
 		# Downward route vectors already carry their full vertical impulse; do
 		# not add the pre-release fall speed a second time.
 		carried_vertical = 0.0
+	elif reason == &"arrived" and is_instance_valid(target) and target is RiftConstruct:
+		# Route anchors release before the hook centre. Their authored lift is the
+		# minimum arc needed to meet the receiving slab or wall after the line
+		# disappears; omitting it made the short zip end in a fall at the lip.
+		carried_vertical = maxf(carried_vertical,minf(lift_cap,target.grapple_exit_lift))
 	player.velocity = direction*exit_speed+Vector3.UP*carried_vertical
 	player.arm_grapple_exit_brake(direction,minimum_exit_speed,player.parkour_profile.grapple_exit_momentum_seconds)
 	if is_instance_valid(target) and target.get_parent() is BossOrbitSurface:

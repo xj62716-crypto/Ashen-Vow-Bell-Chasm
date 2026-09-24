@@ -40,6 +40,12 @@ func _run() -> void:
 	check(is_instance_valid(remnant) and not remnant.visible, "remnant route surface is hidden in present")
 	var remnant_shapes := remnant.find_children("*", "CollisionShape3D", true, false)
 	check(remnant_shapes.size() > 0 and (remnant_shapes[0] as CollisionShape3D).disabled, "hidden remnant route has no active collision")
+	var remnant_anchor: RiftConstruct = null
+	for candidate: RiftConstruct in trial.combat_room.static_anchors:
+		if candidate.has_meta("timeline_phase") and candidate.get_meta("timeline_phase") == &"remnant":
+			remnant_anchor = candidate
+			break
+	check(is_instance_valid(remnant_anchor) and not trial.player.grapple.target_phase_active(remnant_anchor), "present phase rejects only the explicitly inactive remnant anchor")
 	var player := trial.player
 	player.velocity = Vector3(3.0, 7.0, -11.0)
 	player._ignore_floor_once = true
@@ -51,6 +57,7 @@ func _run() -> void:
 	check(runtime.phase == &"remnant" and runtime.charges == runtime.maximum_charges - 1, "shift consumes only phase resource")
 	check(player.global_position.distance_to(before_position) < 1.2 and player.velocity.distance_to(before_velocity) < 8.0, "timeline shift does not teleport or replace player motion")
 	check(remnant.visible and not (remnant_shapes[0] as CollisionShape3D).disabled, "remnant route surface becomes visible and collidable")
+	check(trial.player.grapple.target_phase_active(remnant_anchor), "remnant shift activates its authored grapple anchor")
 	var enemy: Node = null
 	for node: Node in trial.combat_room.enemies:
 		if node.has_meta("phase_route_node"):

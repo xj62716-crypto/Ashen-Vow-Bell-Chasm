@@ -113,6 +113,17 @@ static func _collision_box(parent: Node3D, point: Vector3, size: Vector3, phase:
 	_phase(body, phase)
 	return body
 
+static func _walkable_surface(parent: Node3D, point: Vector3, size: Vector3, surface: Material, phase: StringName, basis := Basis.IDENTITY) -> StaticBody3D:
+	# The visible slab and its collision are the same body and share the same
+	# transform. Decorative masonry may sit on top, but can never advertise a
+	# larger walkable footprint than the authoritative support below it.
+	var body := DemoGeometry.box(parent, point, size, surface, true) as StaticBody3D
+	body.basis = basis
+	body.set_meta("timeline_support", true)
+	body.set_meta("timeline_support_size", size)
+	_phase(body, phase)
+	return body
+
 static func _light(parent: Node3D, point: Vector3, color: Color, energy: float, phase: StringName) -> OmniLight3D:
 	var light := OmniLight3D.new()
 	light.position = point
@@ -151,8 +162,9 @@ static func _build_present(room: CombatRoom, root: Node3D) -> void:
 		var z := -28.0 - index * 58.0
 		var side := -1.0 if index % 2 == 0 else 1.0
 		var support := Vector3(side*7.5, 3.2 + index*.4, z)
-		_collision_box(root, support, Vector3(.48, 6.4, 2.2), PRESENT)
-		_collision_box(root, Vector3(side*7.5, 6.35 + index*.4, z), Vector3(15.0, .38, .58), PRESENT)
+		# These frames establish silhouette and lighting only. The former hidden
+		# box beam crossed the critical grapple flight at z=-144 and stopped the
+		# player in mid-air despite no matching visible obstruction.
 		_asset(root, &"buttress", Vector3(side*7.1, .0, z), Vector3(.82,1.35,.82), PRESENT, side*.5)
 		_asset(root, &"arch", Vector3(0, 1.0 + index*.4, z), Vector3(.72,.82,.72), PRESENT, PI*.5)
 		_asset(root, &"window", Vector3(side*7.5, 2.2 + index*.4, z), Vector3(.56,.76,.56), PRESENT, side*.5)
@@ -166,7 +178,6 @@ static func _build_present(room: CombatRoom, root: Node3D) -> void:
 	# Warm vertical signal columns make the present readable without changing
 	# the authored collision route.
 	for point: Vector3 in [Vector3(-10, 4, -72), Vector3(10, 6, -142), Vector3(-10, 8, -216)]:
-		_collision_box(root, point, Vector3(.16, 5.0, .16), PRESENT)
 		_asset(root, &"bell_frame", point + Vector3(0, .8, 0), Vector3(.42, .72, .42), PRESENT)
 		_asset(root, &"lantern", point + Vector3(0,2.25,0), Vector3(.8,.8,.8), PRESENT)
 		_light(root, point + Vector3.UP*2.1, phase_light, 1.1, PRESENT)
@@ -197,7 +208,7 @@ static func _build_remnant(room: CombatRoom, root: Node3D) -> void:
 		var center: Vector3 = room.route_nodes[deck_index]
 		var side := -1.0 if (deck_index + room.stage) % 2 == 0 else 1.0
 		var high := center + Vector3(side*6.0, 4.2 + room.stage*.35, 1.5)
-		_collision_box(root, high, Vector3(7.0, .48, 6.0), REMNANT)
+		_walkable_surface(root, high, Vector3(7.0, .48, 6.0), ruin, REMNANT)
 		_asset(root, &"flagstone", high + Vector3(0,.08,0), Vector3(1.12,.28,1.12), REMNANT, side*.18)
 		_asset(root, &"broken_end", high + Vector3(-2.0,.05,0), Vector3(.72,.68,.82), REMNANT, side*.18)
 		_asset(root, &"broken_end", high + Vector3(2.0,.05,0), Vector3(.72,.68,.82), REMNANT, side*.18)
@@ -233,7 +244,7 @@ static func _build_remnant(room: CombatRoom, root: Node3D) -> void:
 	for index in range(3):
 		var center := Vector3((-4.0 if index%2==0 else 4.0), 3.0 + index*1.8, -112.0-index*18.0)
 		var plate_basis := Basis(Vector3.UP, .12 if index%2==0 else -.16)
-		_collision_box(root, center, Vector3(3.4, .42, 5.4), REMNANT, plate_basis)
+		_walkable_surface(root, center, Vector3(3.4, .42, 5.4), ruin, REMNANT, plate_basis)
 		_asset(root, &"broken_end", center + Vector3(0,.06,0), Vector3(.62,.58,.72), REMNANT, .12 if index%2==0 else -.16)
 		_asset(root, &"flagstone", center + Vector3(0,.27,0), Vector3(.76,.18,.86), REMNANT, .12 if index%2==0 else -.16)
 	# Three cold rift seams change the near-field read of the walls and floor.
@@ -252,6 +263,15 @@ static func _lock_selected_decks(room: CombatRoom) -> void:
 			if not node.has_meta("route_platform_center"):
 				continue
 			var center: Vector3 = node.get_meta("route_platform_center")
+			if center.distance_to(target) < .08:
+				_phase(node as Node3D, PRESENT)
+		# Foundations were previously left visible after their collision-bearing
+		# platform switched off. Their broad top face looked like a valid floor in
+		# the remnant even though it was intentionally non-solid.
+		for node: Node in room.get_tree().get_nodes_in_group("structural_foundation"):
+			if not node is Node3D or not room.geometry.is_ancestor_of(node):
+				continue
+			var center: Vector3 = node.get_meta("platform_center", Vector3.INF)
 			if center.distance_to(target) < .08:
 				_phase(node as Node3D, PRESENT)
 		for node: Node in room.geometry.find_children("*", "Node", true, false):
