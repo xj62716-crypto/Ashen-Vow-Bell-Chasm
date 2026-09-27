@@ -1,5 +1,9 @@
 # Core Gameplay Plan r6 Implementation
 
+## 2026-09-27 AX01–AX09 追身生命周期收口
+
+`ProfessionArts` 现在提供统一的 `approach/contact/recovery/idle` 处决阶段和取消原因；遮挡、目标失效、移位及重置都会解除追身、恢复入口动量并发出取消事件。`FirstPersonArms` 消费该事件，立即清理执行刀光采样和瞬态能力状态。`PlayerCombat.impact_hold` 独立递减，不需要下一次攻击或死亡才能结束。专项 `execution_lifecycle_checks.gd` 通过 10/10（退出码 0）。这只是 AX01–AX09 的源码生命周期证据，正式关卡连续录像、动作审美和全量 QA 仍保持未关闭。
+
 ## 2026-09-25 R7 功能优先推进：残影军势与地脉塑形首核心
 
 连续路线专项仍有 8 项高差／反向路线失败，属于路线质量收尾项，不能标为通过；正式路线合同、关卡网络、课程和遭遇空间没有因此回退。本轮先推进策划案中会直接改变游玩行为的两个第一核心：

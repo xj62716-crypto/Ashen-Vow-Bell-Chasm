@@ -5,6 +5,7 @@ signal performed(kind: StringName)
 signal pursuit_started(kind: StringName)
 signal pursuit_cut_started(kind: StringName)
 signal pursuit_resolved(kind: StringName, accepted: bool, defeated: bool)
+signal pursuit_cancelled(kind: StringName, reason: StringName)
 @export var pursuit_profile:Resource=preload("res://data/combat/blade_pursuit_default.tres")
 signal mark_changed(target: Node3D, point: Vector3, marked: bool, reason: StringName)
 signal seal_detonated(target: Node3D, point: Vector3)
@@ -58,6 +59,7 @@ var _execution_contact_committed:bool=false
 var _execution_cut_started:bool=false
 var _execution_entry_edge:float=0.
 var execution_cancel_reason:StringName=&""
+var execution_phase:StringName=&"idle"
 
 func _ready() -> void:
 	process_mode=Node.PROCESS_MODE_PAUSABLE
@@ -156,7 +158,9 @@ func _physics_process(delta: float) -> void:
 		return
 	if execution_recovering and combat.impact_hold<=0:
 		execution_recovery_age+=delta
-		if execution_recovery_age>=pursuit_profile.recovery_seconds:execution_recovering=false
+		if execution_recovery_age>=pursuit_profile.recovery_seconds:
+			execution_recovering=false
+			execution_phase=&"idle"
 	if execution_active:
 		advance_execution(delta)
 		return
@@ -324,6 +328,7 @@ func execute(target: LanternAcolyte, kind: StringName) -> bool:
 	_execution_entry_edge=edge
 	execution_kind=kind;execution_serial+=1;_execution_contact_committed=false;_execution_cut_started=false
 	execution_age=0.;execution_recovering=false;execution_recovery_age=0.
+	execution_phase=&"approach"
 	var minimum_seconds:float=pursuit_profile.counter_approach_seconds if kind==&"blink" else pursuit_profile.hunt_approach_seconds
 	# Smoothstep peaks at 1.5 times average speed. Long pursuits remain visibly
 	# continuous and obey the same speed ceiling instead of snapping in 4 frames.
@@ -344,13 +349,18 @@ func blocks_primary_attack()->bool:
 	return execution_active or (execution_recovering and execution_recovery_age<pursuit_profile.attack_unlock_seconds)
 
 func cancel_execution(reason:StringName=&"reset")->void:
+	var had_execution := execution_active or execution_recovering
+	var previous_kind := execution_kind
 	if execution_active and is_instance_valid(player) and reason!=&"reset":
 		# A failed approach does not erase entry momentum or invent a side leap.
 		player.velocity=_execution_entry_velocity.limit_length(pursuit_profile.maximum_exit_speed)
 		execution_cancel_reason=reason
 	execution_active=false;_execution_target=null;execution_age=0.
 	execution_recovering=false
+	execution_phase=&"idle"
 	if is_instance_valid(player):player.blade_approach_active=false
+	if had_execution and reason!=&"reset":
+		pursuit_cancelled.emit(previous_kind,reason)
 
 func advance_execution(delta:float)->void:
 	if not _valid_execution_target(_execution_target):
@@ -366,6 +376,7 @@ func advance_execution(delta:float)->void:
 		cancel_execution(&"obstructed");return
 	if execution_age>=approach_seconds and not _execution_cut_started:
 		_execution_cut_started=true
+		execution_phase=&"contact"
 		pursuit_cut_started.emit(execution_kind)
 	if execution_age<execution_seconds:return
 	var target:LanternAcolyte=_execution_target;var outward:Vector3=_execution_outward
@@ -378,6 +389,7 @@ func finish_execution(target:LanternAcolyte,kind:StringName,toward:Vector3)->boo
 	_execution_contact_committed=true
 	execution_active=false;player.blade_approach_active=false;_execution_target=null
 	execution_recovering=true;execution_recovery_age=0.
+	execution_phase=&"recovery"
 	# Commit the visual contact before damage observers fire. Neither this event
 	# nor the approach is evidence of a hit: only receive_hit can grant rewards.
 	_play_action(str(kind))
@@ -406,6 +418,19 @@ func finish_execution(target:LanternAcolyte,kind:StringName,toward:Vector3)->boo
 	cooldown=.5
 	pursuit_resolved.emit(kind,hit,defeated)
 	return hit
+
+func execution_status() -> Dictionary:
+	return {
+		"phase": execution_phase,
+		"kind": execution_kind,
+		"active": execution_active,
+		"recovering": execution_recovering,
+		"age": execution_age,
+		"duration": execution_seconds,
+		"recovery_age": execution_recovery_age,
+		"cancel_reason": execution_cancel_reason,
+		"serial": execution_serial,
+	}
 
 func placement_for(kind: StringName) -> Dictionary:
 	var origin := player.camera.global_position

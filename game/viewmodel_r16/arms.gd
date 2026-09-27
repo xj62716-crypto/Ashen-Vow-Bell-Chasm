@@ -128,6 +128,7 @@ func bind_combat() -> void:
 	combat.hit_confirmed.connect(func(_target:Node3D,_point:Vector3,_defeated:bool):weapon_hit=1.0)
 	combat.hit_confirmed.connect(blade_contact_accent)
 	combat.echo_sweep_launched.connect(_show_echo_sweep)
+	combat.arts.pursuit_cancelled.connect(_cancel_pursuit_visual)
 	combat.spell_contact.connect(func(_element:StringName):weapon_hit=1.0)
 	combat.ability_used.connect(func():
 		if active_kind=="staff":on_ability(&"quick_cast"))
@@ -146,6 +147,20 @@ func _show_echo_sweep(origin: Vector3, forward: Vector3) -> void:
 	var sweep := preload("res://viewmodel_r16/blade_echo_sweep.gd").new()
 	get_tree().current_scene.add_child(sweep)
 	sweep.global_transform = Transform3D(Basis.looking_at(forward, Vector3.UP), origin)
+
+func _cancel_pursuit_visual(_kind: StringName, _reason: StringName) -> void:
+	# Cancellation is an authored outcome, not an animation failure. Clear the
+	# current edge samples immediately so a blocked/invalid approach cannot leave a
+	# blade ribbon or execution pose alive until the next primary attack.
+	ability_kind=""
+	ability_age=0.0
+	blade_active=false
+	blade_powered=false
+	prime_powered_trail=false
+	trail_samples.clear()
+	previous_edge_tip=Vector3.ZERO
+	if is_instance_valid(new_trail):
+		(new_trail.mesh as ImmediateMesh).clear_surfaces()
 
 func _unhandled_input(event:InputEvent) -> void:
 	if event.is_action_pressed("interact") and player.control_enabled:interaction_left=.28
