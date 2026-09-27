@@ -16,8 +16,8 @@ R7 构筑阶段已接入正式运行时：核心→循环→成型由实际获�
 
 - 文件：`release/AshenVow-Demo.exe`
 - 来源：Godot Windows Desktop release export from the current integration worktree
-- SHA-256：`1FBADF93B94EE6ABBCD99B3E4A15F34B8E7FA85A4BCBDF0D9D558C722351DDE3`
-- 文件大小：`1,509,667,912` bytes
+- SHA-256：`B12ACC18EB03CC8F9835D5C81A973187932050FC4E848CF37292EE7A49CAB395`
+- 文件大小：`1,509,668,456` bytes
 - PCK 内嵌标记：GDPC
 - 冷启动烟测：`--headless --audio-driver Dummy --quit-after 180`，进程正常退出，stderr 为空；EXE 尾部包含 `GDPC`
 

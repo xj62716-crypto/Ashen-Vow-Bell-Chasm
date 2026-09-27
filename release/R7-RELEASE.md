@@ -47,7 +47,10 @@ PCK 内嵌标记：`GDPC`。导出期间唯一错误日志为已运行编辑器�
 ## 当前发布包
 
 - 文件：`release/AshenVow-Demo.exe`
-- 源码提交：`9e06893`
-- 文件大小：`1,509,667,912` bytes
-- SHA-256：`1FBADF93B94EE6ABBCD99B3E4A15F34B8E7FA85A4BCBDF0D9D558C722351DDE3`
+- 源码提交：`d934719`
+- 文件大小：`1,509,668,456` bytes
+- SHA-256：`B12ACC18EB03CC8F9835D5C81A973187932050FC4E848CF37292EE7A49CAB395`
 - PCK 内嵌尾标记：`GDPC`
+
+本轮导出后以 `--headless --audio-driver Dummy --quit-after 180` 冷启动，退出码 `0`，
+stdout 仅输出 Godot 版本行，stderr 为空。
