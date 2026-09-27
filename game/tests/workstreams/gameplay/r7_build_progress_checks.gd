@@ -16,6 +16,11 @@ func _run() -> void:
 	await fresh("shade")
 	check(combat.apply_rune(&"shade_echo"),"echo core applies")
 	check(combat.build_stage==1 and combat.build_synergies.is_empty(),"one core enters the loop-building stage")
+	var followup_rng:=RandomNumberGenerator.new()
+	followup_rng.seed=91
+	var followup:=RuneCatalog.offer(&"shade",[&"shade_echo"],followup_rng)
+	check(followup.any(func(option): return option.get("id",&"")==&"shade_parry"),"a pending cross-theme partner is reliably offered after a core")
+	check(followup.all(func(option): return option.has("offer_role") and option.has("immediate_behavior")),"altar options expose role and immediate behavior metadata")
 	check(combat.apply_rune(&"shade_echo_cut"),"echo extension applies")
 	check(combat.build_stage==1,"single extension keeps a readable mid-build state")
 	check(combat.apply_rune(&"shade_parry"),"parry core applies")
@@ -26,6 +31,10 @@ func _run() -> void:
 	check(combat.has_synergy(&"shade_echo+shade_parry") and not combat._shade_echo_pending.is_empty(),"echo plus parry arms a real secondary attack origin")
 	await fresh("arcanist")
 	combat.apply_rune(&"arcane_element")
+	var arcane_followup_rng:=RandomNumberGenerator.new()
+	arcane_followup_rng.seed=17
+	var arcane_followup:=RuneCatalog.offer(&"arcanist",[&"arcane_element"],arcane_followup_rng)
+	check(arcane_followup.any(func(option): return option.get("id",&"") in [&"arcane_storm",&"arcane_shape",&"arcane_seal"]),"an unowned arcanist core remains reliably available")
 	combat.apply_rune(&"arcane_shape")
 	combat.apply_rune(&"arcane_ice")
 	combat.arts.mana=100

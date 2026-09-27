@@ -131,14 +131,60 @@ static func offer(profile_id: StringName, acquired: Array[StringName], rng: Rand
 		while not opening.is_empty() and result.size() < 3:
 			result.append(opening.pop_at(rng.randi_range(0, opening.size()-1)))
 		return _annotate_offer(result, profile_id, acquired)
-	if not extensions.is_empty():
-		result.append(extensions.pop_at(rng.randi_range(0, extensions.size()-1)))
+	# Keep the altar useful after the opening pick. The old implementation picked
+	# an arbitrary extension first, which could leave a run with three unrelated
+	# cards. Guarantee a pending authored link before filling the remaining slots,
+	# then keep a missing core in the pool while one still exists.
+	var pending_link := _pending_synergy(profile_id, acquired, eligible)
+	if not pending_link.is_empty():
+		result.append(pending_link)
+
+	var missing_cores: Array[Dictionary] = []
+	for core in cores:
+		if core.id not in acquired and not _contains_id(result, core.id):
+			missing_cores.append(core)
+	if result.size() < 3 and not missing_cores.is_empty():
+		result.append(missing_cores.pop_at(rng.randi_range(0, missing_cores.size()-1)))
+
+	# Prefer an extension rooted in the current build for the next slot. It is
+	# still random within that branch, so the player retains meaningful choice.
+	var rooted: Array[Dictionary] = []
+	for extension in extensions:
+		var parent: StringName = extension.get("requires", &"")
+		if parent != &"" and parent in acquired and not _contains_id(result, extension.id):
+			rooted.append(extension)
+	if result.size() < 3 and not rooted.is_empty():
+		result.append(rooted[rng.randi_range(0, rooted.size()-1)])
 	var pool: Array[Dictionary] = []
 	pool.append_array(cores)
 	pool.append_array(extensions)
 	while not pool.is_empty() and result.size() < 3:
-		result.append(pool.pop_at(rng.randi_range(0, pool.size()-1)))
+		var candidate: Dictionary = pool.pop_at(rng.randi_range(0, pool.size()-1))
+		if not _contains_id(result, candidate.id):
+			result.append(candidate)
 	return _annotate_offer(result, profile_id, acquired)
+
+static func _contains_id(options: Array[Dictionary], id: StringName) -> bool:
+	for option in options:
+		if option.get("id", &"") == id:
+			return true
+	return false
+
+static func _pending_synergy(profile_id: StringName, acquired: Array[StringName], eligible: Array[Dictionary]) -> Dictionary:
+	# Return the missing half of an authored R7 link when one half is owned.
+	var pairs := [[&"shade_echo", &"shade_parry"], [&"shade_slide", &"shade_wall"], [&"arcane_shape", &"arcane_ice"], [&"arcane_seal", &"arcane_fire"], [&"arcane_storm", &"arcane_shape"]]
+	for pair in pairs:
+		var left: StringName = pair[0]
+		var right: StringName = pair[1]
+		if definition(left).get("class", &"") != profile_id:
+			continue
+		var wanted: StringName = right if left in acquired and right not in acquired else (left if right in acquired and left not in acquired else &"")
+		if wanted == &"":
+			continue
+		for option in eligible:
+			if option.get("id", &"") == wanted:
+				return option
+	return {}
 
 ## Runtime build phases are deliberately derived from actual acquired cards rather
 ## than altar count.  This keeps a run readable when the player explores a side
@@ -173,7 +219,17 @@ static func _annotate_offer(options: Array[Dictionary], profile_id: StringName, 
 		option["build_stage_title"] = build_stage_title(int(option["build_stage"]))
 		option["immediate_behavior"] = str(option.get("effect", ""))
 		option["synergy_tags"] = synergy_tags(StringName(option.get("id", &"")))
+		option["offer_role"] = _offer_role(option)
 	return options
+
+static func _offer_role(option: Dictionary) -> StringName:
+	var path := str(option.get("path", ""))
+	var id: StringName = option.get("id", &"")
+	if path.contains("跑酷") or path.contains("墙") or path.contains("漂浮") or path.contains("空中") or path.contains("塑形") or id in [&"shade_wall", &"shade_slide", &"arcane_shape", &"arcane_storm"]:
+		return &"route"
+	if path.contains("攻击") or path.contains("剑气") or path.contains("爆裂") or path.contains("冻结") or path.contains("标记") or path.contains("决斗") or id in [&"shade_parry", &"shade_cleave", &"arcane_element", &"arcane_seal"]:
+		return &"combat"
+	return &"risk"
 
 ## The five authored cross-theme links are exposed as data so UI, telemetry and
 ## encounter response can agree on why a card is being offered.  The actual
