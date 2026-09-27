@@ -213,6 +213,11 @@ func visible_target(target: Node3D, distance: float=30) -> bool:
 
 func _wall_kicked(_normal: Vector3) -> void:
 	if not has(&"shade_wall"):return
+	if has(&"shade_slide"):
+		# Wall kick into the low-line branch is a real handoff: the next attack
+		# can become the same broad sweep as a slide-jump without forcing a landing.
+		slide_window=maxf(slide_window,1.35)
+		performed.emit(&"wall_sweep_ready")
 	var best: float=.35
 	locked=null
 	for node: Node in get_tree().get_nodes_in_group("acolytes"):
@@ -474,6 +479,13 @@ func create_construct(kind: StringName,pose: Transform3D) -> RiftConstruct:
 	constructs.append(construct)
 	cooldown=.35
 	_play_action("shape")
+	if has(&"arcane_storm") and kind in [&"wall", &"well", &"platform"]:
+		# Storm + shaping makes the created surface an airborne launch, not a
+		# decorative platform.  The boost is bounded by the existing float meter.
+		player.float_left=minf(player.float_capacity,maxf(player.float_left,.55)+.25)
+		player.dash_available=true
+		player.mark_traversal_action(&"storm_shape",.8)
+		performed.emit(&"storm_shape")
 	SkillEffect.spawn(get_tree().current_scene,pose,&"rift",Color("#77e8cf"),1.5)
 	_shape_attack(pose)
 	return construct
@@ -520,6 +532,22 @@ func _shape_attack(_pose: Transform3D) -> void:
 	if impacted > 0:
 		performed.emit(&"shape_attack")
 		SkillEffect.spawn(get_tree().current_scene, Transform3D(Basis.looking_at(flat_forward), origin + flat_forward * 3.0), &"rift", Color("#9cf1d0"), 1.1)
+
+func construct_ice_shatter(construct: RiftConstruct) -> void:
+	if not is_instance_valid(construct) or not has(&"arcane_ice"):
+		return
+	var affected := 0
+	for node: Node in get_tree().get_nodes_in_group("acolytes"):
+		var enemy := node as LanternAcolyte
+		if enemy == null or not enemy.active or enemy.health <= 0:
+			continue
+		if enemy.get_hit_point().distance_to(construct.global_position) > 5.0 or not visible_target(enemy, 30):
+			continue
+		if enemy.apply_frost(1.15):
+			affected += 1
+	if affected > 0:
+		performed.emit(&"shape_ice_shatter")
+		SkillEffect.spawn(get_tree().current_scene, Transform3D(Basis.IDENTITY,construct.global_position), &"rift", Color("#9fdcf2"), .85)
 
 func _show_preview() -> void:
 	if not is_instance_valid(_preview):
@@ -603,12 +631,15 @@ func detonate(target: Node3D) -> bool:
 	if target is LanternAcolyte:
 		if target.threat_rank not in [&"boss",&"miniboss"]:target.break_guard(2)
 		if target.receive_hit(1,(point-player.camera.global_position).normalized()):combat.confirm_hit(target,point,target.health<=0)
+		if has(&"arcane_fire"):
+			target.apply_burn(3.0)
 		for node: Node in get_tree().get_nodes_in_group("acolytes"):
 			if node == target or node.health <= 0 or node.get_hit_point().distance_to(point) >= (5 if has(&"arcane_seal_radius") else 3): continue
 			var query := PhysicsRayQueryParameters3D.create(point, node.get_hit_point(), 1)
 			if not player.get_world_3d().direct_space_state.intersect_ray(query).is_empty(): continue
 			var exposed: bool = node.vulnerable
 			node.apply_frost(1.2)
+			if has(&"arcane_fire"): node.apply_burn(2.2)
 			if exposed and node.receive_hit(1, (node.get_hit_point()-point).normalized()): combat.confirm_hit(node,node.get_hit_point(),node.health<=0)
 	SkillEffect.spawn(get_tree().current_scene,Transform3D(player.camera.global_basis,point),&"rift",Color("#baa5ef"),2.0)
 	mana=minf(100,mana+8)
@@ -656,6 +687,11 @@ func _hit(_target: Node3D,_point: Vector3,dead: bool) -> void:
 		player._wall_time_used=maxf(0,player._wall_time_used-.3)
 		player.velocity.y = maxf(player.velocity.y, 2.0 if dead else .5)
 		_storm_targets[_target.get_instance_id()]=true
+		if has(&"arcane_shape") and not constructs.is_empty():
+			# A storm hit while using a created surface extends the route action and
+			# gives the player a controlled second launch window.
+			player.float_left=minf(player.float_capacity,player.float_left+.2)
+			performed.emit(&"storm_surface_hit")
 		if has(&"arcane_storm_tempest") and _storm_targets.size()>=3 and not _tempest_used:
 			_tempest_used=true
 			player.dash_available=true

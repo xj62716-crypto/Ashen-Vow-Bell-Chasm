@@ -130,7 +130,7 @@ static func offer(profile_id: StringName, acquired: Array[StringName], rng: Rand
 		var opening := cores.duplicate()
 		while not opening.is_empty() and result.size() < 3:
 			result.append(opening.pop_at(rng.randi_range(0, opening.size()-1)))
-		return result
+		return _annotate_offer(result, profile_id, acquired)
 	if not extensions.is_empty():
 		result.append(extensions.pop_at(rng.randi_range(0, extensions.size()-1)))
 	var pool: Array[Dictionary] = []
@@ -138,7 +138,66 @@ static func offer(profile_id: StringName, acquired: Array[StringName], rng: Rand
 	pool.append_array(extensions)
 	while not pool.is_empty() and result.size() < 3:
 		result.append(pool.pop_at(rng.randi_range(0, pool.size()-1)))
-	return result
+	return _annotate_offer(result, profile_id, acquired)
+
+## Runtime build phases are deliberately derived from actual acquired cards rather
+## than altar count.  This keeps a run readable when the player explores a side
+## altar or changes direction, and gives the HUD/encounter code one authority for
+## "core -> loop -> formed" progression.
+static func build_stage(profile_id: StringName, acquired: Array[StringName]) -> int:
+	var core_count := 0
+	var extension_count := 0
+	for id in acquired:
+		var rune := definition(id)
+		if rune.is_empty() or rune.get("class", &"") != profile_id:
+			continue
+		if bool(rune.get("core", false)):
+			core_count += 1
+		else:
+			extension_count += 1
+	if core_count <= 0:
+		return 0
+	if extension_count >= 3 or (core_count >= 2 and extension_count >= 1):
+		return 2
+	return 1
+
+static func build_stage_title(stage: int) -> String:
+	return ["原始构式", "循环成形", "超常成型"][clampi(stage, 0, 2)]
+
+static func _annotate_offer(options: Array[Dictionary], profile_id: StringName, acquired: Array[StringName]) -> Array[Dictionary]:
+	var current_stage := build_stage(profile_id, acquired)
+	for option in options:
+		var parent: StringName = option.get("requires", &"")
+		var option_stage := 0 if bool(option.get("core", false)) else (1 if parent != &"" else 0)
+		option["build_stage"] = mini(2, maxi(current_stage + 1, option_stage))
+		option["build_stage_title"] = build_stage_title(int(option["build_stage"]))
+		option["immediate_behavior"] = str(option.get("effect", ""))
+		option["synergy_tags"] = synergy_tags(StringName(option.get("id", &"")))
+	return options
+
+## The five authored cross-theme links are exposed as data so UI, telemetry and
+## encounter response can agree on why a card is being offered.  The actual
+## event ownership remains in ProfessionArts/RiftConstruct and PlayerCombat.
+static func synergy_tags(id: StringName) -> Array[StringName]:
+	var tags: Array[StringName] = []
+	var pairs := {
+		&"shade_echo": [&"shade_parry"], &"shade_parry": [&"shade_echo"],
+		&"shade_slide": [&"shade_wall"], &"shade_wall": [&"shade_slide"],
+		&"arcane_ice": [&"arcane_shape"], &"arcane_shape": [&"arcane_ice", &"arcane_storm"],
+		&"arcane_fire": [&"arcane_seal"], &"arcane_seal": [&"arcane_fire"],
+		&"arcane_storm": [&"arcane_shape"]
+	}
+	for partner in pairs.get(id, []):
+		tags.append(partner)
+	return tags
+
+static func active_synergies(profile_id: StringName, acquired: Array[StringName]) -> Array[StringName]:
+	var found: Array[StringName] = []
+	var pairs := [[&"shade_echo", &"shade_parry"], [&"shade_slide", &"shade_wall"], [&"arcane_shape", &"arcane_ice"], [&"arcane_seal", &"arcane_fire"], [&"arcane_storm", &"arcane_shape"]]
+	for pair in pairs:
+		if definition(pair[0]).get("class", &"") == profile_id and pair[0] in acquired and pair[1] in acquired:
+			found.append(StringName("%s+%s" % [pair[0], pair[1]]))
+	return found
 
 static func title(id: StringName) -> String:
 	return str(definition(id).get("name", ""))

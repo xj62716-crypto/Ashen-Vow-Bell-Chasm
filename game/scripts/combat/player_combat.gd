@@ -12,6 +12,7 @@ signal blocked_hit
 signal spell_contact(element: StringName)
 signal temporal_reset_requested
 signal rune_applied(id: StringName)
+signal build_progressed(stage: int, title: String, synergies: Array[StringName])
 signal runes_reset
 signal flow_changed(value: float, capacity: float)
 signal echo_sweep_launched(origin: Vector3, forward: Vector3)
@@ -42,6 +43,8 @@ var _projectile_fired: bool = false
 var damage_multiplier: float = 1.0
 var next_attack_multiplier: float = 1.0
 var runes: Array[StringName] = []
+var build_stage: int = 0
+var build_synergies: Array[StringName] = []
 var shield: bool = false
 var _wall_buff_left: float = 0.0
 var _tide_used: bool = false
@@ -144,6 +147,8 @@ func reset_run() -> void:
 	kills = 0
 	damage_taken = 0
 	runes.clear()
+	build_stage = 0
+	build_synergies.clear()
 	_primary_element = &"arcane"
 	_confirmed_defeats.clear()
 	_shade_echo_pending.clear()
@@ -183,6 +188,7 @@ func apply_rune(id: StringName) -> bool:
 	if rune.get("requires", &"") != &"" and rune.requires not in runes:
 		return false
 	runes.append(id)
+	_refresh_build_progress()
 	if id == &"shade_wall_chain": player.wall_chain_limit=3
 	if id == &"shade_wall_master": player.wall_chain_limit=4
 	if id == &"arcane_element": _primary_element = &"fire"
@@ -217,6 +223,18 @@ func apply_rune(id: StringName) -> bool:
 	if id==&"arcane_storm_chain":_chain_range=10
 	rune_applied.emit(id)
 	return true
+
+func _refresh_build_progress() -> void:
+	var next_stage := RuneCatalog.build_stage(player.parkour_profile.id, runes)
+	var next_synergies := RuneCatalog.active_synergies(player.parkour_profile.id, runes)
+	var changed := next_stage != build_stage or next_synergies != build_synergies
+	build_stage = next_stage
+	build_synergies = next_synergies
+	if changed:
+		build_progressed.emit(build_stage, RuneCatalog.build_stage_title(build_stage), build_synergies.duplicate())
+
+func has_synergy(id: StringName) -> bool:
+	return id in build_synergies
 
 
 func cancel_attack() -> void:
@@ -255,7 +273,7 @@ func try_attack() -> bool:
 	_projectile_fired = false
 	_attack_charged = definition.ranged and charge_ready
 	_attack_airtime = player.airtime_serial
-	_attack_slide = not definition.ranged and &"shade_slide" in runes and _slide_buff_left > 0.0
+	_attack_slide = not definition.ranged and &"shade_slide" in runes and (_slide_buff_left > 0.0 or (arts.slide_window > 0.0 and has_synergy(&"shade_slide+shade_wall")))
 	var flow_break := not definition.ranged and flow >= 35.0
 	_attack_break_guard = flow_break or _attack_slide or (not definition.ranged and &"shade_wall" in runes and _wall_buff_left > 0.0)
 	if flow_break:
@@ -451,6 +469,16 @@ func confirm_hit(target: LanternAcolyte, point: Vector3, defeated: bool, can_cha
 	hits += 1
 	if defeated:
 		kills += 1
+		if &"arcane_seal" in runes and &"arcane_fire" in runes:
+			# Seal + fire converts a confirmed kill into the next marked target
+			# instead of an unrelated damage-over-time burst.  Marks remain visible
+			# and still require the same deliberate Q detonation.
+			for nearby: Node in get_tree().get_nodes_in_group("acolytes"):
+				if nearby == target or nearby.health <= 0 or not nearby.active:
+					continue
+				if nearby.get_hit_point().distance_to(point) > 4.0 or not arts.visible_target(nearby):
+					continue
+				arts.mark(nearby, true)
 		if _attack_slide and attacking:
 			_sweep_kills+=1
 			if _sweep_kills>=2 and not _return_scheduled and &"shade_slide_return" in runes and not echo_cuts.is_empty():
@@ -597,6 +625,18 @@ func try_ability() -> bool:
 func confirm_parry(enemy: LanternAcolyte) -> void:
 	if not is_instance_valid(enemy) or not enabled or health <= 0: return
 	last_parried_enemy=enemy
+	# Parry + echo turns a defensive read into a second attack origin.  The
+	# pending sample is consumed by the next real swing, so it cannot spawn a
+	# free hit or repeat while idle.
+	if has_synergy(&"shade_echo+shade_parry"):
+		_shade_echo_pending = {
+			"time": Time.get_ticks_usec(),
+			"origin": player.camera.global_position,
+			"forward": -player.camera.global_basis.z,
+			"reach": shade_echo_reach,
+			"wide": true,
+			"parry": true,
+		}
 	if &"shade_duel_riposte" in runes: riposte_ready=true
 	if is_instance_valid(enemy.brain): enemy.brain.interrupted()
 	parry_left = 0.0
@@ -612,26 +652,29 @@ func confirm_parry(enemy: LanternAcolyte) -> void:
 	parried.emit()
 
 func build_status() -> String:
+	var phase_text := RuneCatalog.build_stage_title(build_stage) if build_stage > 0 else "原始构式"
+	var synergy_text := ""
+	if not build_synergies.is_empty(): synergy_text = " · 联动 %d" % build_synergies.size()
 	var flow_text := "流势 %.0f" % flow if flow > 0.5 else ""
 	if player.floating:
-		return flow_text + (" · " if not flow_text.is_empty() else "") + "漂浮 · %.1f" % player.float_left
+		return phase_text + synergy_text + " · " + flow_text + (" · " if not flow_text.is_empty() else "") + "漂浮 · %.1f" % player.float_left
 	if charge_ready:
-		return flow_text + (" · " if not flow_text.is_empty() else "") + "雷行 · 已充能"
+		return phase_text + synergy_text + " · " + flow_text + (" · " if not flow_text.is_empty() else "") + "雷行 · 已充能"
 	if &"arcane_charge" in runes and not _charge_spent:
-		return "雷行 · %d%%" % roundi(charge_progress/charge_duration()*100)
+		return phase_text + synergy_text + " · 雷行 · %d%%" % roundi(charge_progress/charge_duration()*100)
 	if _wall_buff_left > 0.0 and &"shade_wall" in runes:
-		return "飞檐 · 破盾斩就绪"
+		return phase_text + synergy_text + " · 飞檐 · 破盾斩就绪"
 	if _slide_buff_left > 0.0 and &"shade_slide" in runes:
-		return "掠地 · 破盾斩就绪"
+		return phase_text + synergy_text + " · 掠地 · 破盾斩就绪"
 	if player.empowered_dash:
-		return "返刃 · 突袭就绪"
+		return phase_text + synergy_text + " · 返刃 · 突袭就绪"
 	if player.float_capacity > 0.0:
-		return "御风 · %.1f" % player.float_left
+		return phase_text + synergy_text + " · 御风 · %.1f" % player.float_left
 	if &"arcane_fire" in runes or &"arcane_ice" in runes:
-		return "火 · 范围爆裂" if &"arcane_fire" in runes else "冰 · 冻结破盾"
-	if &"shade_arc" in runes: return "离刃 · 远程剑气"
-	if &"shade_cleave" in runes: return "断月 · 宽幅横扫"
-	return flow_text
+		return phase_text + synergy_text + " · " + ("火 · 范围爆裂" if &"arcane_fire" in runes else "冰 · 冻结破盾")
+	if &"shade_arc" in runes: return phase_text + synergy_text + " · 离刃 · 远程剑气"
+	if &"shade_cleave" in runes: return phase_text + synergy_text + " · 断月 · 宽幅横扫"
+	return phase_text + synergy_text + ((" · " + flow_text) if not flow_text.is_empty() else "")
 
 func charge_duration() -> float:
 	return .45 if &"arcane_conduit" in runes else .7

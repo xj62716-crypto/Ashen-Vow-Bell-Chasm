@@ -48,6 +48,7 @@ var _animation_clock: float = 0.0
 var _mesh_parts: Array[Node] = []
 var _tell: MeshInstance3D
 var frozen_left: float = 0.0
+var burning_left: float = 0.0
 var _frost_material: ShaderMaterial
 
 func _ready() -> void:
@@ -137,6 +138,7 @@ func reset_enemy() -> void:
 	if is_instance_valid(brain): brain.reset_state()
 	control_pressure=0
 	frozen_left = 0.0
+	burning_left = 0.0
 	health = maximum_health
 	velocity = Vector3.ZERO
 	windup = -1.0
@@ -185,6 +187,19 @@ func apply_frost(seconds: float) -> bool:
 	_title.text = _name()+" · 冰冻"
 	if is_instance_valid(brain): brain.interrupted()
 	_report_control(&"ice",frozen_left)
+	return true
+
+func apply_burn(seconds: float) -> bool:
+	if not active or health<=0:
+		return false
+	# Fire is a readable pressure state, not an invisible damage-over-time loop.
+	# It opens ordinary guards briefly and lets seal+fire propagate its mark after
+	# a confirmed kill without creating an extra damage source or kill race.
+	burning_left=maxf(burning_left,seconds)
+	if threat_rank not in [&"boss",&"miniboss"]:
+		break_guard(minf(1.2,seconds))
+	if is_instance_valid(brain): brain.interrupted()
+	_title.text=_name()+" · 灼印"
 	return true
 
 func apply_wind(_direction: Vector3) -> void:
@@ -299,9 +314,10 @@ func _physics_process(delta: float) -> void:
 	if not active or health <= 0 or not is_instance_valid(player) or not player.control_enabled:
 		_beam.visible = false
 		return
+	frozen_left = maxf(0,frozen_left-delta)
+	burning_left = maxf(0,burning_left-delta)
 	if is_instance_valid(boss_controller):
 		boss_controller.advance(delta)
-		frozen_left = maxf(0,frozen_left-delta)
 		_stagger = maxf(0,_stagger-delta)
 		if not boss_controller.may_attack() or frozen_left>0 or _stagger>0: return
 		brain.advance(delta)
@@ -313,7 +329,6 @@ func _physics_process(delta: float) -> void:
 		guard_broken = false
 		seal_requested.emit()
 	if frozen_left>0:
-		frozen_left = maxf(0,frozen_left-delta)
 		return
 	_stagger = maxf(0.0,_stagger-delta)
 	if _stagger>0.0:
@@ -348,7 +363,7 @@ func _process(delta: float) -> void:
 	_core.scale=Vector3.ONE*(1.0+0.6*(1.0-windup/1.0) if windup>=0.0 else 1.0)
 	for part in _mesh_parts:
 		if part is MeshInstance3D:
-			part.material_overlay=_frost_material if frozen_left>0 and health>0 else (_flash_material if _flash>0.0 else null)
+			part.material_overlay=_frost_material if frozen_left>0 and health>0 else (_flash_material if (_flash>0.0 or burning_left>0.0) else null)
 	if health<=0 and _death_time>0.0:
 		_death_time=maxf(0.0,_death_time-delta)
 		_visual.visible=_death_time>0.0

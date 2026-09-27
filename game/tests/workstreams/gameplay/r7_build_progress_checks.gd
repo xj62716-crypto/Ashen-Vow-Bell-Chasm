@@ -1,0 +1,57 @@
+extends "res://tests/workstreams/gameplay/builds_ai_checks.gd"
+
+func _run() -> void:
+	arena=Node3D.new()
+	root.add_child(arena)
+	current_scene=arena
+	solid(Vector3(0,-.5,0),Vector3(120,1,120))
+	player=load("res://scenes/player/player.tscn").instantiate()
+	arena.add_child(player)
+	combat=player.get_node("Combat")
+	await step(4)
+	var rng:=RandomNumberGenerator.new()
+	rng.seed=44
+	var opening:=RuneCatalog.offer(&"shade",[],rng)
+	check(opening.size()==3 and opening.all(func(r): return int(r.get("build_stage",0))==1 and not str(r.get("build_stage_title","")).is_empty()),"first altar marks every core as an immediately playable stage-one choice")
+	await fresh("shade")
+	check(combat.apply_rune(&"shade_echo"),"echo core applies")
+	check(combat.build_stage==1 and combat.build_synergies.is_empty(),"one core enters the loop-building stage")
+	check(combat.apply_rune(&"shade_echo_cut"),"echo extension applies")
+	check(combat.build_stage==1,"single extension keeps a readable mid-build state")
+	check(combat.apply_rune(&"shade_parry"),"parry core applies")
+	check(combat.apply_rune(&"shade_counter"),"parry extension applies")
+	check(combat.build_stage==2,"second core plus extensions reaches formed stage")
+	var foe:=enemy_at(Vector3(0,0,-6))
+	combat.confirm_parry(foe)
+	check(combat.has_synergy(&"shade_echo+shade_parry") and not combat._shade_echo_pending.is_empty(),"echo plus parry arms a real secondary attack origin")
+	await fresh("arcanist")
+	combat.apply_rune(&"arcane_element")
+	combat.apply_rune(&"arcane_shape")
+	combat.apply_rune(&"arcane_ice")
+	combat.arts.mana=100
+	foe=enemy_at(Vector3(4,0,-7),&"heavy")
+	var construct:=combat.arts.create_construct(&"platform",Transform3D(Basis.IDENTITY,Vector3(4,.2,-4)))
+	check(is_instance_valid(construct),"shape core creates a real construct for cross-theme play")
+	combat.arts.construct_ice_shatter(construct)
+	check(foe.frozen_left>0,"shape plus ice turns a constructed surface into a control event")
+	await fresh("arcanist")
+	combat.apply_rune(&"arcane_element")
+	combat.apply_rune(&"arcane_fire")
+	combat.apply_rune(&"arcane_seal")
+	var marked:=enemy_at(Vector3(0,0,-6))
+	var nearby:=enemy_at(Vector3(1.5,0,-6))
+	marked.health=0
+	combat.confirm_hit(marked,marked.get_hit_point(),true)
+	check(nearby in combat.arts.marks,"seal plus fire propagates a mark only after a confirmed kill")
+	await fresh("arcanist")
+	combat.apply_rune(&"arcane_storm")
+	combat.apply_rune(&"arcane_shape")
+	combat.arts.mana=100
+	player.dash_available=false
+	player.float_left=0
+	construct=combat.arts.create_construct(&"platform",Transform3D(Basis.IDENTITY,Vector3(5,.2,-5)))
+	check(is_instance_valid(construct) and player.dash_available and player.float_left>0,"storm plus shaping grants a bounded airborne launch on surface creation")
+	arena.queue_free()
+	await step(4)
+	print("RESULT %d checks, %d failures" % [checks,failures])
+	quit(1 if failures else 0)

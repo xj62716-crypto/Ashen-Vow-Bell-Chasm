@@ -25,6 +25,7 @@ signal expiring(construct: RiftConstruct)
 signal expired(construct: RiftConstruct)
 var _warning_sent: bool = false
 var _grace_left: float = 1.5
+var _ice_shattered: bool = false
 
 static func dimensions(type: StringName) -> Vector3:
 	return Vector3(.4,4.6,9) if type==&"wall" else (Vector3(4,.28,4) if type==&"platform" else Vector3(2.2,.28,2.2))
@@ -73,6 +74,9 @@ func _hook_arrived(target: Node3D) -> void:
 	if combat != null:
 		arts = combat.arts as ProfessionArts
 	if not _used and arts != null and arts.has(&"arcane_shape_refund"):arts.mana=minf(100,arts.mana+15)
+	if not _ice_shattered and arts != null and arts.has(&"arcane_ice"):
+		_ice_shattered=true
+		arts.construct_ice_shatter(self)
 	# Authored anchors can hand off to a real wall. The follow-up is expressed
 	# as world-space plane data so it remains valid when a route section is
 	# rotated or moved by the level builder.
@@ -119,6 +123,9 @@ func _physics_process(delta: float) -> void:
 	_launch_lock=maxf(0,_launch_lock-delta)
 	if not preload("res://scripts/run/timeline_collision.gd").active(self): return
 	if kind==&"wall" and not _used and is_instance_valid(player) and player.is_wall_running() and supporting_player():
+		if not _ice_shattered and is_instance_valid(owner_arts) and owner_arts.has(&"arcane_ice"):
+			_ice_shattered=true
+			owner_arts.construct_ice_shatter(self)
 		_used=true
 		if is_instance_valid(owner_arts) and owner_arts.has(&"arcane_shape_refund"):owner_arts.mana=minf(100,owner_arts.mana+15)
 	if kind==&"well" and is_instance_valid(player) and player.control_enabled and _launch_lock<=0:
@@ -130,6 +137,9 @@ func _physics_process(delta: float) -> void:
 			if not _used: player.dash_available=true
 			_launch_lock=.8
 			if not _used and is_instance_valid(owner_arts):owner_arts.mana=minf(100,owner_arts.mana+(15 if owner_arts.has(&"arcane_shape_refund") else 8))
+			if not _ice_shattered and is_instance_valid(owner_arts) and owner_arts.has(&"arcane_ice"):
+				_ice_shattered=true
+				owner_arts.construct_ice_shatter(self)
 			_used = true
 	var word: String={&"wall":"裂隙壁",&"well":"上升风井",&"anchor":"E · 钩锁",&"platform":"悬空符台"}.get(kind,"构造")
 	_title.text=word+("" if permanent else "  %.0fs" % timer)
