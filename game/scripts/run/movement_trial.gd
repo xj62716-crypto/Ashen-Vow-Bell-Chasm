@@ -41,6 +41,7 @@ var gameplay_audio: Node
 var _combat_checkpoint_defeated:Array[StringName]=[]
 var _combat_checkpoint_kills:int=0
 var timeline_runtime: TimelineRuntime
+var guidance: Node
 
 
 func _ready() -> void:
@@ -82,6 +83,10 @@ func _ready() -> void:
 	add_child(timeline_runtime)
 	timeline_runtime.bind(self, player, combat_room)
 	timeline_runtime.shifted.connect(_timeline_shifted)
+	guidance = preload("res://scripts/run/run_guidance.gd").new()
+	guidance.name = "RunGuidance"
+	add_child(guidance)
+	guidance.bind(self)
 	timeline_runtime.blocked.connect(func(reason: StringName):
 		if reason == &"empty": hud.toast("相位资源耗尽 · 用墙跑或击杀返还")
 	)
@@ -92,7 +97,11 @@ func _ready() -> void:
 		# Real parry/contact signals own their sounds.
 		if player.parkour_profile.id!=&"shade":_play("bolt",.9))
 	combat.parried.connect(func(): _play("parry",1.0); hud.show_hit(false))
-	combat.arts.performed.connect(func(kind: StringName):_play(str(kind),.85))
+	combat.arts.performed.connect(func(kind: StringName):
+		if kind not in [&"execute",&"blink"]:_play(str(kind),.85))
+	combat.arts.pursuit_started.connect(func(kind:StringName):
+		if kind==&"blink":_play("blink",.45))
+	combat.arts.pursuit_cut_started.connect(func(_kind:StringName):_play("execute",.65))
 	combat.blocked_hit.connect(func(): _play("parry",.55))
 	player.slide_started.connect(func(): _play("slide",.9))
 	for child: Node in $Triggers.get_children():
@@ -182,6 +191,7 @@ func start_run() -> void:
 		_retry_combat_checkpoint()
 		return
 	var retrying := phase == Phase.DEFEATED
+	if is_instance_valid(guidance): guidance.reset()
 	get_tree().paused = false
 	if (formal_release or hud.course_choice.selected == 2) and not _load_combat_room(1): return
 	elapsed = 0.0

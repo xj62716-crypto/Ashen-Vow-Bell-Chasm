@@ -10,6 +10,12 @@ signal control_applied(enemy: LanternAcolyte, point: Vector3, element: StringNam
 @export var archetype: StringName = &"normal"
 @export var role: StringName = &""
 @export var threat_rank: StringName = &""
+## Authored encounter identity copied into the live actor at room build time.
+## These typed fields avoid relying on Object metadata for hot-path checks.
+var encounter_id: StringName = &""
+var gameplay_role: StringName = &""
+var required_guardian: bool = false
+var initial_delay_seconds: float = 1.1
 var brain: EnemyBrain
 var boss_controller: BossPhaseController
 var control_pressure: float = 0.0
@@ -76,6 +82,7 @@ func _ready() -> void:
 	_guard_visual = DemoGeometry.mesh(_visual,torus,Vector3(0,1.22*_size,.33*_size),DemoGeometry.material(_core_color(),.7))
 	_guard_visual.rotation.x=PI/2
 	_title = DemoGeometry.label(self,Vector3(0,2.25*_size,0),_name(),28)
+	_title.hide() # Mechanism shells and core tells carry state; avoid floating paragraphs.
 	_title.visibility_range_end=26
 	_beam = DemoGeometry.box(self,Vector3.ZERO,Vector3.ONE,DemoGeometry.material(Color("#d56835"),1.0)) as MeshInstance3D
 	_beam.top_level = true
@@ -144,7 +151,7 @@ func reset_enemy() -> void:
 	_visual.visible = true
 	_visual.scale = Vector3.ONE
 	_beam.visible = false
-	_title.visible = true
+	_title.visible = false
 	collision_layer = 4
 	_title.text = _name() + ("  ·  一击处决" if archetype in [&"normal",&"shield"] else "  %d / %d" % [health,maximum_health])
 	reset_physics_interpolation()
@@ -232,7 +239,7 @@ func receive_hit(amount: int, direction: Vector3) -> bool:
 	# must arrive through a wall run, dash, slide-jump, wall kick or grapple
 	# before the guardian can be converted into a kill window; this closes the
 	# old walk-up-and-spam loophole without changing optional enemies.
-	if bool(get_meta("required_guardian",false)) and threat_rank in [&"normal",&"elite"] and is_instance_valid(player):
+	if required_guardian and threat_rank in [&"normal",&"elite"] and is_instance_valid(player):
 		var combat := player.get_node_or_null("Combat") as PlayerCombat
 		var movement_ready := player.has_recent_traversal_action() or (combat != null and combat.movement_advantage())
 		if not movement_ready:

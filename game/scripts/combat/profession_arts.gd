@@ -2,6 +2,10 @@ class_name ProfessionArts
 extends Node
 
 signal performed(kind: StringName)
+signal pursuit_started(kind: StringName)
+signal pursuit_cut_started(kind: StringName)
+signal pursuit_resolved(kind: StringName, accepted: bool, defeated: bool)
+@export var pursuit_profile:Resource=preload("res://data/combat/blade_pursuit_default.tres")
 signal mark_changed(target: Node3D, point: Vector3, marked: bool, reason: StringName)
 signal seal_detonated(target: Node3D, point: Vector3)
 var _mark_points: Dictionary = {}
@@ -44,6 +48,16 @@ var _execution_target:LanternAcolyte
 var _execution_start:Vector3
 var _execution_end:Vector3
 var _execution_outward:Vector3
+var execution_kind:StringName=&"execute"
+var execution_recovery_age:float=0.
+var execution_recovering:bool=false
+var execution_serial:int=0
+var _execution_entry_velocity:Vector3
+var _execution_target_start:Vector3
+var _execution_contact_committed:bool=false
+var _execution_cut_started:bool=false
+var _execution_entry_edge:float=0.
+var execution_cancel_reason:StringName=&""
 
 func _ready() -> void:
 	process_mode=Node.PROCESS_MODE_PAUSABLE
@@ -140,6 +154,9 @@ func _physics_process(delta: float) -> void:
 		_held=0
 		if is_instance_valid(_preview):_preview.hide()
 		return
+	if execution_recovering and combat.impact_hold<=0:
+		execution_recovery_age+=delta
+		if execution_recovery_age>=pursuit_profile.recovery_seconds:execution_recovering=false
 	if execution_active:
 		advance_execution(delta)
 		return
@@ -207,7 +224,7 @@ func _wall_kicked(_normal: Vector3) -> void:
 	if locked!=null:
 		lock_left=3.0
 		if is_instance_valid(_lock_icon):_lock_icon.queue_free()
-		_lock_icon=DemoGeometry.label(locked,Vector3.UP*2.5,"◇ Q · 飞檐处决",28)
+		_lock_icon=DemoGeometry.label(locked,Vector3.UP*2.35,"◇",22)
 
 func _parried() -> void:
 	if not has(&"shade_parry"):return
@@ -225,13 +242,9 @@ func activate_skill(held: float=.1) -> bool:
 		&"counter":
 			if counter_left<=0 or not is_instance_valid(counter_target):return false
 			if counter_target.health<=0:
-				var offset: Vector3=player.global_position-counter_target.global_position
-				offset.y=0
-				if not travel_to(counter_target.global_position+offset.normalized()*1.4+Vector3.UP*.15): return false
 				counter_left=0
-				cooldown=.5
-				_play_action("blink")
-				return true
+				counter_target=null
+				return false
 			return execute(counter_target,&"blink")
 		&"sweep":
 			if slide_window<=0:return false
@@ -292,63 +305,101 @@ func travel_to(destination: Vector3, grounded_finish: bool=true) -> bool:
 	return true
 
 func execute(target: LanternAcolyte, kind: StringName) -> bool:
-	if target.health<=0 or not target.active or target.threat_rank in [&"boss",&"miniboss"] or not visible_target(target,32 if has(&"shade_counter_range") else 26):return false
+	if execution_active or not _valid_execution_target(target) or target.threat_rank in [&"boss",&"miniboss"] or not visible_target(target,32 if has(&"shade_counter_range") else 26):return false
 	var toward := (player.global_position-target.global_position)
 	toward.y=0
 	toward=toward.normalized()
-	var arms:Node=player.get_node_or_null("FirstPersonArms")
-	var spacing:float=arms.tuning.blade_execution_distance if arms and arms.get("tuning") else 1.95
-	var destination := target.global_position+toward*spacing+Vector3.UP*.15
-	if kind==&"execute":
-		if not can_travel_to(destination):return false
-		combat.cancel_attack()
-		_execution_target=target;_execution_start=player.global_position;_execution_end=destination;_execution_outward=toward
-		execution_age=0.;execution_seconds=arms.tuning.blade_execution_camera_seconds if arms and arms.get("tuning") else .18
-		execution_start_sample=minf(_held,.16)
-		player.apply_rewind_state(player.global_position,Vector3.ZERO,false)
-		execution_active=true;player.blade_approach_active=true;cooldown=.5
-		return true
-	if not travel_to(destination):return false
-	return finish_execution(target,kind,toward)
+	var destination:Vector3 = target.global_position+toward*pursuit_profile.target_spacing+Vector3.UP*.15
+	if not can_travel_to(destination):return false
+	combat.cancel_attack()
+	combat.parry_left=0.
+	_execution_target=target;_execution_start=player.global_position;_execution_end=destination;_execution_outward=toward
+	_execution_target_start=target.global_position
+	_execution_entry_velocity=player.velocity
+	_execution_entry_edge=edge
+	execution_kind=kind;execution_serial+=1;_execution_contact_committed=false;_execution_cut_started=false
+	execution_age=0.;execution_recovering=false;execution_recovery_age=0.
+	var minimum_seconds:float=pursuit_profile.counter_approach_seconds if kind==&"blink" else pursuit_profile.hunt_approach_seconds
+	# Smoothstep peaks at 1.5 times average speed. Long pursuits remain visibly
+	# continuous and obey the same speed ceiling instead of snapping in 4 frames.
+	var distance_seconds:float=_execution_start.distance_to(_execution_end)*1.5/pursuit_profile.peak_approach_speed
+	execution_seconds=maxf(minimum_seconds,distance_seconds)+pursuit_profile.contact_seconds
+	execution_start_sample=minf(_held,.10)
+	player.apply_rewind_state(player.global_position,_execution_entry_velocity,false)
+	player.mark_traversal_action(&"pursuit")
+	execution_active=true;player.blade_approach_active=true;cooldown=.5
+	execution_cancel_reason=&""
+	pursuit_started.emit(kind)
+	return true
 
-func cancel_execution()->void:
+func _valid_execution_target(target:LanternAcolyte)->bool:
+	return is_instance_valid(target) and target.health>0 and target.active and preload("res://scripts/run/timeline_collision.gd").active(target)
+
+func blocks_primary_attack()->bool:
+	return execution_active or (execution_recovering and execution_recovery_age<pursuit_profile.attack_unlock_seconds)
+
+func cancel_execution(reason:StringName=&"reset")->void:
+	if execution_active and is_instance_valid(player) and reason!=&"reset":
+		# A failed approach does not erase entry momentum or invent a side leap.
+		player.velocity=_execution_entry_velocity.limit_length(pursuit_profile.maximum_exit_speed)
+		execution_cancel_reason=reason
 	execution_active=false;_execution_target=null;execution_age=0.
+	execution_recovering=false
 	if is_instance_valid(player):player.blade_approach_active=false
 
 func advance_execution(delta:float)->void:
-	if not is_instance_valid(_execution_target) or _execution_target.health<=0 or not _execution_target.active:
-		cancel_execution();return
+	if not _valid_execution_target(_execution_target):
+		cancel_execution(&"target_invalid");return
+	if _execution_target.global_position.distance_to(_execution_target_start)>pursuit_profile.target_motion_tolerance:
+		cancel_execution(&"target_moved");return
 	execution_age=minf(execution_seconds,execution_age+delta)
-	var wanted:Vector3=_execution_start.lerp(_execution_end,smoothstep(0.,1.,execution_age/execution_seconds))
+	var approach_seconds:float=execution_seconds-pursuit_profile.contact_seconds
+	var wanted:Vector3=_execution_start.lerp(_execution_end,smoothstep(0.,1.,minf(1.,execution_age/approach_seconds)))
 	# Sweep each step too: an obstacle can enter the path after the initial check.
 	var collision:=player.move_and_collide(wanted-player.global_position)
 	if collision:
-		cancel_execution();return
+		cancel_execution(&"obstructed");return
+	if execution_age>=approach_seconds and not _execution_cut_started:
+		_execution_cut_started=true
+		pursuit_cut_started.emit(execution_kind)
 	if execution_age<execution_seconds:return
 	var target:LanternAcolyte=_execution_target;var outward:Vector3=_execution_outward
-	cancel_execution()
-	if player.global_position.distance_to(target.global_position)>2.8 or not visible_target(target,4.):return
-	finish_execution(target,&"execute",outward)
+	if player.global_position.distance_to(target.global_position)>pursuit_profile.maximum_contact_distance or not visible_target(target,4.):
+		cancel_execution(&"out_of_reach");return
+	finish_execution(target,execution_kind,outward)
 
 func finish_execution(target:LanternAcolyte,kind:StringName,toward:Vector3)->bool:
+	if not execution_active or _execution_contact_committed or not _valid_execution_target(target):return false
+	_execution_contact_committed=true
+	execution_active=false;player.blade_approach_active=false;_execution_target=null
+	execution_recovering=true;execution_recovery_age=0.
+	# Commit the visual contact before damage observers fire. Neither this event
+	# nor the approach is evidence of a hit: only receive_hit can grant rewards.
+	_play_action(str(kind))
 	target.break_guard(1)
 	var hit: bool=target.receive_hit(1,-toward)
-	if hit:combat.confirm_hit(target,target.get_hit_point(),target.health<=0)
-	# Keep departure outside the target. Preserve lateral/backward input; default
-	# to a lateral leap instead of propelling the camera through a dead mesh.
+	var defeated:bool=hit and target.health<=0
+	if hit:combat.confirm_hit(target,target.get_hit_point(),defeated)
 	var stick:=Input.get_vector("move_left","move_right","move_forward","move_backward")
 	var depart:Vector3=player.global_basis*Vector3(stick.x,0,stick.y)
-	if depart.dot(toward)<0:depart-=toward*depart.dot(toward)
-	if depart.length_squared()<.05:depart=toward.cross(Vector3.UP)
-	player.velocity=depart.normalized()*8.+Vector3.UP*(2.+edge*3. if kind==&"execute" else 2.)
-	player._momentum_left=.35;player._ignore_floor_once=true
-	player.dash_available=true
-	if has(&"shade_counter_guard"):combat.invulnerability=maxf(combat.invulnerability,.45)
-	edge=1.0 if has(&"shade_hunt_chain") else (.5 if has(&"shade_refund") else 0.0)
+	if depart.length_squared()<.05:depart=Vector3(_execution_entry_velocity.x,0,_execution_entry_velocity.z)
+	if depart.length_squared()<.05:depart=-toward
+	var exit_speed:float=clampf(Vector2(_execution_entry_velocity.x,_execution_entry_velocity.z).length(),pursuit_profile.minimum_exit_speed,pursuit_profile.maximum_exit_speed)
+	depart=depart.normalized()*exit_speed
+	# A living target keeps its physical space. Do not rotate neutral input into
+	# an arbitrary sideways launch when its guard rejected the strike.
+	if not defeated and depart.dot(toward)<0:depart-=toward*depart.dot(toward)
+	var lift:float=(pursuit_profile.hunt_exit_lift+_execution_entry_edge*3. if kind==&"execute" else pursuit_profile.counter_exit_lift) if hit else minf(_execution_entry_velocity.y,0.)
+	player.velocity=depart+Vector3.UP*lift
+	player._momentum_left=pursuit_profile.momentum_seconds;player._ignore_floor_once=true
+	if defeated:
+		player.dash_available=true
+		if has(&"shade_counter_guard") and kind==&"blink":combat.invulnerability=maxf(combat.invulnerability,pursuit_profile.kill_guard_seconds)
+		edge=1.0 if has(&"shade_hunt_chain") else (.5 if has(&"shade_refund") else 0.0)
 	lock_left=0
 	counter_left=0
 	cooldown=.5
-	_play_action(str(kind))
+	pursuit_resolved.emit(kind,hit,defeated)
 	return hit
 
 func placement_for(kind: StringName) -> Dictionary:
@@ -424,7 +475,51 @@ func create_construct(kind: StringName,pose: Transform3D) -> RiftConstruct:
 	cooldown=.35
 	_play_action("shape")
 	SkillEffect.spawn(get_tree().current_scene,pose,&"rift",Color("#77e8cf"),1.5)
+	_shape_attack(pose)
 	return construct
+
+
+func _shape_attack(_pose: Transform3D) -> void:
+	# The shaping core is a route action and a spell in the same gesture. Keep
+	# the hit corridor narrow enough to read as a forward stone ridge, then use
+	# real visibility, guard and hit events instead of a visual-only pulse.
+	var origin := player.camera.global_position
+	var forward := -player.camera.global_basis.z
+	var flat_forward := Vector3(forward.x, 0.0, forward.z)
+	if flat_forward.length_squared() < 0.04:
+		flat_forward = -player.global_basis.z
+	flat_forward = flat_forward.normalized()
+	# A successful shaping cast is itself a short traversal receipt: an
+	# authored guardian may be opened by this route-building attack.
+	player.mark_traversal_action(&"shape_cast", .8)
+	var right := Vector3.UP.cross(flat_forward).normalized()
+	var impacted := 0
+	for node: Node in get_tree().get_nodes_in_group("acolytes"):
+		var enemy := node as LanternAcolyte
+		if not is_instance_valid(enemy) or not enemy.active or enemy.health <= 0:
+			continue
+		if enemy.threat_rank in [&"boss", &"miniboss"]:
+			continue
+		var point := enemy.get_hit_point()
+		var offset := point - origin
+		if offset.length() > 8.0 or forward.dot(offset.normalized()) < 0.35:
+			continue
+		if absf(right.dot(offset)) > 2.4 or absf(offset.y) > 3.5:
+			continue
+		var ray := PhysicsRayQueryParameters3D.create(origin, point, 5, [player.get_rid()])
+		var contact := player.get_world_3d().direct_space_state.intersect_ray(ray)
+		if not contact.is_empty() and contact.get("collider") != enemy:
+			continue
+		enemy.break_guard(0.8)
+		enemy.apply_wind(flat_forward * 7.0)
+		var accepted := enemy.receive_hit(1, flat_forward)
+		if accepted:
+			enemy.velocity.y = maxf(enemy.velocity.y, 6.0)
+			combat.confirm_hit(enemy, point, enemy.health <= 0)
+		impacted += 1
+	if impacted > 0:
+		performed.emit(&"shape_attack")
+		SkillEffect.spawn(get_tree().current_scene, Transform3D(Basis.looking_at(flat_forward), origin + flat_forward * 3.0), &"rift", Color("#9cf1d0"), 1.1)
 
 func _show_preview() -> void:
 	if not is_instance_valid(_preview):

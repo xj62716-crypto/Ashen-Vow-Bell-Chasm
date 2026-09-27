@@ -9,8 +9,8 @@ extends Resource
 ## Local velocity transformed by the device basis; never edits player stats.
 @export var launch_velocity_local_mps := Vector3(-4,14,-13)
 @export_range(.25,8,.05,"suffix:s") var launch_cooldown_seconds: float=1.5
-@export_range(.5,5,.1,"suffix:m") var launch_interact_range_m: float=3.0
-@export_range(.25,2,.05,"suffix:m") var launch_auto_radius_m: float=1.4
+@export_range(.5,5,.1,"suffix:m") var launch_interact_range_m: float=4.0
+@export_range(.25,2,.05,"suffix:m") var launch_auto_radius_m: float=1.0
 @export_range(0,3,.05,"suffix:s") var launch_momentum_seconds: float=1.1
 ## Boss phase-one exposure after destroying every core/chain; later phases use 5/6 and 2/3.
 ## Field name retained for existing Resources. Legacy altar seals never bypass boss objectives.

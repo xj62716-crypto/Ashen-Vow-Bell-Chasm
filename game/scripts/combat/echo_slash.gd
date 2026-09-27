@@ -9,9 +9,11 @@ var _hits: Dictionary = {}
 
 func _ready() -> void:
 	process_mode = PROCESS_MODE_PAUSABLE
+	preload("res://scripts/run/timeline_collision.gd").capture_phase(self)
 	add_to_group("transient_effects")
 
 func _physics_process(delta: float) -> void:
+	if preload("res://scripts/run/timeline_collision.gd").cancel_if_inactive(self):return
 	if not is_instance_valid(owner_combat) or not owner_combat.enabled or owner_combat.health <= 0 or not owner_combat.player.control_enabled:
 		queue_free()
 		return
@@ -32,4 +34,6 @@ func _physics_process(delta: float) -> void:
 		var hit := get_world_3d().direct_space_state.intersect_ray(ray)
 		if hit.get("collider") != enemy: continue
 		_hits[enemy.get_instance_id()] = true
-		if enemy.receive_hit(1, sweep.forward): owner_combat.confirm_hit(enemy, enemy.get_hit_point(), enemy.health <= 0)
+		var damage := maxi(1, int(sweep.get("damage", 1)))
+		if enemy.receive_hit(damage, sweep.forward):
+			owner_combat.confirm_hit(enemy, enemy.get_hit_point(), enemy.health <= 0, bool(sweep.get("can_chain", false)))

@@ -38,6 +38,10 @@ static func _root(parent: Node3D, role: StringName) -> Node3D:
 
 static func _module(parent: Node3D, kind: StringName, point: Vector3, scale_value := Vector3.ONE, yaw := 0.0) -> Node3D:
 	var holder := _root(parent,kind)
+	if OS.has_feature("headless"):
+		holder.position=point;holder.scale=scale_value;holder.rotation.y=yaw
+		holder.set_meta("asset_id",String(MODULES[kind]).get_basename())
+		return holder
 	var model := _scene(kind).instantiate() as Node3D
 	holder.add_child(model)
 	holder.set_meta("asset_id",String(MODULES[kind]).get_basename())
@@ -49,6 +53,8 @@ static func _box_collision(parent:Node3D,point:Vector3,size:Vector3)->CollisionS
 	shape.shape=bounds;shape.position=point;parent.add_child(shape);return shape
 
 static func platform_skin(parent: Node3D, center: Vector3, size: Vector2, stage: int) -> void:
+	if OS.has_feature("headless"):
+		return
 	var template := _scene(&"floor").instantiate() as Node3D
 	var holder := _root(parent,&"platform_skin")
 	holder.set_meta("asset_id","C03_flagstone")
@@ -112,10 +118,14 @@ static func _edge_landmark(room: CombatRoom, point: Vector3, size: Vector2, inde
 	var rotation:=atan2(-travel.x,-travel.z)
 	var arch:=_module(room.geometry,&"arch",edge,Vector3(1.1,1.25,1.1),rotation)
 	var body:=StaticBody3D.new();body.name="ArchPiers";body.collision_layer=1;body.collision_mask=0;arch.add_child(body)
-	_box_collision(body,Vector3(-2.13,2.1,0),Vector3(.62,4.2,.72))
-	_box_collision(body,Vector3(2.13,2.1,0),Vector3(.62,4.2,.72))
+	# Keep the piers on the actual slab edges.  The old fixed 2.13 m offset put
+	# both supports in the authored landing lane on the wider expansion decks,
+	# trapping a player who had already completed the wall transfer.
+	var pier_offset := maxf(2.13,size.x*.5-1.0)
+	_box_collision(body,Vector3(-pier_offset,2.1,0),Vector3(.62,4.2,.72))
+	_box_collision(body,Vector3(pier_offset,2.1,0),Vector3(.62,4.2,.72))
 	body.add_to_group("integrated_environment_collision")
-	arch.set_meta("support_points",[Vector3(-2.13,.08,0),Vector3(2.13,.08,0)])
+	arch.set_meta("support_points",[Vector3(-pier_offset,.08,0),Vector3(pier_offset,.08,0)])
 	# A visible forged crossbar is the banner attachment, rather than an implied
 	# floating pivot. Holder scaling places this at roughly 5.15 m world height.
 	DemoGeometry.box(arch,Vector3(0,4.12,0),Vector3(2.05,.12,.22),room._iron)
@@ -123,14 +133,19 @@ static func _edge_landmark(room: CombatRoom, point: Vector3, size: Vector2, inde
 	# into the already-authored platform foundation.
 	var buttress:=_module(room.geometry,&"buttress",edge+Vector3(0,-5.3,0),Vector3(.72,1.0,.72),rotation)
 	buttress.set_meta("attached_to",arch.get_path())
+	var owner := room.platform_at(point)
+	if owner != null:
+		arch.reparent(owner,true)
+		buttress.reparent(owner,true)
 	if room.stage!=2 or index%2==0:
 		# Baked banner origin is at cloth bottom; its rod is 2.857 m above.
 		var banner:=_module(room.geometry,&"banner",edge+Vector3(0,2.12,0),Vector3(1.05,1.05,1.05),rotation)
 		banner.set_meta("attached_to",arch.get_path())
 		banner.set_meta("rod_local",Vector3(0,2.857,0))
 		banner.set_meta("attachment_world",edge+Vector3(0,5.12,0))
+		if owner != null: banner.reparent(owner,true)
 
-static func _route_lantern(room: CombatRoom, point: Vector3, tint: Color) -> void:
+static func _route_lantern(room: CombatRoom, point: Vector3, tint: Color, support: Node3D = null) -> void:
 	var lantern:=_module(room.geometry,&"lantern",point,Vector3(1.15,1.15,1.15))
 	var body:=StaticBody3D.new();body.name="LanternBody";body.collision_layer=1;body.collision_mask=0;lantern.add_child(body)
 	_box_collision(body,Vector3(0,.52,0),Vector3(.56,1.04,.56));body.add_to_group("integrated_environment_collision")
@@ -139,11 +154,16 @@ static func _route_lantern(room: CombatRoom, point: Vector3, tint: Color) -> voi
 	light.light_energy=1.8;light.omni_range=7.5;light.shadow_enabled=true
 	light.distance_fade_enabled=true;light.distance_fade_begin=22;light.distance_fade_length=7
 	lantern.add_child(light)
+	if support != null: lantern.reparent(support,true)
 
 static func decorate(room: CombatRoom) -> void:
 	_ensure_foundations(room)
 	for point: Vector3 in room.platform_extents:
-		platform_skin(room.geometry,point,room.platform_extents[point],room.stage)
+		var owner := room.platform_at(point)
+		if owner != null:
+			platform_skin(owner,owner.to_local(room.to_global(point)),room.platform_extents[point],room.stage)
+		else:
+			push_error("Missing collision owner for floor skin at %s" % point)
 	var points:=room.route_nodes if not room.route_nodes.is_empty() else room.platform_extents.keys()
 	for index in points.size():
 		var point:Vector3=points[index]
@@ -151,7 +171,7 @@ static func decorate(room: CombatRoom) -> void:
 		if index%2==0:_edge_landmark(room,point,size,index)
 		if index%2==1 or index==0:
 			var tint:Color=[Color("e0a170"),Color("ef784c"),Color("9abcb4")][room.stage-1]
-			_route_lantern(room,point+Vector3(size.x*.5-.65,.05,size.y*.25),tint)
+			_route_lantern(room,point+Vector3(size.x*.5-.65,.05,size.y*.25),tint,room.platform_at(point))
 	for device:RunAltar in room.altars:altar_skin(device)
 	if is_instance_valid(room._gate):gate_skin(room._gate)
 	_selected_route_assets(room)

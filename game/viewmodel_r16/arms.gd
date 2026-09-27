@@ -127,6 +127,7 @@ func bind_combat() -> void:
 	combat.parried.connect(func():weapon_hit=1.0)
 	combat.hit_confirmed.connect(func(_target:Node3D,_point:Vector3,_defeated:bool):weapon_hit=1.0)
 	combat.hit_confirmed.connect(blade_contact_accent)
+	combat.echo_sweep_launched.connect(_show_echo_sweep)
 	combat.spell_contact.connect(func(_element:StringName):weapon_hit=1.0)
 	combat.ability_used.connect(func():
 		if active_kind=="staff":on_ability(&"quick_cast"))
@@ -137,6 +138,14 @@ func bind_combat() -> void:
 	if rewind:
 		rewind.rewound.connect(func(_a:Vector3,_b:Vector3,_c:PackedVector3Array):set_transient("rewind"))
 		rewind.state_changed.connect(func(value:Dictionary):rewind_ready=value.ready)
+
+
+func _show_echo_sweep(origin: Vector3, forward: Vector3) -> void:
+	if not weapon_effects_enabled:
+		return
+	var sweep := preload("res://viewmodel_r16/blade_echo_sweep.gd").new()
+	get_tree().current_scene.add_child(sweep)
+	sweep.global_transform = Transform3D(Basis.looking_at(forward, Vector3.UP), origin)
 
 func _unhandled_input(event:InputEvent) -> void:
 	if event.is_action_pressed("interact") and player.control_enabled:interaction_left=.28
@@ -302,7 +311,10 @@ func reset_motion() -> void:
 func on_ability(kind:StringName) -> void:
 	var aliases:Dictionary={"mark":"seal","shape_wall":"shape","shape_well":"shape","shape_anchor":"shape","shape_platform":"shape","tempest":"storm","sweep_return":"rewind"}
 	ability_kind=aliases.get(str(kind),str(kind));ability_age=0
-	prime_powered_trail=active_kind=="blade" and ability_kind in ["execute","blink"]
+	# Pursuit is sampled continuously from its gameplay clock. Never fabricate
+	# historical blade poses after arrival or reconnect a previous attack trail.
+	if active_kind=="blade" and kind in [&"execute",&"blink"]:ability_kind=""
+	prime_powered_trail=false
 	weapon_release=1.0
 
 func on_release() -> void:
@@ -393,10 +405,6 @@ func _process_rig(delta:float) -> void:
 		sample=release+ability_age
 		if active_kind=="blade" and row.has("cuts"):
 			sample=float(row.cuts[0].nominal_contact_s)+ability_age
-	if active_kind=="blade" and combat.arts.execution_active:
-		state="execute"
-		var cut:Dictionary=event_map["blade_execute"].cuts[0]
-		sample=phase_map(combat.arts.execution_age,PackedFloat32Array([0.,combat.arts.execution_seconds*.55,combat.arts.execution_seconds]),PackedFloat32Array([combat.arts.execution_start_sample,float(cut.active_start_s),float(cut.nominal_contact_s)]))
 	if combat.attacking:
 		if combat.attacks!=previous_attack_id:
 			combo_return=active_kind=="blade" and combat.swing_return and motion_clock-previous_attack_end<.12
@@ -412,22 +420,23 @@ func _process_rig(delta:float) -> void:
 			var combo_row:Dictionary=event_map["blade_combo"]
 			sample=lerpf(float(combo_row.cuts[0].active_end_s),float(combo_row.get("return_start_s",.4)),clampf((combat.attack_age-combat.windup-combat.active_time)/maxf(.001,combat.recovery_time),0,1))
 		previous_attack_end=motion_clock
+	if active_kind=="blade" and (combat.arts.execution_active or combat.arts.execution_recovering):
+		state=str(combat.arts.execution_kind)
+		var row:Dictionary=event_map["blade_"+state]
+		var cut:Dictionary=row.cuts[0]
+		if combat.arts.execution_active:
+			var approach:float=combat.arts.execution_seconds-combat.arts.pursuit_profile.contact_seconds
+			sample=phase_map(combat.arts.execution_age,PackedFloat32Array([0.,approach,combat.arts.execution_seconds]),PackedFloat32Array([combat.arts.execution_start_sample,float(cut.active_start_s),float(cut.nominal_contact_s)]))
+		else:
+			sample=lerpf(float(cut.nominal_contact_s),float(row.duration_s),clampf(combat.arts.execution_recovery_age/combat.arts.pursuit_profile.recovery_seconds,0,1))
 	if interaction_left>0 and not combat.attacking and state in ["idle","run","air"]:state="grapple";sample=minf(.28,.28-interaction_left)
 	was_attacking=combat.attacking
 	var chosen:String=active_kind+"_"+state
 	if not animation_player.has_animation(chosen):chosen=active_kind+"_idle";sample=0
-	if prime_powered_trail and state in ["execute","blink"] and weapon_effects_enabled:
-		# Instant travel/contact is authoritative on skill release. Fill the swept
-		# visual from this clip's real edge sockets, without additional hit checks.
+	if chosen!=clip_name and (state in ["execute","blink"] or last_motion_state in ["execute","blink"]):
 		trail_samples.clear()
-		var contact:float=event_map[chosen].cuts[0].nominal_contact_s
-		var start:float=event_map[chosen].cuts[0].active_start_s
-		for index in range(6):
-			pose_at(chosen,lerpf(start,contact,index/5.),1.,true)
-			trail_samples.append({"a":sockets.edge_root.global_position,"b":sockets.edge_tip.global_position,"age":(5-index)*.009,"speed":35.,"powered":true})
-		prime_powered_trail=false
 	if not weapon_effects_enabled:prime_powered_trail=false
-	pose_at(chosen,sample,delta,combat.attacking)
+	pose_at(chosen,sample,delta,combat.attacking or combat.arts.execution_active or combat.arts.execution_recovering)
 	if active_kind=="blade" and combat.attacking and not authored_grip(state) and not (tuning.blade_sample_r3 and state in ["attack","execute"]):
 		# Independent quaternion interpolation can open a closed two-hand chain.
 		# Re-solve the authored upper/forearm lengths against the weapon's grip frame.
@@ -584,7 +593,7 @@ func update_blade_trail(delta:float,combat:PlayerCombat) -> void:
 		update_sample_trail(delta,combat);return
 	var mesh:=new_trail.mesh as ImmediateMesh;mesh.clear_surfaces()
 	if active_kind!="blade" or not player.control_enabled or not weapon_effects_enabled:trail_samples.clear();return
-	for row in trail_samples:row.age+=delta if combat.impact_hold<=0 else 0.0
+	for row in trail_samples:row.age+=delta
 	var style:int=blade_style()
 	var lifetime:float=tuning.blade_empowered_lifetime if blade_powered else tuning.blade_trail_lifetime*(.93 if style==2 else 1.1 if style==4 else 1.)
 	while not trail_samples.is_empty() and (trail_samples[0].age>lifetime or trail_samples.size()>32):trail_samples.pop_front()
@@ -650,7 +659,7 @@ func update_sample_trail(delta:float,combat:PlayerCombat)->void:
 	var mesh:=new_trail.mesh as ImmediateMesh;mesh.clear_surfaces()
 	if active_kind!="blade" or not player.control_enabled or not weapon_effects_enabled:
 		trail_samples.clear();return
-	for row in trail_samples:row.age+=delta if combat.impact_hold<=0 else 0.0
+	for row in trail_samples:row.age+=delta
 	var lifetime:float=tuning.blade_arc_lifetime*(.8 if blade_powered else 1.)
 	while not trail_samples.is_empty() and (trail_samples[0].age>lifetime or trail_samples.size()>24):trail_samples.pop_front()
 	if blade_active and combat.impact_hold<=0 and is_instance_valid(sockets.get("edge_root")) and is_instance_valid(sockets.get("edge_tip")):

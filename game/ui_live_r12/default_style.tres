@@ -6,4 +6,4 @@ hud_opacity = 0.94
 focus_strength = 0.92
 focus_enter_seconds = 0.06
 focus_exit_seconds = 0.10
-notice_seconds = 2.2
+notice_seconds = 1.35

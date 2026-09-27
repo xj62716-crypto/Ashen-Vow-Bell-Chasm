@@ -7,6 +7,10 @@ var health: int = 1
 
 func _ready() -> void:
 	process_mode = PROCESS_MODE_PAUSABLE
+	# Persistent mechanism belongs to its enemy's authored world, not a transient
+	# shot's launch world. A shared enemy's anchor remains shared as well.
+	var phase := preload("res://scripts/run/timeline_collision.gd").phase_of(owner_enemy)
+	if phase != &"":set_meta("timeline_phase",phase)
 	collision_layer = 4
 	collision_mask = 0
 	var shape := CollisionShape3D.new()
@@ -20,7 +24,7 @@ func get_hit_point() -> Vector3:
 	return global_position
 
 func receive_hit(amount: int, _direction: Vector3) -> bool:
-	if health <= 0 or amount <= 0: return false
+	if health <= 0 or amount <= 0 or not preload("res://scripts/run/timeline_collision.gd").active(self): return false
 	health = 0
 	collision_layer = 0
 	if is_instance_valid(owner_enemy): owner_enemy.break_guard(4.0)

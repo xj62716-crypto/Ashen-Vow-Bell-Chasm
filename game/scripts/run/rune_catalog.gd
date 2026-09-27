@@ -13,7 +13,7 @@ const ALL: Array[Dictionary] = [
 	{"id":&"arcane_shape_recall","class":&"arcanist","name":"归墟震波","path":"裂隙塑形","requires":&"arcane_shape","effect":"达到上限后替换未承载玩家的旧构造，释放三米震波打断可见敌人。","color":Color("#78dfbf")},
 	{"id":&"arcane_seal_spread","class":&"arcanist","name":"连铭","path":"封印术士","requires":&"arcane_seal","effect":"普通法术刻印向一个四米内可见活敌传播，不递归扩散，一次 Q 引爆。","color":Color("#c2a6e6")},
 	{"id":&"arcane_storm","class":&"arcanist","name":"风暴行者","path":"法力 · 连锁机动","core":true,"effect":"滞空或墙跑移动产生法力；空中法术消耗法力破盾并连锁，命中延长漂浮和沿墙时间。Q 回收冲刺。","color":Color("#8dcde8")},
-	{"id":&"arcane_shape","class":&"arcanist","name":"裂隙塑形","path":"创造 · 跑酷表面","core":true,"effect":"按住 Q 预览，松开生成临时墙、风井或牵引锚；Z 切换。每个消耗 30 法力，持续 12 秒，最多 3 个。","color":Color("#78dfbf")},
+	{"id":&"arcane_shape","class":&"arcanist","name":"裂隙塑形","path":"创造 · 跑酷表面","core":true,"effect":"一次施法同时向前顶起并破防敌人，再生成可承重的临时墙、风井或牵引锚；构造持续 12 秒，最多 3 个。","color":Color("#78dfbf")},
 	{"id":&"arcane_seal","class":&"arcanist","name":"封印术士","path":"标记 · 路线引爆","core":true,"effect":"点按 Q 标记敌人或机关；长按 Q 引爆。高速接近标记也会触发，冻结周围敌人并处决核心。Boss 封印仍需机关。","color":Color("#c2a6e6")},
 	{"id":&"arcane_element","class":&"arcanist","name":"元素塑能者","path":"元素 · 形态塑能","core":true,"effect":"法杖基础施法保持单一输入；祭坛获得火、冰、风或雷形态后改变弹道、控制和连锁方式，可与移动构筑混搭。","color":Color("#e6b27f")},
 	{"id":&"shade_edge_fast","class":&"shade","name":"磨锋","path":"飞檐猎杀","requires":&"shade_wall","effect":"墙跑锋势积累速度提高 30%。","color":Color("#dd987d")},
@@ -37,7 +37,7 @@ const ALL: Array[Dictionary] = [
 	{"id": &"shade_wall", "class": &"shade", "name": "飞檐血契", "path": "飞檐猎杀", "core": true, "effect": "墙跑积累锋势，超过半格后蹬墙锁敌；空中按 Q 追身处决，击杀刷新冲刺。蹬墙跳更高，下一刀可破盾。", "color": Color("#dd987d")},
 	{"id": &"shade_slide", "class": &"shade", "name": "掠地血契", "path": "掠地突袭", "core": true, "effect": "增强滑铲和滑铲跳。滑铲后破盾，滑铲跳后 Q 或挥刀展开宽幅横斩，处理多个核心。", "color": Color("#e3bd72")},
 	{"id": &"shade_parry", "class": &"shade", "name": "返刃血契", "path": "返刃决斗", "core": true, "effect": "延长弹反窗口。弹反弹体后 3 秒内按 Q 追身到射手并处决，恢复冲刺；实体墙会阻断追身。", "color": Color("#c3cbbb")},
-	{"id": &"shade_echo", "class": &"shade", "name": "残影行者", "path": "残影 · 回溯猎杀", "core": true, "effect": "G 在合法历史锚点回溯约 1.5 秒，不回滚生命、世界或奖励；回溯位置可留下短暂残影诱导敌人，空中回溯可形成一次临时踏步。", "color": Color("#bda7d8")},
+	{"id": &"shade_echo", "class": &"shade", "name": "残影行者", "path": "残影 · 回溯猎杀", "core": true, "effect": "冲刺会在起点留下短暂残影；下一次真实横斩同步补斩该位置。G 仍可沿合法历史锚点回溯，不回滚生命、世界或奖励。", "color": Color("#bda7d8")},
 	{"id": &"shade_echo_decoy", "class": &"shade", "name": "诱影", "path": "残影行者", "requires": &"shade_echo", "effect": "回溯前的位置留下可被敌人锁定、射击或突进的残影；命中后消散，不会替玩家承受真实生命伤害。", "color": Color("#bda7d8")},
 	{"id": &"shade_echo_step", "class": &"shade", "name": "踏影", "path": "残影行者", "requires": &"shade_echo", "effect": "空中回溯点生成短暂可碰撞踏步，允许回溯后接墙跑或滑铲跳，过期前有清晰消散预警。", "color": Color("#bda7d8")},
 	{"id": &"shade_echo_cut", "class": &"shade", "name": "返身幻斩", "path": "残影行者", "requires": &"shade_echo", "effect": "回溯完成后，残影沿回溯路径末端补出一次幻影横斩；仍受视线和实际敌人碰撞限制。", "color": Color("#bda7d8")},
@@ -84,9 +84,9 @@ static func _current(source: Dictionary) -> Dictionary:
 	rune.core = rune.id in CORE_IDS.get(rune["class"], [])
 	if PARENTS.has(rune.id): rune.requires = PARENTS[rune.id]
 	if rune.id == &"arcane_element": rune.effect = "默认获得爆裂火球。后续祭坛选择冰、风、雷可改变主法术；混合元素保留控制与范围联动，无需战斗中切技能盘。"
-	if rune.id == &"arcane_shape": rune.effect = "按住 Q 显示落点，松开塑形；垂直面生成跑墙，地面生成风井，向上生成悬锚，下方虚空生成浮台。直接攻击始终可用。"
+	if rune.id == &"arcane_shape": rune.effect = "一次 Q 施法先对前方可见敌人破防并顶起，再生成与瞄准方向一致的跑墙、风井、悬锚或浮台；基础攻击始终可用。"
 	if rune.id == &"arcane_seal": rune.effect = "普通法术命中自动刻印，Q 引爆可见符印；瞄准机关点 Q 可标记。移动经过符印触发冻结与核心处决。"
-	if rune.id == &"shade_echo": rune.effect = "G 沿合法历史返回约 1.5 秒前的位置，保持当前视角；不回滚生命、击杀、世界或冲刺。后续可获得诱饵、踏步和幻影补刀。"
+	if rune.id == &"shade_echo": rune.effect = "冲刺在起点留下残影，下一次真实横斩同步补斩；G 沿合法历史返回约 1.5 秒前的位置，不回滚生命、击杀、世界或冲刺。"
 	if rune.id == &"shade_wall": rune.effect = "蹬墙锁定视线内敌人，空中 Q 追身处决；击杀恢复冲刺。无需先积满锋势；普通挥刀始终可用。"
 	if rune.id == &"shade_parry": rune.path="流刃决斗"
 	if rune.id == &"shade_slide": rune.path="掠地破阵"

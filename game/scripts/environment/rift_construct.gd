@@ -117,6 +117,7 @@ func _physics_process(delta: float) -> void:
 			queue_free()
 			return
 	_launch_lock=maxf(0,_launch_lock-delta)
+	if not preload("res://scripts/run/timeline_collision.gd").active(self): return
 	if kind==&"wall" and not _used and is_instance_valid(player) and player.is_wall_running() and supporting_player():
 		_used=true
 		if is_instance_valid(owner_arts) and owner_arts.has(&"arcane_shape_refund"):owner_arts.mana=minf(100,owner_arts.mana+15)

@@ -32,8 +32,9 @@ signal slide_jumped
 @export_range(0.0, 8.0, 0.5) var dash_exit_bonus: float = 3.0
 @export_group("Wall movement")
 @export var parkour_profile: ParkourProfile = preload("res://data/classes/shade.tres")
-@export_range(0.4, 1.2, 0.05) var wall_probe_reach: float = 0.8
+@export_range(0.4, 2.4, 0.05) var wall_probe_reach: float = 2.2
 @export var wall_minimum_speed: float = 4.0
+@export_range(0.0, 1.5, 0.05) var wall_surface_gap_grace: float = 1.1
 @export var wall_jump_grace: float = 0.12
 @export_range(0.12, 0.6, 0.01) var wall_jump_transfer_window: float = 0.5
 @export_range(2, 4, 1) var wall_chain_limit: int = 2
@@ -76,6 +77,8 @@ var _wall_time_used: float = 0.0
 var _wall_look_yaw: float = 0.0
 var _wall_coyote_left: float = 0.0
 var _wall_jump_transfer_left: float = 0.0
+var _wall_capture_left: float = 0.0
+var _wall_surface_gap_left: float = 0.0
 var _wall_bonus_used: bool = false
 var _momentum_left: float = 0.0
 var _grapple_exit_brake_left: float = 0.0
@@ -152,7 +155,10 @@ func _ready() -> void:
 	camera.fov = field_of_view
 	floor_snap_length = 0.25
 	floor_stop_on_slope = true
-	floor_constant_speed = true
+	# Preserve directional momentum on authored ramps.  Constant-speed slope
+	# correction can reverse a capsule at the seam between a platform and its
+	# connector, which is especially visible during wall-run exits.
+	floor_constant_speed = false
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -184,6 +190,7 @@ func _physics_process(delta: float) -> void:
 		if grapple.active:grapple.cancel()
 		return
 	_wall_jump_transfer_left = maxf(0.0, _wall_jump_transfer_left - delta)
+	_wall_capture_left = maxf(0.0, _wall_capture_left - delta)
 	if blade_approach_active:return # ProfessionArts owns the brief swept approach.
 	if grapple.active:
 		grapple.advance(delta)
@@ -241,6 +248,11 @@ func _physics_process(delta: float) -> void:
 		_coyote_left = 0.0
 		grounded = false
 		jump_count += 1
+		# A jump that grazes an authored wall can lose horizontal speed to the
+		# capsule contact before the next physics tick. Keep a short capture
+		# window so the wall-run begins from the real surface instead of leaving
+		# the player frozen beside its end cap.
+		_wall_capture_left = .5
 		jumped.emit()
 	var stick: Vector2 = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
 	var wish_direction: Vector3 = global_basis * Vector3(stick.x, 0.0, stick.y)
@@ -475,7 +487,10 @@ func apply_profile(profile: ParkourProfile) -> void:
 	float_capacity = 0.0
 	float_left = 0.0
 	empowered_dash = false
-	wall_chain_limit = 2
+	# The authored R7 transfers can legitimately cross two offset wall faces
+	# before the receiving deck. Keep a small airborne chain budget so the player
+	# can reattach after a dash without forcing a ground reset.
+	wall_chain_limit = 4
 	profile_changed.emit(profile)
 
 
@@ -490,7 +505,10 @@ func _side_wall(side: int, reattach_hint: bool = false) -> Dictionary:
 		if hit.is_empty():
 			return {}
 		var normal: Vector3 = hit["normal"]
-		if absf(normal.y) > 0.15 or normal.dot(direction) > -0.75:
+		# Authored route walls may be diagonal to the player's local side axis.
+		# Accept a glancing opposing face instead of requiring a near-perfect
+		# world-axis normal; the two-height probe still rejects floors and caps.
+		if absf(normal.y) > 0.15 or normal.dot(direction) > -0.2:
 			return {}
 		if not result.is_empty() and (normal.dot(result["normal"]) < 0.95 or absf(normal.dot(hit.position-result.position)) > 0.08):
 			return {}
@@ -506,7 +524,15 @@ func _update_wall_contact(wish: Vector3, stick: Vector2, delta: float) -> void:
 		var nearby_ground := get_world_3d().direct_space_state.intersect_ray(ground_query)
 		if not nearby_ground.is_empty() and nearby_ground.normal.y>.7:
 			return
-	if stick.y > -0.2 or horizontal_speed() < wall_minimum_speed or parkour_profile.wall_duration <= 0.0:
+	if stick.y > -0.2 or (horizontal_speed() < wall_minimum_speed and _wall_capture_left <= 0.0 and _wall_surface_gap_left <= 0.0) or parkour_profile.wall_duration <= 0.0:
+		# Backward input is the intentional wall-run brake used at a receiving
+		# deck. Preserve a readable burst, but bleed most of the tangent speed
+		# before leaving the face so the player lands on the authored platform
+		# instead of carrying the full wall speed into the void.
+		if _wall_active and stick.y > 0.2:
+			var tangent_speed := velocity.dot(_wall_tangent)
+			if tangent_speed > 0.0:
+				velocity -= _wall_tangent * tangent_speed * .65
 		_stop_wall()
 		return
 	if _wall_active and wall_time_remaining() <= 0.0:
@@ -537,7 +563,7 @@ func _update_wall_contact(wish: Vector3, stick: Vector2, delta: float) -> void:
 		# wall can be caught in mid-air after two segments on the first wall.
 		var approach: Vector3 = Vector3(velocity.x,0,velocity.z) if hinted else wish
 		var allow_wall_jump_transfer: bool = _wall_jump_transfer_left > 0.0 and switched_wall
-		if not _wall_active and not allow_wall_jump_transfer and not grapple_handoff:
+		if not _wall_active and not allow_wall_jump_transfer and not grapple_handoff and _wall_capture_left <= 0.0:
 			var approach_direction := approach.normalized()
 			if approach_direction.length_squared() > 0.0 and (approach_direction.dot(normal) > 0.35 or absf(approach_direction.dot(normal)) > 0.78):
 				continue
@@ -564,13 +590,43 @@ func _update_wall_contact(wish: Vector3, stick: Vector2, delta: float) -> void:
 			_same_wall_reattach_ready = false
 			wall_chain_count += 1
 			_wall_time_used = 0.0
+			_wall_capture_left = 0.0
 			_coyote_left = 0.0
 			_wall_coyote_left = 0.0
-			velocity.y = clampf(velocity.y, -0.8, 5.0)
+			var wall_collider := hit.get("collider") as Node
+			var entry_wall := wall_collider != null and bool(wall_collider.get_meta("entry_wall", false))
+			# The short entrance wall teaches capture and handoff; it should not
+			# turn the jump arc into a high launch that sails past its receiving
+			# deck. Authored high-line transfers keep the normal vertical carry.
+			velocity.y = clampf(velocity.y, -0.8, 1.8 if entry_wall else 5.0)
 			wall_run_count += 1
 			mark_traversal_action(&"wall_run")
 			wall_run_started.emit(side)
 		_wall_time_used = minf(parkour_profile.wall_duration, _wall_time_used + delta)
+		_wall_surface_gap_left = wall_surface_gap_grace
+		return
+	if _wall_active and _wall_surface_gap_left > 0.0:
+		# Route walls may end directly over a real receiving deck. Once the wall
+		# probe loses the face, use the deck as the handoff instead of spending the
+		# full airborne seam grace at wall speed. Keep a small forward carry so the
+		# runner reaches the authored landing centre; void transfers still use the
+		# normal grace window below.
+		var landing_query := PhysicsRayQueryParameters3D.create(
+			global_position + Vector3.UP * 0.1,
+			global_position - Vector3.UP * 5.0,
+			1,
+			[get_rid()]
+		)
+		var landing_hit := get_world_3d().direct_space_state.intersect_ray(landing_query)
+		if not landing_hit.is_empty() and landing_hit.normal.y > 0.7 and absf(global_position.y - float(landing_hit.position.y)) <= 3.5:
+			var carry := velocity.dot(_wall_tangent)
+			velocity -= _wall_tangent * maxf(0.0, carry - 4.0)
+			_stop_wall()
+			return
+		# Authored wall modules can have a short masonry seam at a transfer. Keep
+		# the latched tangent for that physical gap so a player can carry the same
+		# wall-run into the next face without touching the ground.
+		_wall_surface_gap_left = maxf(0.0, _wall_surface_gap_left - delta)
 		return
 	_stop_wall()
 
@@ -635,6 +691,8 @@ func _reset_wall_airtime() -> void:
 	_wall_bonus_used = false
 	_wall_coyote_left = 0.0
 	_wall_jump_transfer_left = 0.0
+	_wall_capture_left = 0.0
+	_wall_surface_gap_left = 0.0
 	_momentum_left = 0.0
 	_clear_grapple_exit_brake()
 	_grapple_wall_handoff_left = 0.0

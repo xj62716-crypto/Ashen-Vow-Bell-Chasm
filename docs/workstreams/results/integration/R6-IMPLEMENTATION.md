@@ -1,5 +1,28 @@
 # Core Gameplay Plan r6 Implementation
 
+## 2026-09-25 R7 功能优先推进：残影军势与地脉塑形首核心
+
+连续路线专项仍有 8 项高差／反向路线失败，属于路线质量收尾项，不能标为通过；正式路线合同、关卡网络、课程和遭遇空间没有因此回退。本轮先推进策划案中会直接改变游玩行为的两个第一核心：
+
+- `shade_echo`：冲刺开始时记录真实起点；下一次真实近战挥刀才生成 `EchoSlash`，在起点按当前伤害、范围、宽斩状态和实际视线／碰撞补斩。补斩不会移动玩家、不能递归生成残影，超出可调触发窗口会清除；复活、换职业和重置会清理记录。新增 `shade_echo_trigger_window`、`shade_echo_reach`、`shade_echo_damage_scale` 与 `echo_sweep_launched` 接口。
+- `arcane_shape`：创建可承重构造的同一次施法会沿视线攻击可见普通／精英目标，先破防、击退并抬升，再按真实 `receive_hit` 结算；Boss／小 Boss 不被该第一核心直接跳过。构造的碰撞、寿命、容量和原有放置规则保持不变，新增 `shape_attack` 事件和既有技能特效触发。
+
+Godot 4.7.2 编辑器解析通过；新增专项 `shade_echo_checks.gd` 为 5/5，`shape_attack_checks.gd` 为 4/4；既有 `builds_ai_checks.gd` 回归为 57/57。以上是受控物理检查，不替代两职业正式关卡连续实机录像，也不代表 R7 八主题三阶段、五组联动或发布门禁已完成。
+
+## 2026-09-25 继续推进：HUD 信息压缩
+
+针对“UI 文字解释太多、削弱暗黑奇幻感”的实机反馈，正式 HUD 的路线教学和 Boss 状态已改为短状态标签：
+
+- 教学只保留输入与动作关系，例如 `贴墙 · Shift`、`蹬墙 · 换侧`、`V · 残世`、`E · 牵引`。
+- Boss HUD 保留破核数量、可伤窗口和地台崩塌倒计时，去掉重复的解释句。
+- 目标提示保留祭坛、核心、出口和破核状态，不改动玩法门槛、输入映射或碰撞。
+
+本轮通过 `git diff --check`；Godot 实机验证尚未完成，不能将 UI 人工观感标为完成。
+
+随后补齐了阶段 2 的双向墙跑连接：现世保留连续承重点，残世使用偏移短墙作为替代路线；首个锻炉接收平台增加真实制动纵深。当前源码回归追加通过：`level_network_checks.gd` 146/146、`timeline_threat_checks.gd` 11/11、`level_configuration_checks.gd` 97/97、`gameplay_audio_checks.gd` 22/22、`synergy_construct_checks.gd` 18/18、`lifecycle_checks.gd` 24/24、`grapple_pull_checks.gd` 63/63、`grapple_transition_checks.gd` 16/16、`timeline_runtime_checks.gd` 14/14。
+
+这些是自动和受控物理回归，不替代两职业三关连续人工通关；新导出包会保留这一发布边界。
+
 日期：2026-09-23
 范围：阶段 A/B 的第一批源工程实现。没有导出 EXE。
 
@@ -61,3 +84,13 @@
 | E 教学、音频、画面与发布 | 动态分层音乐、动作音频事件、相位/专注/Boss/祭坛 HUD 已接入 | 教学重播/跳过、全事件人工试听、两职业菜单到结算长流程与最终美术验收未完成 |
 
 本轮回归：`grapple_route_checks` 26/26、`grapple_pull_checks` 63/63、`grapple_transition_checks` 16/16、`timeline_runtime_checks` 14/14、`environment_integration_checks` 45/45（图形模式亦通过）、`level_route_checks` 21/21、`level_network_checks` 146/146、`boss_room_checks` 15/15、`boss_mechanics_checks` 72/72、`level_configuration_checks` 97/97、`lifecycle_checks` 24/24、`synergy_construct_checks` 18/18、`presentation_checks` 55/55。
+
+## 2026-09-25 R8 发布
+
+候选导出包 `builds/windows/AshenVow-Demo-r8.exe` 已完成冷启动烟测并复制为 `release/AshenVow-Demo.exe`。命令为 `--audio-driver Dummy --quit-after 180`，退出码 0；启动日志无 `SCRIPT ERROR` 或资源导入错误。发布包 PCK 已内嵌（文件尾标记 `GDPC`），SHA-256 为 `182BF6581207D86661A4B44CD3BC0F9A3D15C249203522415508CD6A1E459DBE`。自动回归通过项与人工验收边界见 `release/R8-RELEASE.md`；本次发布不把尚未完成的连续人工通关、八构筑完整循环、GOAP、教学重播/跳过、全事件试听和最终美术审美验收标记为完成。
+
+## 2026-09-25 R7 route follow-up
+
+R7 路线与敌人时间线合同已在同一整合工作树中完成：`r7_route_contract_checks` 77/77、`level_network_checks` 30/30、`level_encounter_spatial_checks` 26/26、`level_course_checks` 16/16。旧 `level_configuration_checks` 因高模重复重建超过 600 秒，未计入通过；这批源码也没有导出新的 EXE。当前结论只覆盖路线/分配和相关自动回归，不覆盖连续人工通关、八构筑完整循环、最终美术和全量发布门禁。
+
+为降低无窗口回归的重复成本，`CombatRoom._build()` 现在只在非 headless 窗口执行环境合批；headless 保留同一原始网格与碰撞。该保护已在上述四套 R7 回归中通过，不改变正式窗口渲染路径。

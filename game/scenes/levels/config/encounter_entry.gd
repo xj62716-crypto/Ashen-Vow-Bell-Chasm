@@ -9,6 +9,8 @@ extends Resource
 @export_enum("normal","shield","elite","miniboss","boss") var archetype: String="normal"
 @export_enum("pursuer","heavy","crossbow","caster","bell","sentinel") var role: String="crossbow"
 @export var required_guardian: bool=false
+@export_enum("shared","present","remnant") var timeline_phase: String="shared"
+@export_enum("shared","present_only","remnant_only","air_chain") var route_contract: String="shared"
 ## First attack delay, not a periodic attack-speed override.
 @export_range(0.1,15,.05,"suffix:s") var initial_delay_seconds: float=1.1
 ## Baseline actor attack/awareness radius; AI behavior remains gameplay-owned.
@@ -22,6 +24,8 @@ func validation_errors(path: String="encounter") -> PackedStringArray:
 		errors.append(path+".position_m: outside finite authored bounds x±150 y[-10,60] z[-400,30]")
 	if archetype not in ["normal","shield","elite","miniboss","boss"]:errors.append(path+".archetype: unknown prototype "+archetype)
 	if role not in ["pursuer","heavy","crossbow","caster","bell","sentinel"]:errors.append(path+".role: unknown behavior "+role)
+	if timeline_phase not in ["shared","present","remnant"]:errors.append(path+".timeline_phase: expected shared/present/remnant")
+	if route_contract not in ["shared","present_only","remnant_only","air_chain"]:errors.append(path+".route_contract: unknown route contract "+route_contract)
 	if not is_finite(initial_delay_seconds) or initial_delay_seconds<.1 or initial_delay_seconds>15:errors.append(path+".initial_delay_seconds: expected finite 0.1..15 s")
 	if not is_finite(attack_range_m) or attack_range_m<4 or attack_range_m>40:errors.append(path+".attack_range_m: expected finite 4..40 m")
 	return errors

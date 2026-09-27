@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "profile_id": "blade_arc_r2",
-  "source_glb_sha256": "1f069041593a274483bb5c2df8c91d68189f8feabf3804c0a7a460e184409410",
+  "source_glb_sha256": "011e35a8b43edfec0e884fef174d69fbf3e61fbf021384e21dcba4500a4d09a7",
   "profile_sha256": "b81c58d3bcf1e3f558af96b211dc7c4b0d9f736c33dbc1c86c004a1a9b43d599",
   "events": [
     {
@@ -70,31 +70,33 @@
     },
     {
       "clip": "blade_execute",
-      "duration_s": 0.62,
+      "duration_s": 0.61,
       "cuts": [
         {
           "cut_id": "blade_execute.1",
-          "active_start_s": 0.16248275862068967,
-          "nominal_contact_s": 0.2191379310344828,
-          "active_end_s": 0.28327586206896554,
-          "follow_end_s": 0.3741379310344828,
+          "active_start_s": 0.1367241379310345,
+          "nominal_contact_s": 0.2156034482758621,
+          "active_end_s": 0.28396551724137936,
+          "follow_end_s": 0.3681034482758621,
           "hit_audio_and_impact": "Only the actual combat hit result may trigger impact; nominal contact is a review cue."
         }
-      ]
+      ],
+      "support_release_s": 0.35758620689655174
     },
     {
       "clip": "blade_blink",
-      "duration_s": 0.58,
+      "duration_s": 0.55,
       "cuts": [
         {
           "cut_id": "blade_blink.1",
-          "active_start_s": 0.152,
-          "nominal_contact_s": 0.20500000000000002,
-          "active_end_s": 0.265,
-          "follow_end_s": 0.35,
+          "active_start_s": 0.12327586206896554,
+          "nominal_contact_s": 0.19439655172413794,
+          "active_end_s": 0.25603448275862073,
+          "follow_end_s": 0.33189655172413796,
           "hit_audio_and_impact": "Only the actual combat hit result may trigger impact; nominal contact is a review cue."
         }
-      ]
+      ],
+      "support_release_s": 0.32241379310344837
     },
     {
       "clip": "blade_rewind",
@@ -114,5 +116,6 @@
   "runtime_integration": true,
   "retained_from_r14": false,
   "notes": "Contact sample times unchanged. Source clips .58s; existing combat .44s is preserved through phase_map. Nominal contact .205 maps to first real overlap at windup+.05.",
-  "motion_profile_sha256": "5d21c88e026522d02f89a8e4c4e2e105ff38da0cc88daa0554c10f78a0a36705"
+  "motion_profile_sha256": "5d21c88e026522d02f89a8e4c4e2e105ff38da0cc88daa0554c10f78a0a36705",
+  "pursuit_revision": "20260925-contact-synchronized"
 }

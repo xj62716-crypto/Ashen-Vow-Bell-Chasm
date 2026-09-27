@@ -8,6 +8,7 @@ var _ring: MeshInstance3D
 var _halo: MeshInstance3D
 
 func _ready() -> void:
+	preload("res://scripts/run/timeline_collision.gd").capture_phase(self)
 	add_to_group("hostile_projectiles")
 	var torus := TorusMesh.new()
 	torus.inner_radius = .93
@@ -18,6 +19,7 @@ func _ready() -> void:
 	_halo.rotation.x = -PI/2
 
 func _physics_process(delta: float) -> void:
+	if preload("res://scripts/run/timeline_collision.gd").cancel_if_inactive(self):return
 	radius += delta*7.0
 	_ring.scale = Vector3(radius,1,radius)
 	_halo.scale = Vector3(radius,radius,1)

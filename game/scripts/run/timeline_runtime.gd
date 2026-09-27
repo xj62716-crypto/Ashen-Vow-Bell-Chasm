@@ -11,6 +11,7 @@ signal resource_changed(charges: int, maximum: int)
 const ACTION := &"timeline_shift"
 const PRESENT := &"present"
 const REMNANT := &"remnant"
+const CollisionSafety = preload("res://scripts/run/timeline_collision.gd")
 
 @export_range(1, 4, 1) var maximum_charges: int = 2
 @export_range(0.05, 1.0, 0.05) var cooldown_seconds: float = 0.28
@@ -21,6 +22,7 @@ var player: ParkourPlayer
 var room: CombatRoom
 var _trial: MovementTrial
 var _input_locked: bool = false
+var _pending_wall_phase: StringName = &""
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -32,6 +34,7 @@ func bind(owner_trial: MovementTrial, owner_player: ParkourPlayer, owner_room: C
 	player = owner_player
 	room = owner_room
 	if is_instance_valid(room):
+		_pending_wall_phase = &""
 		room.timeline_runtime = self
 		room.apply_timeline_phase(phase)
 	_emit_resource()
@@ -39,11 +42,15 @@ func bind(owner_trial: MovementTrial, owner_player: ParkourPlayer, owner_room: C
 func set_room(owner_room: CombatRoom) -> void:
 	room = owner_room
 	if is_instance_valid(room):
+		_pending_wall_phase = &""
 		room.timeline_runtime = self
 		room.apply_timeline_phase(phase)
 
 func _process(delta: float) -> void:
 	cooldown_left = maxf(0.0, cooldown_left - delta)
+	if _pending_wall_phase != &"" and is_instance_valid(room) and is_instance_valid(player) and not player.is_wall_running():
+		room.apply_timeline_phase(_pending_wall_phase)
+		_pending_wall_phase = &""
 	if _trial == null or _trial.phase != MovementTrial.Phase.RUNNING:
 		return
 	if Input.is_action_just_pressed(ACTION):
@@ -71,10 +78,18 @@ func try_shift() -> bool:
 		blocked.emit(&"unavailable")
 		return false
 	var previous := phase
-	phase = REMNANT if phase == PRESENT else PRESENT
+	var next_phase := REMNANT if phase == PRESENT else PRESENT
+	if not CollisionSafety.can_enter(player,room.geometry,next_phase):
+		blocked.emit(&"occupied")
+		return false
+	phase = next_phase
 	charges -= 1
 	cooldown_left = cooldown_seconds
-	room.apply_timeline_phase(phase)
+	if player.is_wall_running():
+		room.prepare_timeline_phase(phase)
+		_pending_wall_phase = phase
+	else:
+		room.apply_timeline_phase(phase)
 	_emit_resource()
 	shifted.emit(previous, phase)
 	return true
@@ -98,6 +113,7 @@ func reset_state() -> void:
 	charges = maximum_charges
 	cooldown_left = 0.0
 	_input_locked = false
+	_pending_wall_phase = &""
 	if is_instance_valid(room):
 		room.apply_timeline_phase(phase)
 	_emit_resource()

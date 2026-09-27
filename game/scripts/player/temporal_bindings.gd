@@ -56,5 +56,9 @@ static func label(action: StringName) -> String:
 		return ""
 	var labels: PackedStringArray = []
 	for event in InputMap.action_get_events(action):
-		labels.append(event.as_text().replace(" (Physical)", ""))
+		if event is InputEventKey:
+			var code: Key = event.physical_keycode if event.physical_keycode != KEY_NONE else event.keycode
+			labels.append(OS.get_keycode_string(code))
+		else:
+			labels.append(event.as_text())
 	return " / ".join(labels)

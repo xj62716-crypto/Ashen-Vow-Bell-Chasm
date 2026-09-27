@@ -74,6 +74,11 @@ var _timeline_state: Dictionary = {}
 var _flow_value: float = 0.0
 var _flow_capacity: float = 100.0
 var _last_resource_notice: String = ""
+var _phase_flash: float = 0.0
+var _refund_flash: float = 0.0
+var _crest: Texture2D
+var _crest_id: String = ""
+var _hud_icons: Dictionary = {}
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -82,6 +87,8 @@ func _ready() -> void:
 	_serif = load("res://ui_live_r12/fonts/SourceHanSerifSC-Medium.otf")
 	_sans = load("res://ui_live_r12/fonts/SourceHanSansSC-Regular.otf")
 	_leather = load("res://ui_live_r12/textures/brown_leather.jpg")
+	for icon_name: String in ["guard","focus","wind"]:
+		_hud_icons[icon_name] = load("res://ui_live_r12/icons/"+icon_name+".svg")
 	_gold = profile.gold; _ivory = profile.ivory; _muted = profile.muted; _danger = profile.danger
 	backdrop = ColorRect.new(); backdrop.color = Color(.025,.024,.021,.93); backdrop.mouse_filter = Control.MOUSE_FILTER_STOP; add_child(backdrop)
 	canvas = Control.new(); canvas.size = DESIGN; canvas.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(canvas)
@@ -135,10 +142,7 @@ func attach(manager: Node) -> bool:
 	_connect(combat,"rune_applied",_rune_applied)
 	_connect(combat,"temporal_reset_requested",_clear_feedback)
 	_connect(player.grapple,"state_changed",_grapple_state)
-	_connect(player.grapple,"arrived",func(_anchor: Node3D): notify("牵引落点确认 · 可继续接墙跑"))
-	_connect(player.grapple,"traversed",func(_anchor: Node3D): notify("锚点已兑现 · 路线动量保留"))
-	_connect(player,"wall_bonus_triggered",func(_bonus: StringName): notify("移动收益 · 空中冲刺已恢复"))
-	_connect(player,"slide_jumped",func(): notify("低线兑现 · 滑铲跳已接入下一段"))
+	_connect(player,"wall_bonus_triggered",func(_bonus: StringName): _refund_flash = .45)
 	var timeline = trial.get("timeline_runtime")
 	if is_instance_valid(timeline):
 		_connect(timeline,"shifted",_timeline_shifted)
@@ -200,29 +204,31 @@ func _button(id: String, caption: String, point: Vector2, action: Callable, widt
 	return b
 
 func _build_hud() -> void:
-	_text(hud_layer,"stage","",Rect2(64,40,620,44),29,true)
-	_text(hud_layer,"objective","",Rect2(66,94,680,68),20)
-	_text(hud_layer,"class","",Rect2(65,874,430,48),28,true)
-	_text(hud_layer,"build","",Rect2(67,924,540,66),18)
-	_text(hud_layer,"ward","护契",Rect2(65,1004,82,33),18)
-	_text(hud_layer,"dash","",Rect2(245,1004,230,33),18)
-	_text(hud_layer,"wall","",Rect2(64,789,540,65),20)
-	_text(hud_layer,"skill","",Rect2(1280,868,570,65),25,true,HORIZONTAL_ALIGNMENT_RIGHT)
-	_text(hud_layer,"skill_detail","",Rect2(1240,929,610,64),18,false,HORIZONTAL_ALIGNMENT_RIGHT)
-	_text(hud_layer,"flow","",Rect2(1420,704,430,48),20,true,HORIZONTAL_ALIGNMENT_RIGHT)
-	_text(hud_layer,"focus_hint","",Rect2(1390,1006,460,32),19,false,HORIZONTAL_ALIGNMENT_RIGHT)
-	_text(hud_layer,"resource","",Rect2(620,1004,600,32),18,false,HORIZONTAL_ALIGNMENT_LEFT)
-	_text(hud_layer,"rewind","",Rect2(1310,794,540,64),20,false,HORIZONTAL_ALIGNMENT_RIGHT)
-	_text(hud_layer,"interaction","",Rect2(615,618,690,72),24,true,HORIZONTAL_ALIGNMENT_CENTER)
-	_text(hud_layer,"notice","",Rect2(520,710,880,70),23,true,HORIZONTAL_ALIGNMENT_CENTER)
+	_text(hud_layer,"stage","",Rect2(64,40,540,40),25,true)
+	_text(hud_layer,"objective","",Rect2(66,87,480,32),18,true)
+	_text(hud_layer,"guide","",Rect2(66,132,620,32),19)
+	_text(hud_layer,"class","",Rect2(132,931,400,35),23,true)
+	_text(hud_layer,"build","",Rect2(133,971,420,29),16,true)
+	_text(hud_layer,"ward","",Rect2(65,1004,82,33),18)
+	_text(hud_layer,"dash","",Rect2(299,1005,210,28),17)
+	_text(hud_layer,"wall","",Rect2(64,887,380,27),17)
+	_text(hud_layer,"skill","",Rect2(1400,940,450,37),24,true,HORIZONTAL_ALIGNMENT_RIGHT)
+	_text(hud_layer,"skill_detail","",Rect2(1460,983,390,28),17,false,HORIZONTAL_ALIGNMENT_RIGHT)
+	_text(hud_layer,"flow","",Rect2(67,1034,370,25),15,true)
+	_text(hud_layer,"focus_hint","",Rect2(1200,1008,235,30),17,true,HORIZONTAL_ALIGNMENT_RIGHT)
+	_text(hud_layer,"resource","",Rect2(1470,1026,380,26),15,false,HORIZONTAL_ALIGNMENT_RIGHT)
+	_text(hud_layer,"rewind","",Rect2(1440,889,410,27),17,false,HORIZONTAL_ALIGNMENT_RIGHT)
+	_text(hud_layer,"interaction","",Rect2(660,611,600,40),23,true,HORIZONTAL_ALIGNMENT_CENTER)
+	_text(hud_layer,"notice","",Rect2(640,823,640,38),23,true,HORIZONTAL_ALIGNMENT_CENTER)
 	_text(hud_layer,"boss","",Rect2(610,150,700,52),25,true,HORIZONTAL_ALIGNMENT_CENTER)
 	_text(hud_layer,"boss_detail","",Rect2(610,200,700,38),16,false,HORIZONTAL_ALIGNMENT_CENTER)
-	_text(hud_layer,"timeline","",Rect2(1330,40,520,42),20,true,HORIZONTAL_ALIGNMENT_RIGHT)
-	_text(hud_layer,"timeline_detail","",Rect2(1330,82,520,30),14,false,HORIZONTAL_ALIGNMENT_RIGHT)
-	_text(hud_layer,"time","",Rect2(1690,46,160,40),20,false,HORIZONTAL_ALIGNMENT_RIGHT)
+	_text(hud_layer,"timeline","",Rect2(1550,40,300,38),23,true,HORIZONTAL_ALIGNMENT_RIGHT)
+	_text(hud_layer,"timeline_detail","",Rect2(1550,91,220,27),16,false,HORIZONTAL_ALIGNMENT_RIGHT)
+	_text(hud_layer,"time","",Rect2(1690,139,160,28),17,false,HORIZONTAL_ALIGNMENT_RIGHT)
 	_text(hud_layer,"diagnostics","",Rect2(67,190,700,280),18)
 	labels.objective.modulate = _muted; labels.skill_detail.modulate = _muted; labels.build.modulate = _muted
 	labels.timeline_detail.modulate = _muted; labels.boss_detail.modulate = _muted; labels.resource.modulate = _muted
+	labels.time.hide()
 
 func _process(_delta: float) -> void:
 	var now := Time.get_ticks_usec()
@@ -265,6 +271,7 @@ func _render_page() -> void:
 	if mode == "appearance": _appearance(); return
 	if mode == "settings": _settings(); return
 	if mode == "class": _classes(); return
+	if mode == "help": _help(); return
 	var titles := {"title":"灰烬行者","pause":"稍作停留","death":"契火熄灭","result":"城垣已解封"}
 	_text(page_layer,"page_eyebrow","A S H E N   V O W",Rect2(150,132,800,42),21)
 	_text(page_layer,"page_title",titles.get(mode,"灰烬行者"),Rect2(142,224,1350,126),80,true)
@@ -278,10 +285,14 @@ func _render_page() -> void:
 			_button("begin","踏入城垣",Vector2(126,500),func(): navigate("class"))
 			_button("settings","旅者设置",Vector2(126,588),func(): navigate("settings"))
 			_button("quit","退出",Vector2(126,676),func(): legacy.quit_requested.emit())
+			_button("help","按键与行路",Vector2(940,500),func(): navigate("help"))
 		"pause":
 			_button("resume","继续前行",Vector2(126,500),func(): legacy.resume_requested.emit())
 			_button("settings","旅者设置",Vector2(126,588),func(): navigate("settings"))
 			_button("restart","重新挑战",Vector2(126,676),func(): legacy.restart_requested.emit())
+			_button("help","按键与行路",Vector2(940,500),func(): navigate("help"))
+			_button("replay_guidance","重看入门 · 新旅程",Vector2(940,588),func(): trial.guidance.replay())
+			_button("toggle_guidance","略过指引" if trial.guidance.enabled else "开启指引",Vector2(940,676),func(): trial.guidance.set_enabled(not trial.guidance.enabled); _pending_refresh = true)
 		"death","result":
 			var combat = trial.get("combat")
 			_text(page_layer,"results_time",_time(trial.get("elapsed")),Rect2(150,476,450,80),48,true)
@@ -290,6 +301,20 @@ func _render_page() -> void:
 			_button("restart","再次远征" if mode=="result" else "重新挑战",Vector2(126,705),func(): legacy.restart_requested.emit())
 			_button("class","选择另一条道路",Vector2(126,793),func(): navigate("class"))
 	_text(page_layer,"menu_controls","方向键选择   ·   Enter 确认",Rect2(150,995,800,40),18).modulate = _muted
+	_focus_first()
+
+func _help() -> void:
+	_text(page_layer,"help_title","行路之术",Rect2(150,95,1200,85),58,true)
+	var entries := [
+		["W A S D","移动"],["Space","跳跃 / 蹬墙"],["Shift","冲刺 / 同墙续接"],["Ctrl","滑铲；途中起跳"],
+		["左键 / 右键","攻击 / 弹反或破咒"],["Q","职业技；按住塑形"],["E","牵引 / 交互"],["V","现世 / 残世"],
+		[binding_label(&"focus"),"按住专注"],[binding_label(&"rewind"),"主动回溯（残影契印）"],["R","返回祭坛"],["Esc","暂停"]]
+	for index in entries.size():
+		var x := 155.0+(index/6)*820.0
+		var y := 265.0+(index%6)*87.0
+		_text(page_layer,"help_key_%d"%index,str(entries[index][0]),Rect2(x,y,230,40),25,true).modulate=_gold
+		_text(page_layer,"help_action_%d"%index,str(entries[index][1]),Rect2(x+250,y,500,44),24)
+	_button("back","返回",Vector2(125,920),back,320)
 	_focus_first()
 
 func navigate(page: String) -> void:
@@ -316,7 +341,7 @@ func start_class(index: int) -> void:
 
 func _altar() -> void:
 	_text(page_layer,"altar_title","铭刻契印",Rect2(480,82,960,84),54,true,HORIZONTAL_ALIGNMENT_CENTER)
-	_text(page_layer,"altar_subtitle","第 %d 域 · 动作 / 武器 / 路线三类槽位会改变下一段循环。"%trial.get("stage_number"),Rect2(330,184,1260,55),23,false,HORIZONTAL_ALIGNMENT_CENTER).modulate = _muted
+	_text(page_layer,"altar_subtitle","只取一契，铭于此行。",Rect2(330,184,1260,55),23,true,HORIZONTAL_ALIGNMENT_CENTER).modulate = _muted
 	var options: Array = trial.get("reward_options")
 	var width := 400.0
 	var left := (DESIGN.x-options.size()*width-maxi(0,options.size()-1)*26)/2
@@ -330,7 +355,7 @@ func _altar() -> void:
 		var contract := _rune_contract(rune,id)
 		card.number = index+1; card.title = str(rune.get("name",id)); card.eyebrow = str(contract.get("slot","武器槽"))+" · "+_rune_stage(rune)
 		card.description = str(rune.get("effect",""))
-		card.synergy = "要求：%s\n攻击：%s\n返还：%s · 路线：%s" % [contract.get("move","移动兑现"),contract.get("attack","改变攻击窗口"),contract.get("refund","击杀返还资源"),contract.get("route","开启下一段路线")]
+		card.synergy = str(rune.get("synergy",""))
 		var core: StringName = id
 		var seen: Array[StringName] = []
 		while not CORE_ICONS.has(str(core)) and core!=&"" and core not in seen:
@@ -541,6 +566,8 @@ func _focus_first() -> void:
 	if not choices.is_empty(): choices[0].grab_focus()
 
 func _update_hud(dt: float) -> void:
+	_phase_flash = maxf(0.0,_phase_flash-dt)
+	_refund_flash = maxf(0.0,_refund_flash-dt)
 	var player = trial.get("player"); var combat = trial.get("combat"); var arts = combat.arts
 	focus_state = player.get_node("TemporalFocus").status()
 	rewind_state = player.get_node("PositionRewind").status()
@@ -553,45 +580,54 @@ func _update_hud(dt: float) -> void:
 	hud_layer.modulate.a = profile.hud_opacity
 	var room = trial.get("combat_room")
 	labels.stage.text = "%02d / %02d  %s" % [trial.get("stage_number"),trial.get("stage_count"),room.stage_title]
-	labels.objective.text = room.objective_text()
+	labels.objective.text = "铭刻初契" if not room.altar.used else ("前往封印门" if room.exit_unlocked else "破除守印")
+	labels.guide.text = trial.guidance.cue if is_instance_valid(trial.guidance) else ""
+	labels.guide.modulate = _muted
 	labels["class"].text = player.parkour_profile.display_name
 	var runtime = trial.get("timeline_runtime")
 	_timeline_state = runtime.status() if is_instance_valid(runtime) else {}
 	_update_timeline()
 	var names: PackedStringArray = []
+	var crest_name: String = "flow_blade" if player.parkour_profile.id == &"shade" else "elementalist"
 	for id in combat.runes:
 		var rune: Dictionary = CATALOG.definition(id)
-		if rune.get("core",false): names.append(str(rune.get("name",id)))
-	labels.build.text = " · ".join(names) if not names.is_empty() else "前往祭坛，铭刻你的第一枚契印"
-	labels.dash.text = "冲刺就绪" if player.dash_available else "冲刺已消耗"
-	labels.wall.text = "沿墙疾行 · %.1f 秒 · 余 %d 段"%[player.wall_time_remaining(),player.wall_segments_remaining()] if player.is_wall_running() else ""
+		if rune.get("core",false):
+			if names.is_empty(): crest_name = str(CORE_ICONS.get(str(id),crest_name))
+			names.append(str(rune.get("name",id)))
+	if crest_name != _crest_id:
+		_crest_id = crest_name
+		_crest = load("res://ui_live_r12/icons/"+crest_name+".svg")
+	labels.build.text = (names[0]+("  +%d" %(names.size()-1) if names.size()>1 else "")) if not names.is_empty() else "未铭契印"
+	labels.dash.text = "Shift"
+	labels.dash.modulate = _ivory if player.dash_available else _muted*.65
+	labels.wall.text = ""
 	var focus_key: String = binding_label(&"focus")
 	var focus_phase := str(focus_state.get("phase","idle"))
 	var focus_reserve := clampf(float(focus_state.get("reserve",0.0))/maxf(.001,float(focus_state.get("capacity",1.0))),0.0,1.0)
 	if active:
-		labels.focus_hint.text = "%s · 专注中 · 时流 %d%%" % [focus_key,roundi(focus_reserve*100.0)]
+		labels.focus_hint.text = "%s  专注" % focus_key
 	elif focus_phase in ["exiting","entering"]:
-		labels.focus_hint.text = "%s · 时流回响" % focus_key
+		labels.focus_hint.text = focus_key
 	elif bool(focus_state.get("release_required",false)):
-		labels.focus_hint.text = "松开 %s · 等待时流复归" % focus_key
+		labels.focus_hint.text = "松开 %s" % focus_key
 	elif focus_reserve <= .001:
-		labels.focus_hint.text = "%s · 时流耗尽 · 紧急切换仍可用" % focus_key
+		labels.focus_hint.text = "%s  耗尽" % focus_key
 	else:
-		labels.focus_hint.text = "%s · 时流 %d%% · 空中可用" % [focus_key,roundi(focus_reserve*100.0)]
+		labels.focus_hint.text = "%s  专注" % focus_key
 	labels.focus_hint.modulate = _ivory if active or focus_reserve > .001 else _muted
 	labels.time.text = _time(trial.get("elapsed"))
 	_update_skill(arts)
 	_update_resources(combat,arts,player)
 	_update_rewind()
-	labels.interaction.text = legacy.interaction_label.text
+	labels.interaction.text = _short_interaction(legacy.interaction_label.text)
 	if arts._held>0 and arts._skill_intent in [&"wall",&"well",&"platform",&"anchor"]:
 		var shapes := {&"wall":"石壁",&"well":"风井",&"platform":"浮台",&"anchor":"悬锚"}
-		labels.interaction.text = "松开 Q · 凝成"+str(shapes[arts._skill_intent]) if arts._preview_valid else "此处无法塑形 · 移开遮挡，寻找落点"
+		labels.interaction.text = "松开 Q · "+str(shapes[arts._skill_intent]) if arts._preview_valid else "此处受阻"
 		labels.interaction.modulate = _ivory if arts._preview_valid else _danger
 	else: labels.interaction.modulate = _ivory
 	if player.grapple.has_method("status") and player.grapple.active:
 		var tether:Dictionary=player.grapple.status()
-		labels.interaction.text=("符链出手" if str(tether.phase)=="launch" else "牵引中 · 到达路线出口自动松钩")
+		labels.interaction.text=""
 		labels.interaction.modulate=_ivory
 	labels.boss.text = ""
 	labels.boss_detail.text = ""
@@ -611,6 +647,15 @@ func _update_hud(dt: float) -> void:
 	labels.boss_detail.visible = not has_authoritative_boss_panel
 	labels.diagnostics.text = legacy.telemetry_label.text if legacy.telemetry_label.visible else ""
 
+func _short_interaction(value: String) -> String:
+	if value.is_empty(): return ""
+	if "祭坛" in value or "契印" in value: return "E · 契坛"
+	if "钩锁" in value or "牵引" in value or "锚" in value: return "E · 牵引"
+	if "升降" in value: return "E · 升降机"
+	if "机关" in value: return "E · 机关"
+	if "封印" in value: return "E · 封印"
+	return value.split("\n")[0].split("（")[0].left(20)
+
 func _update_timeline() -> void:
 	if _timeline_state.is_empty():
 		labels.timeline.text = ""
@@ -618,57 +663,54 @@ func _update_timeline() -> void:
 		return
 	var phase_name := "残世" if _timeline_state.get("phase",&"present") == &"remnant" else "现世"
 	var charges := int(_timeline_state.get("charges",0)); var maximum := int(_timeline_state.get("maximum",0))
-	labels.timeline.text = "%s  ·  V 相位切换" % phase_name
+	labels.timeline.text = phase_name
 	var cooldown := float(_timeline_state.get("cooldown",0.0))
 	var readiness := "可切换" if bool(_timeline_state.get("ready",false)) else ("冷却 %.1fs" % cooldown if cooldown>0.0 else "相位耗尽")
-	labels.timeline_detail.text = "相位 %d / %d  ·  %s  ·  独立于时流" % [charges,maximum,readiness]
+	labels.timeline_detail.text = str(_timeline_state.get("binding","V"))
 	labels.timeline.modulate = Color("c59ce7") if phase_name == "残世" else _gold
 
 func _update_resources(combat: Node,arts: Node,player: Node) -> void:
 	_flow_value = float(combat.flow); _flow_capacity = maxf(1.0,float(combat.flow_capacity))
 	var flow_name := "锋势" if player.parkour_profile.id == &"shade" else "流势"
-	var threshold := "强化攻击就绪" if _flow_value >= 35.0 else "移动继续积累"
-	labels.flow.text = "%s  %d / %d  ·  %s" % [flow_name,roundi(_flow_value),roundi(_flow_capacity),threshold]
-	labels.resource.text = arts.status().split("\n")[0]
+	labels.flow.text = flow_name if _flow_value>0 else ""
+	labels.resource.text = str(roundi(arts.mana)) if player.parkour_profile.id == &"arcanist" else ""
 	labels.flow.modulate = _gold if _flow_value >= 35.0 else _ivory
 
 func _update_skill(arts: Node) -> void:
 	var action: StringName = arts.selected()
 	var names := {&"counter":"追身返刃",&"hunt":"空中处决",&"sweep":"掠地横斩",&"wall":"塑形 · 石壁",&"well":"塑形 · 风井",&"platform":"塑形 · 浮台",&"anchor":"塑形 · 悬锚",&"seal":"封印引爆",&"storm":"风暴借势"}
-	labels.skill.text = "Q · "+str(names.get(action,"等待破势时机"))
-	labels.skill_detail.text = "基础攻击始终可用"
-	if action in [&"wall",&"well",&"platform",&"anchor"]: labels.skill_detail.text = "按住预览，松开塑形 · 法力 %d"%arts.mana
-	elif action==&"seal": labels.skill_detail.text = "攻击自动刻印 · %d 枚符印"%arts.marks.size()+ ("\n按住 Q 预览塑形" if arts.has(&"arcane_shape") else "")
-	elif action==&"storm": labels.skill_detail.text = "空中命中维持机动 · 法力 %d"%arts.mana
-	elif action==&"counter": labels.skill_detail.text = "弹反机会 · %.1f 秒"%arts.counter_left
-	elif action==&"hunt": labels.skill_detail.text = "锁定机会 · %.1f 秒"%arts.lock_left
-	elif action==&"sweep": labels.skill_detail.text = "滑铲跳切入 · %.1f 秒"%arts.slide_window
-	if arts.cooldown>0: labels.skill_detail.text = "恢复中 · %.1f 秒"%arts.cooldown
+	labels.skill.text = "Q  "+str(names[action]) if names.has(action) else ""
+	labels.skill_detail.text = ""
+	if action==&"seal" and arts.marks.size()>0: labels.skill_detail.text = "%d 枚契印"%arts.marks.size()
+	elif action==&"counter": labels.skill_detail.text = "%.1f"%arts.counter_left
+	elif action==&"hunt": labels.skill_detail.text = "%.1f"%arts.lock_left
+	elif action==&"sweep": labels.skill_detail.text = "%.1f"%arts.slide_window
+	if arts.cooldown>0: labels.skill_detail.text = "%.1f"%arts.cooldown
 
 func _update_rewind() -> void:
 	labels.rewind.visible = rewind_state.get("unlocked",false)
 	if not labels.rewind.visible: return
 	var key: String = binding_label(&"rewind")
-	if float(rewind_state.cooldown)>0: labels.rewind.text = "%s · 回溯恢复 %.1f 秒"%[key,rewind_state.cooldown]
-	elif not rewind_state.has_anchor: labels.rewind.text = "%s · 正在留下足迹"%key
-	elif not rewind_state.path_valid: labels.rewind.text = "%s · %s"%[key,REASONS.get(str(rewind_state.path_reason),"返回路径受阻")]
-	else: labels.rewind.text = "%s · 回溯 %.1f 秒前"%[key,rewind_state.anchor_age]
+	if float(rewind_state.cooldown)>0: labels.rewind.text = "%s  回溯  %.1f"%[key,rewind_state.cooldown]
+	elif not rewind_state.has_anchor: labels.rewind.text = "%s  留影"%key
+	elif not rewind_state.path_valid: labels.rewind.text = "%s  受阻"%key
+	else: labels.rewind.text = "%s  回溯"%key
 	labels.rewind.modulate = _ivory if rewind_state.ready else _muted
 
 func _focus_changed(_previous: StringName, _current: StringName, _reason: StringName) -> void:
 	if is_instance_valid(trial): focus_state = trial.get("player").get_node("TemporalFocus").status()
 
 func _timeline_shifted(_previous: StringName, current: StringName) -> void:
-	notify("已切换至%s · 保留当前速度与落点责任" % ("残世" if current == &"remnant" else "现世"))
+	_phase_flash = .55
 
 func _timeline_blocked(reason: StringName) -> void:
-	if reason == &"empty": notify("相位已耗尽 · 通过墙跑、滑铲跳或击杀返还")
-	elif reason == &"cooldown": notify("相位正在冷却")
+	if reason == &"empty": notify("相位耗尽")
+	elif reason == &"occupied": notify("彼岸受阻")
 
 func _timeline_resource_changed(charges: int, maximum: int) -> void:
 	var signature := "%d/%d" % [charges,maximum]
 	if not _last_resource_notice.is_empty() and signature != _last_resource_notice and charges > int(_last_resource_notice.split("/")[0]):
-		notify("相位返还 · %s" % signature)
+		_refund_flash = .45
 	_last_resource_notice = signature
 
 func _flow_changed(value: float,capacity: float) -> void:
@@ -678,8 +720,7 @@ func _rune_applied(id: StringName) -> void:
 	notify("契印生效 · %s" % CATALOG.title(id))
 
 func _grapple_state(phase: StringName, reason: StringName) -> void:
-	if phase == &"launch": notify("符链命中 · 短促牵引")
-	elif phase == &"detached" and reason in [&"arrived",&"jump",&"dash"]: notify("牵引兑现 · 冲量保留")
+	if phase == &"detached" and reason == &"blocked": notify("符链受阻")
 
 func _rewind_changed(state: Dictionary) -> void:
 	rewind_state = state.duplicate(true)
@@ -699,7 +740,7 @@ func _hurt(_amount: int) -> void:
 
 func _hit(_target: Node3D,_point: Vector3,defeated: bool) -> void:
 	_hit_left = .19; _kill = defeated
-	if defeated: notify("击杀兑现 · 冲刺与相位资源返还")
+	if defeated: _refund_flash = .45
 
 func _clear_feedback() -> void:
 	focus_state.clear(); rewind_state.clear(); _notice_left=0; _hurt_left=0; _hit_left=0; _focus_level=0
@@ -726,15 +767,41 @@ func _draw_decals() -> void:
 		canvas.draw_polygon(PackedVector2Array([Vector2(1920,745),Vector2(1215,890),Vector2(1180,1080),Vector2(1920,1080)]),PackedColorArray([clear,clear,clear,dark]))
 		canvas.draw_circle(Vector2(960,540),2.0,_ivory)
 		var health: int = trial.get("combat").health
-		for i in range(2): _diamond(Vector2(167+i*35,1020),9,_gold if health>i else Color("51493d"),2)
-		canvas.draw_line(Vector2(65,859),Vector2(452,859),Color(_gold,.65),1,true)
-		canvas.draw_line(Vector2(1600,853),Vector2(1850,853),Color(_gold,.45),1,true)
-		var phase_ratio := float(_timeline_state.get("charges",0))/maxf(1.0,float(_timeline_state.get("maximum",1)))
-		_meter(Rect2(1330,116,520,7),phase_ratio,Color("c59ce7") if _timeline_state.get("phase",&"present")==&"remnant" else _gold)
-		_meter(Rect2(1420,762,430,7),_flow_value/maxf(1.0,_flow_capacity),_gold if _flow_value>=35.0 else _ivory)
+		if _crest != null:
+			canvas.draw_texture_rect(_crest,Rect2(61,933,61,61),false,Color(_ivory,.82))
+		for i in range(2):
+			var point := Vector2(78+i*39,1018)
+			canvas.draw_texture_rect(_hud_icons.guard,Rect2(point-Vector2.ONE*16,Vector2.ONE*32),false,_gold if health>i else Color("473f38"))
+		var player = trial.get("player")
+		canvas.draw_texture_rect(_hud_icons.wind,Rect2(258,1001,34,34),false,Color(_ivory,1.0 if player.dash_available else .22))
+		canvas.draw_line(Vector2(132,925),Vector2(350,925),Color(_gold,.4),1,true)
+		canvas.draw_line(Vector2(1580,928),Vector2(1850,928),Color(_gold,.4),1,true)
+		# Discrete carved seals represent phase charges; focus has a separate
+		# hourglass ring. Nothing shares a misleading combined resource bar.
+		var phase_color := Color("bca3c7") if _timeline_state.get("phase",&"present")==&"remnant" else _gold
+		var maximum := int(_timeline_state.get("maximum",2))
+		for index in maximum:
+			var point := Vector2(1839-index*29,104)
+			var available := index < int(_timeline_state.get("charges",0))
+			_diamond(point,8,Color(phase_color,1.0 if available else .24),1.6)
+			if available: _diamond(point,3,phase_color,1.2)
+			if _phase_flash>0: _diamond(point,10+(1-_phase_flash/.55)*8,Color(phase_color,_phase_flash),1)
+		if _flow_value>.01:
+			_meter(Rect2(126,1047,227,4),_flow_value/maxf(1.0,_flow_capacity),_gold if _flow_value>=35.0 else _ivory)
+		var focus_ratio := float(focus_state.get("reserve",0))/maxf(.001,float(focus_state.get("capacity",1)))
+		var focus_center := Vector2(1458,1021)
+		canvas.draw_texture_rect(_hud_icons.focus,Rect2(focus_center-Vector2.ONE*16,Vector2.ONE*32),false,Color(_ivory,.85))
+		canvas.draw_arc(focus_center,24,-PI*.5,TAU-PI*.5,40,Color(_gold,.2),2,true)
+		if focus_ratio>0: canvas.draw_arc(focus_center,24,-PI*.5,-PI*.5+TAU*focus_ratio,40,Color("a6b6ba"),2,true)
 		var arts = trial.get("combat").arts
 		var resource_ratio := float(arts.mana)/100.0 if trial.get("player").parkour_profile.id==&"arcanist" else float(arts.edge)
-		_meter(Rect2(620,1042,600,6),clampf(resource_ratio,0.0,1.0),Color("78dfbf") if trial.get("player").parkour_profile.id==&"arcanist" else Color("dd987d"))
+		_meter(Rect2(1555,1045,244,5),clampf(resource_ratio,0.0,1.0),Color("829eaa") if trial.get("player").parkour_profile.id==&"arcanist" else Color("b99368"))
+		if player.is_wall_running():
+			canvas.draw_arc(Vector2(960,540),39,PI*.65,PI*1.35,20,Color(_gold,.3),2,true)
+			var remaining := clampf(player.wall_time_remaining()/maxf(.01,player.parkour_profile.wall_duration),0,1)
+			canvas.draw_arc(Vector2(960,540),39,PI*.65,PI*.65+PI*.7*remaining,20,Color(_ivory,.8),2,true)
+		if _refund_flash>0:
+			_diamond(Vector2(275,1018),20+(1-_refund_flash/.45)*8,Color(_gold,_refund_flash),1.2)
 		if _hurt_left>0: canvas.draw_rect(Rect2(Vector2.ZERO,DESIGN),Color(_danger,minf(.35,_hurt_left)),false,10)
 		if _hit_left>0:
 			for x in [-1,1]:

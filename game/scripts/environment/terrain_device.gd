@@ -74,6 +74,7 @@ func get_hit_point() -> Vector3:return global_position
 func receive_hit(damage: int,_direction: Vector3) -> bool:return damage>0 and activate()
 
 func activate() -> bool:
+	if not preload("res://scripts/run/timeline_collision.gd").active(self):return false
 	if _tuning==null or not is_inside_tree() or not can_process() or get_tree().paused or not is_instance_valid(player) or not player.control_enabled:return false
 	if is_instance_valid(linked_device):return linked_device.activate()
 	if kind==&"lift":
@@ -101,7 +102,8 @@ func sync_collision_state(room_enabled: bool) -> void:
 	_room_enabled=room_enabled
 	if is_instance_valid(_barrier):
 		for shape: CollisionShape3D in _barrier.find_children("*","CollisionShape3D",true,false):
-			shape.set_deferred("disabled",not room_enabled or used)
+			shape.set_meta("gameplay_disabled",used)
+			shape.set_deferred("disabled",not room_enabled or used or not preload("res://scripts/run/timeline_collision.gd").active(self))
 
 func reset_device() -> void:
 	if is_instance_valid(linked_device):
@@ -133,6 +135,7 @@ func _update_label() -> void:
 		_label.text="通路已打开" if used else {&"bridge":"E / 攻击 · 转动栈桥",&"vent":"E / 攻击 · 蒸汽阀",&"breakable":"击碎封板",&"pulse":"高位扫光 · 滑铲穿过"}.get(kind,"机关")
 
 func _physics_process(delta: float) -> void:
+	if not preload("res://scripts/run/timeline_collision.gd").active(self):return
 	if is_instance_valid(linked_device):
 		_update_label()
 		return

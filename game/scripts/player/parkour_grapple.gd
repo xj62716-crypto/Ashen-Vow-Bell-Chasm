@@ -69,16 +69,9 @@ func can_begin(target: Node3D) -> bool:
 	return distance >= 2.0 and distance <= RANGE and not _cable_blocked(player.camera.global_position,target)
 
 func target_phase_active(target: Node3D) -> bool:
-	# A construct's logic root is not required to own its rendered mesh. Generic
-	# `is_visible_in_tree()` therefore rejects valid authored anchors when their
-	# art is supplied by a child or a batched sibling. Only explicit timeline
-	# ownership gates grapple acquisition; ordinary anchors remain interactive.
-	var cursor: Node = target
-	while cursor != null:
-		if cursor.has_meta("timeline_phase") and cursor is Node3D and not (cursor as Node3D).visible:
-			return false
-		cursor = cursor.get_parent()
-	return true
+	# The presentation bridge hides placeholder roots and draws separate skins.
+	# Eligibility follows gameplay phase ownership, never placeholder visibility.
+	return preload("res://scripts/run/timeline_collision.gd").active(target)
 
 ## Small aim tolerance for high-speed acquisition. The room keeps nearby altar /
 ## device priority and calls this only when its exact interaction ray missed.
@@ -107,6 +100,8 @@ func begin(target: Node3D) -> bool:
 	if player.crouched:
 		player._end_slide()
 		if player.crouched: return false
+	var combat:=player.get_node_or_null("Combat") as PlayerCombat
+	if combat and combat.arts:combat.arts.cancel_execution(&"grapple")
 	anchor = target
 	active = true
 	age = 0.0

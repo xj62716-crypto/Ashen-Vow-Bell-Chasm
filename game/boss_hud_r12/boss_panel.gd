@@ -106,9 +106,9 @@ func _process(delta:float)->void:
 	var target_name:String="熔炉核心" if chosen.kind==&"forge" else "束缚锁链"
 	match state:
 		&"shielded":status.text="击碎%s  ·  剩余 %d"%[target_name,remaining];detail.text="护盾尚存 · 攻击本体无效" if notice_left>0 else "本体受护盾保护"
-		&"exposed":status.text="核心暴露  ·  攻击本体";detail.text="%.1f 秒后重新封闭"%seconds
-		&"terrain_warning":status.text="地台即将崩塌";detail.text="%.1f 秒  ·  跃入风井 / 牵引浮墙"%seconds
-		&"transition":status.text="封印破裂";detail.text=""
+		&"exposed":status.text="本体可伤";detail.text="%.1f 秒"%seconds
+		&"terrain_warning":status.text="地台崩塌";detail.text="%.1f 秒  ·  走高线"%seconds
+		&"transition":status.text="阶段转移";detail.text=""
 		&"defeated":status.text="已击败";detail.text=""
 		_:status.text="";detail.text=""
 	visible=not paused and player.control_enabled and int(manager.get("phase"))==1

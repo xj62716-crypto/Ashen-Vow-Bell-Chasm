@@ -5,6 +5,15 @@ const MeshSanitizer=preload("res://scripts/environment/environment_mesh_sanitize
 static var _assets: Dictionary = {}
 
 static func asset(parent: Node3D, name: String, position: Vector3, scale_value: Vector3 = Vector3.ONE, yaw: float = 0.0) -> Node3D:
+	if OS.has_feature("headless"):
+		var placeholder := Node3D.new()
+		placeholder.name = "HeadlessDressing_%s" % name
+		placeholder.position = position
+		placeholder.scale = scale_value
+		placeholder.rotation.y = yaw
+		placeholder.set_meta("static_dressing", true)
+		parent.add_child(placeholder)
+		return placeholder
 	if not _assets.has(name):
 		# The chosen dark stone arch replaces the older bright, foil-like bay.
 		_assets[name] = load("res://environment_live/modules/C02_pointed_arch.scn" if name=="gothic_bay" else "res://assets/models/blender/"+name+".glb")
@@ -13,6 +22,12 @@ static func asset(parent: Node3D, name: String, position: Vector3, scale_value: 
 	model.scale = scale_value
 	model.rotation.y = yaw
 	parent.add_child(model)
+	# Dressing is presentation only. Traversal collision is authored by the
+	# room's route bodies; imported arch/roof scenes must not create invisible
+	# blockers or phase-independent shortcuts around those surfaces.
+	for collider: CollisionObject3D in model.find_children("*", "CollisionObject3D", true, false):
+		collider.collision_layer = 0
+		collider.collision_mask = 0
 	model.set_meta("static_dressing",true)
 	return model
 
@@ -28,7 +43,7 @@ static func batch_static(parent: Node3D) -> void:
 		var dynamic: bool=false
 		while ancestor!=parent and ancestor!=null:
 			authored=authored or ancestor.has_meta("static_dressing")
-			dynamic=dynamic or ancestor is AnimatableBody3D or ancestor is LanternAcolyte or ancestor is TerrainDevice
+			dynamic=dynamic or ancestor is AnimatableBody3D or ancestor is LanternAcolyte or ancestor is TerrainDevice or ancestor.has_meta("timeline_phase") or ancestor.has_meta("interactive_visual")
 			if ancestor is Node3D and not ancestor.visible:dynamic=true
 			ancestor=ancestor.get_parent()
 		if not authored or dynamic:continue
@@ -50,6 +65,8 @@ static func batch_static(parent: Node3D) -> void:
 		parent.add_child(batch)
 
 static func paving(parent: Node3D, center: Vector3, size: Vector2) -> void:
+	if OS.has_feature("headless"):
+		return
 	var nx: int = maxi(1,ceili(size.x/2))
 	var nz: int = maxi(1,ceili(size.y/2))
 	var tile := Vector2(size.x/nx,size.y/nz)
@@ -83,7 +100,7 @@ static func batch_primitives(parent: Node3D) -> void:
 		var ancestor: Node=part
 		var dynamic: bool=false
 		while ancestor!=null and ancestor!=parent:
-			dynamic=dynamic or ancestor is LanternAcolyte or ancestor is RunAltar or ancestor is RunMechanism or ancestor is TerrainDevice or ancestor is RiftConstruct or ancestor is AnimatableBody3D or ancestor.has_meta("interactive_visual")
+			dynamic=dynamic or ancestor is LanternAcolyte or ancestor is RunAltar or ancestor is RunMechanism or ancestor is TerrainDevice or ancestor is RiftConstruct or ancestor is AnimatableBody3D or ancestor.has_meta("interactive_visual") or ancestor.has_meta("timeline_phase")
 			if ancestor is Node3D and not ancestor.visible:dynamic=true
 			ancestor=ancestor.get_parent()
 		if dynamic:continue
@@ -127,10 +144,13 @@ static func build(parent: Node3D, stage: int) -> void:
 		asset(parent,"gothic_bay",Vector3(0,1,-44),Vector3(2.5,2.5,1))
 
 static func brazier(parent: Node3D, point: Vector3) -> void:
+	if OS.has_feature("headless"):
+		return
 	var anchored := point
 	# Props are authored next to route beats, but some beats are deliberately
 	# voids. Refuse to spawn a brazier without a real collision surface below it.
 	var supported := false
+	var support_body:Node3D
 	for body: Node in parent.find_children("*","StaticBody3D",true,false):
 		for child: Node in body.get_children():
 			if not child is CollisionShape3D or not child.shape is BoxShape3D: continue
@@ -139,15 +159,25 @@ static func brazier(parent: Node3D, point: Vector3) -> void:
 			if absf(local.x)<=bounds.x*.5 and absf(local.z)<=bounds.z*.5 and absf(local.y-bounds.y*.5)<1.0:
 				anchored.y=body.global_position.y+bounds.y*.5+.03
 				supported=true
+				support_body=body
 				break
 		if supported: break
 	if parent.is_inside_tree():
 		var query := PhysicsRayQueryParameters3D.create(point+Vector3.UP*5.0,point-Vector3.UP*30.0,1)
 		var hit := parent.get_world_3d().direct_space_state.intersect_ray(query)
-		if not hit.is_empty():
+		if not hit.is_empty() and Vector3(hit.normal).y>.65:
 			anchored.y=float(hit.position.y)+.03
 			supported=true
+			support_body=hit.collider as Node3D
 	if not supported: return
+	# Flame, model, light and plinth belong to the real supporting floor. Phase
+	# changes and Boss collapse cannot leave a burning prop suspended over a void.
+	if is_instance_valid(support_body):
+		var holder:=Node3D.new();holder.name="SupportedBrazier"
+		holder.set_meta("supported_prop",true)
+		support_body.add_child(holder)
+		holder.global_position=parent.to_global(anchored)
+		parent=holder;anchored=Vector3.ZERO
 	# Every flame is grounded by a visible plinth and a short iron bracket.
 	# The support is deliberately separate from the imported brazier origin so
 	# Blender pivot changes cannot leave a floating prop in a route screenshot.

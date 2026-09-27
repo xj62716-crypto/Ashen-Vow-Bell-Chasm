@@ -32,6 +32,7 @@ var _visual_age: float=0
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_PAUSABLE
+	preload("res://scripts/run/timeline_collision.gd").capture_phase(self,source_enemy)
 	add_to_group("friendly_projectiles" if friendly else "hostile_projectiles")
 	cast = ShapeCast3D.new()
 	var sphere := SphereShape3D.new()
@@ -75,6 +76,7 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	if _contact_reported or is_queued_for_deletion(): return
+	if preload("res://scripts/run/timeline_collision.gd").cancel_if_inactive(self):return
 	lifetime -= delta
 	if lifetime <= 0.0:
 		queue_free()

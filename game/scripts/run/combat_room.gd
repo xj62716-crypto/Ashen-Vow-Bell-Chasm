@@ -35,6 +35,8 @@ var platform_extents: Dictionary={}
 ## Named, inspectable sections used by route tests and later encounter tuning.
 ## These are runtime facts about formal geometry, not separate preview cells.
 var signature_sections: Dictionary={}
+## Explicit authored route contracts used by route checks and encounter tuning.
+var timeline_contracts: Array[Dictionary]=[]
 ## Set by MovementTrial; kept here so authored phase geometry and collision
 ## share the same room lifecycle as enemies, altars and checkpoints.
 var timeline_runtime: TimelineRuntime
@@ -42,6 +44,8 @@ var timeline_phase: StringName = &"present"
 ## Built connection graph, including intermediate rest platforms. Coordinates
 ## are room-local floor points; runtime/editor inspection shares this record.
 var route_links: Array[Dictionary]=[]
+var _timeline_nodes: Array[Node] = []
+var _timeline_shapes: Array[CollisionShape3D] = []
 var exit_unlocked: bool = false
 var _required_enemies: Array[LanternAcolyte] = []
 var _bridge_open: bool = false
@@ -87,7 +91,12 @@ func _build(number: int) -> bool:
 	_collisions_suspended = false
 	if is_instance_valid(geometry):
 		remove_child(geometry)
-		geometry.queue_free()
+		# A queued free leaves the previous room's StaticBody3D instances in the
+		# physics broadphase until the next frame. During a retry or stage rebuild
+		# that stale timeline wall can block the new route and overlap the player.
+		# The room owns this subtree exclusively, so release it synchronously before
+		# constructing the replacement geometry.
+		geometry.free()
 	enemies.clear()
 	_required_enemies.clear()
 	exit_unlocked = false
@@ -105,6 +114,9 @@ func _build(number: int) -> bool:
 	platform_extents.clear()
 	route_links.clear()
 	signature_sections.clear()
+	timeline_contracts.clear()
+	_timeline_nodes.clear()
+	_timeline_shapes.clear()
 	_bridge = null
 	geometry = Node3D.new()
 	geometry.name = "StageGeometry"
@@ -123,7 +135,10 @@ func _build(number: int) -> bool:
 		CitadelExpansion.build(self)
 	_spawn_configured_encounters()
 	altar = RunAltar.new()
-	altar.position = Vector3(2.4,0,5.0) if stage == 1 else Vector3(-1.6,0,4.5)
+	# Every altar is a real checkpoint and must sit on an authored walkable
+	# surface.  Keeping the placement in this room builder prevents a mesh pivot
+	# change or a route extension from leaving the checkpoint over the void.
+	altar.position = _grounded_platform_point(Vector3(2.4,0,5.0) if stage == 1 else Vector3(-1.6,0,4.5))
 	geometry.add_child(altar)
 	altar.requested.connect(func(device: RunAltar): altar_requested.emit(device))
 	altars.push_front(altar)
@@ -133,12 +148,17 @@ func _build(number: int) -> bool:
 	_scenery()
 	if stage!=1:CitadelDressing.build(geometry,stage)
 	IntegratedEnvironmentDressing.decorate(self)
-	CitadelDressing.batch_static(geometry)
-	CitadelDressing.batch_primitives(geometry)
-	# Timeline architecture is added after batching so phase-exclusive meshes,
-	# lights and collisions cannot be folded into a static batch and lose their
-	# present/remnant visibility boundary.
+	# Phase ownership must exist BEFORE static batching. Otherwise a hidden
+	# platform leaves its baked paving visible after its collision is removed.
 	TimelineArchitecture.build(self)
+	_cache_timeline_graph()
+	# Headless physics suites repeatedly rebuild all three dressed rooms. Keep
+	# their authored meshes and collision intact while avoiding a costly render
+	# batching pass that has no effect on collision or route reachability. The
+	# normal windowed game still batches the same assets for the shipped visual.
+	if not OS.has_feature("headless"):
+		CitadelDressing.batch_static(geometry)
+		CitadelDressing.batch_primitives(geometry)
 	var environment: Environment = get_tree().current_scene.get_node("WorldEnvironment").environment if get_tree().current_scene != null else null
 	if environment != null:
 		var sky := Sky.new()
@@ -163,17 +183,51 @@ func apply_timeline_phase(next_phase: StringName) -> void:
 	## disables its collision shapes as well as its visible mesh, so the player
 	## never receives an invisible wall or a visual-only shortcut.
 	timeline_phase = next_phase if next_phase in [&"present", &"remnant"] else &"present"
+	# Remove attacks from the departed world in the same transaction. Waiting
+	# for their physics callbacks leaves one-frame invisible/visible threats.
+	for group in ["friendly_projectiles","hostile_projectiles"]:
+		for effect in get_tree().get_nodes_in_group(group):
+			if effect is Node3D and effect.has_meta("timeline_phase") and StringName(effect.get_meta("timeline_phase"))!=timeline_phase:
+				effect.hide();effect.set_physics_process(false);effect.queue_free()
 	if is_instance_valid(geometry):
-		for node: Node in geometry.find_children("*", "Node", true, false):
+		var tagged_nodes: Array[Node] = _timeline_nodes if not _timeline_nodes.is_empty() else geometry.find_children("*", "Node", true, false)
+		for node: Node in tagged_nodes:
 			if not node.has_meta("timeline_phase"):
 				continue
 			var active := StringName(node.get_meta("timeline_phase")) == timeline_phase
+			if node is LanternAcolyte: active = active and node.health > 0
+			# Shape disabling is authoritative for queries, while the layer toggle
+			# also removes an already-broadphase body in the same transaction. This
+			# prevents a just-departed timeline wall from stealing the player's
+			# momentum for one or more physics frames after a route handoff.
+			if node is CollisionObject3D and node.has_meta("timeline_phase"):
+				if not node.has_meta("timeline_base_layer"):
+					node.set_meta("timeline_base_layer",node.collision_layer)
+					node.set_meta("timeline_base_mask",node.collision_mask)
+				node.collision_layer = int(node.get_meta("timeline_base_layer")) if active else 0
+				node.collision_mask = int(node.get_meta("timeline_base_mask")) if active else 0
 			if node is CanvasItem or node is Node3D:
-				node.visible = active
+				node.visible = active and not node.get_meta("presentation_replaced",false) and not node.get_meta("gameplay_hidden",false)
 			if node is LanternAcolyte:
 				node.active = active and enabled
-			for shape: CollisionShape3D in node.find_children("*", "CollisionShape3D", true, false):
-				shape.set_deferred("disabled", not active or not enabled)
+		var tagged_shapes: Array[CollisionShape3D] = _timeline_shapes if not _timeline_shapes.is_empty() else geometry.find_children("*", "CollisionShape3D", true, false)
+		for shape: CollisionShape3D in tagged_shapes:
+			var shape_phase := preload("res://scripts/run/timeline_collision.gd").phase_of(shape)
+			if shape_phase not in [&"present", &"remnant"]:
+				continue
+			if not shape.has_meta("timeline_initial_disabled"):shape.set_meta("timeline_initial_disabled",shape.disabled)
+			var gameplay_disabled:bool=shape.get_meta("gameplay_disabled",shape.get_meta("timeline_initial_disabled",false))
+			var should_disable := not preload("res://scripts/run/timeline_collision.gd").active(shape) or gameplay_disabled
+			# Update the authoritative flag immediately after a room rebuild.  The
+			# deferred write remains for the physics-safe end-of-frame sync, but
+			# relying on it alone can leave a freshly rebuilt phase wall collidable
+			# for the first route frames.
+			shape.disabled = should_disable
+			shape.set_deferred("disabled", should_disable)
+		# Imported modules can contain a nested CollisionObject3D below a phase
+		# holder.  Propagate the phase to that owner as well as the shape; relying
+		# only on the holder's visibility leaves a stale body in the broadphase.
+		_sync_timeline_collision_owners()
 	var scene: Node = get_tree().current_scene
 	var environment: Environment = null
 	if scene != null:
@@ -231,6 +285,47 @@ func apply_timeline_phase(next_phase: StringName) -> void:
 			var base_energy := float(light.get_meta("present_energy"))
 			light.light_energy = base_energy * (.50 if timeline_phase == &"remnant" else 1.0)
 
+func prepare_timeline_phase(next_phase: StringName) -> void:
+	## Arms the destination world during a wall-run handoff. The current world
+	## remains visible and collidable until the player leaves its surface; this
+	## prevents a phase switch from deleting the wall under the player's hands
+	## while still making the receiving platform physically real before the kick.
+	var target := next_phase if next_phase in [&"present", &"remnant"] else &"present"
+	if not is_instance_valid(geometry) or target == timeline_phase:
+		return
+	var tagged_nodes: Array[Node] = _timeline_nodes if not _timeline_nodes.is_empty() else geometry.find_children("*", "Node", true, false)
+	for node: Node in tagged_nodes:
+		if not node.has_meta("timeline_phase"):
+			continue
+		if StringName(node.get_meta("timeline_phase")) != target:
+			continue
+		if node is CollisionObject3D:
+			if not node.has_meta("timeline_base_layer"):
+				node.set_meta("timeline_base_layer",node.collision_layer)
+				node.set_meta("timeline_base_mask",node.collision_mask)
+			node.collision_layer = int(node.get_meta("timeline_base_layer"))
+			node.collision_mask = int(node.get_meta("timeline_base_mask"))
+		if node is CanvasItem or node is Node3D:
+			node.visible = not node.get_meta("presentation_replaced", false) and not node.get_meta("gameplay_hidden", false)
+		if node is LanternAcolyte:
+			node.active = enabled
+	var tagged_shapes: Array[CollisionShape3D] = _timeline_shapes if not _timeline_shapes.is_empty() else geometry.find_children("*", "CollisionShape3D", true, false)
+	for shape: CollisionShape3D in tagged_shapes:
+		if preload("res://scripts/run/timeline_collision.gd").phase_of(shape) == target:
+			# A phase holder may contain an imported StaticBody3D several levels
+			# below it.  Enabling only the shape leaves that owner on layer zero,
+			# so the receiving wall looks present but cannot be touched during the
+			# wall-run handoff.  Arm the owner and the shape together; apply_phase()
+			# will atomically retire the old phase after the player leaves the wall.
+			var owner := shape.get_parent() as CollisionObject3D
+			if owner != null:
+				if not owner.has_meta("timeline_base_layer"):
+					owner.set_meta("timeline_base_layer",owner.collision_layer)
+					owner.set_meta("timeline_base_mask",owner.collision_mask)
+				owner.collision_layer = int(owner.get_meta("timeline_base_layer"))
+				owner.collision_mask = int(owner.get_meta("timeline_base_mask"))
+			shape.set_deferred("disabled", false)
+
 func _platform(center: Vector3, size: Vector2) -> Node3D:
 	platform_extents[center]=size
 	var body := DemoGeometry.box(geometry,center-Vector3.UP*0.6,Vector3(size.x,1.2,size.y),_floor,true)
@@ -238,8 +333,95 @@ func _platform(center: Vector3, size: Vector2) -> Node3D:
 	body.set_meta("route_platform_size", size)
 	CitadelDressing.paving(body,Vector3.UP*.6,size)
 	for end: float in [-1,1]:
-		DemoGeometry.box(geometry,center+Vector3(0,.055,end*(size.y/2-.07)),Vector3(size.x,.025,.055),_accent)
+		DemoGeometry.box(body,Vector3(0,.655,end*(size.y/2-.07)),Vector3(size.x,.025,.055),_accent)
 	return body
+
+func _grounded_platform_point(point: Vector3, margin: float = .95) -> Vector3:
+	## Clamp a gameplay prop to the nearest authored platform.  Props are placed
+	## during room construction, before physics has a reliable broadphase, so a
+	## data-driven platform lookup is the authoritative grounding source.
+	var best_center := Vector3.INF
+	var best_size := Vector2.ZERO
+	var best_score := INF
+	for candidate_variant in platform_extents.keys():
+		var candidate := Vector3(candidate_variant)
+		var size: Vector2 = platform_extents[candidate_variant]
+		var dx := absf(point.x-candidate.x)
+		var dz := absf(point.z-candidate.z)
+		var inside := dx <= maxf(.2,size.x*.5-margin) and dz <= maxf(.2,size.y*.5-margin)
+		var score := Vector2(maxf(0.0,dx-size.x*.5),maxf(0.0,dz-size.y*.5)).length_squared()+pow(point.y-candidate.y,2.0)
+		if inside:
+			score = point.distance_squared_to(candidate)-10000.0
+		if score < best_score:
+			best_score=score
+			best_center=candidate
+			best_size=size
+	if not best_center.is_finite():
+		return point
+	var inset_x := maxf(.2,best_size.x*.5-margin)
+	var inset_z := maxf(.2,best_size.y*.5-margin)
+	return Vector3(clampf(point.x,best_center.x-inset_x,best_center.x+inset_x),best_center.y,clampf(point.z,best_center.z-inset_z,best_center.z+inset_z))
+
+func platform_at(center: Vector3) -> Node3D:
+	for node: Node in geometry.find_children("*", "Node3D", true, false):
+		if node.has_meta("route_platform_center") and Vector3(node.get_meta("route_platform_center")).is_equal_approx(center):
+			return node as Node3D
+	return null
+
+func _cache_timeline_graph() -> void:
+	_timeline_nodes.clear()
+	_timeline_shapes.clear()
+	if not is_instance_valid(geometry):
+		return
+	for node: Node in geometry.find_children("*", "Node", true, false):
+		if node.has_meta("timeline_phase"):
+			_timeline_nodes.append(node)
+	for shape: CollisionShape3D in geometry.find_children("*", "CollisionShape3D", true, false):
+		var phase := preload("res://scripts/run/timeline_collision.gd").phase_of(shape)
+		if phase in [&"present", &"remnant"]:
+			_timeline_shapes.append(shape)
+			shape.set_meta("timeline_phase", phase)
+			var owner := shape.get_parent() as CollisionObject3D
+			if owner != null:
+				owner.set_meta("timeline_phase", phase)
+
+func _sync_timeline_collision_owners() -> void:
+	if not is_instance_valid(geometry):
+		return
+	# Imported modules can put more than one CollisionShape3D under the same
+	# CollisionObject3D.  A body layer must stay active when any of its shapes
+	# belongs to the current phase; writing it once per shape made the last
+	# shape in traversal order decide the whole body's state and could leave an
+	# inactive timeline wall in the broadphase.
+	var owner_shapes: Dictionary = {}
+	for shape: CollisionShape3D in geometry.find_children("*", "CollisionShape3D", true, false):
+		var phase := preload("res://scripts/run/timeline_collision.gd").phase_of(shape)
+		if phase not in [&"present", &"remnant"]:
+			continue
+		var owner := shape.get_parent() as CollisionObject3D
+		if owner == null:
+			continue
+		var records: Array = owner_shapes.get(owner, [])
+		records.append({"shape": shape, "phase": phase})
+		owner_shapes[owner] = records
+	for owner_key in owner_shapes.keys():
+		var owner := owner_key as CollisionObject3D
+		if owner == null:
+			continue
+		if not owner.has_meta("timeline_base_layer"):
+			owner.set_meta("timeline_base_layer", owner.collision_layer)
+			owner.set_meta("timeline_base_mask", owner.collision_mask)
+		var owner_active := false
+		for record: Dictionary in owner_shapes[owner]:
+			var shape := record["shape"] as CollisionShape3D
+			if shape == null:
+				continue
+			var active: bool = StringName(record["phase"]) == timeline_phase and enabled and not bool(shape.get_meta("gameplay_disabled", false))
+			owner_active = owner_active or active
+			shape.disabled = not active
+			shape.set_deferred("disabled", shape.disabled)
+		owner.collision_layer = int(owner.get_meta("timeline_base_layer")) if owner_active else 0
+		owner.collision_mask = int(owner.get_meta("timeline_base_mask")) if owner_active else 0
 
 func _wall(center: Vector3, size: Vector3) -> void:
 	var body:=DemoGeometry.box(geometry,center,size,_stone,true)
@@ -296,12 +478,32 @@ func _forge() -> void:
 	_platform(Vector3(0,0,3),Vector2(8,10))
 	_platform(Vector3(0,0,-9),Vector2(4,10))
 	_platform(Vector3(4,0,-19),Vector2(7,8))
-	_platform(Vector3(0,3,-32),Vector2(12,14))
+	# The upper forge deck keeps a rear lane behind the furnace cheek. The extra
+	# depth is deliberate traversal space for circling the caster, not a flat
+	# shortcut across the wall-run route.
+	# Keep the raised landing physically present without putting a vertical front
+	# face across the wind-well launch arc.  The previous 28 m slab began at
+	# z=-18 and caught the player below its top surface, so the launch read as a
+	# collision with an invisible wall instead of a route transfer.
+	# Leave a capsule-width braking margin on both sides of the entry wall.
+	# The wall exit is intentionally close to this deck edge; a 16 m slab let
+	# the faster profession miss the real floor by a few centimetres while
+	# descending from the wall.
+	_platform(Vector3(0,3,-32),Vector2(12,20))
 	# Separate the caster from the wind-well launch and protect its arrival.
 	# A furnace cheek breaks both firing lines; the centre lane and the rear
 	# approach at z=-37.5 remain open to either base profession.
-	_wall(Vector3(2,4.5,-34),Vector3(.65,3,4))
-	_wall(Vector3(4,4.5,-33),Vector3(3.4,3,.65))
+	# Keep the furnace cheek beside the tutorial wall, outside the player's
+	# two-metre wall probe. Its earlier x=2 placement was read as the first
+	# runnable surface and pulled the runner into a dead-end cap before the
+	# authored entrance face.
+	# The caster must be shielded from the launch and upper-deck approach, but
+	# the cover cannot occupy the player's centre lane. This offset cheek sits
+	# between the caster and both protected sight lines while the rear approach
+	# remains exposed and physically walkable.
+	_wall(Vector3(3.0,4.4,-34),Vector3(.55,2.4,3.6))
+	_wall(Vector3(5.0,4.5,-34),Vector3(.65,3,4))
+	_wall(Vector3(7.0,4.5,-33),Vector3(3.4,3,.65))
 	# The low service throat commits the player to a slide and releases them at
 	# the first broken deck. Its 1.2 m clearance rejects the standing capsule.
 	DemoGeometry.box(geometry,Vector3(0,2.05,1),Vector3(6,1.7,3),_iron,true)
@@ -314,7 +516,13 @@ func _forge() -> void:
 	_route_marker(Vector3(0,.08,4),Color("#d48f63"),&"slide")
 	_wall(Vector3(8,2,-16),Vector3(.7,6,23))
 	_timeline_wall(Vector3(-4.8,4.2,-20),Vector3(.7,7.0,11),DemoGeometry.material(Color("#40344e"),.35))
-	_mechanism(Vector3(4,1.0,-20),&"launch")
+	# Place the wind well inside the real lower landing so a player arriving
+	# from the slide-jump can trigger it without an edge-perfect interaction.
+	# Keep the wind well beside the approach lane instead of under the upper
+	# deck's front lip.  The player reaches it from the lower landing and
+	# commits with the interaction key; the smaller auto radius prevents the
+	# approach from consuming the launch before the player has lined up.
+	_mechanism(Vector3(4.4,1.0,-20.6),&"launch")
 	_mechanism(Vector3(-3,4.1,-29),&"seal")
 	_platform(Vector3(-6,0,1),Vector2(5,3))
 	_platform(Vector3(-7,1.8,-13),Vector2(3,5))
@@ -330,7 +538,7 @@ func _forge() -> void:
 	DemoGeometry.box(geometry,Vector3(0,-9,-20),Vector3(27,.2,58),melt)
 	signature_sections[&"chain_well"]={
 		"start":Vector3(0,.08,6),"slide_exit":Vector3(0,.08,-.5),
-		"wind":Vector3(4,1,-20),"upper_landing":Vector3(0,3,-32),
+		"wind":Vector3(4.4,1,-20.6),"upper_landing":Vector3(0,3,-32),
 		"standing_clearance_m":1.2,"mechanics":[&"slide",&"slide_jump",&"launch"]}
 	_exit(Vector3(0,3,-37))
 
@@ -339,7 +547,14 @@ func _tower() -> void:
 	_platform(Vector3(0,0,4),Vector2(8,10))
 	_platform(Vector3(-5,1,-11),Vector2(5,10))
 	_platform(Vector3(0,1,-24),Vector2(17,14))
-	_platform(Vector3(0,1,-39),Vector2(8,16))
+	# The tower entry is a short departure deck for the bidirectional wall
+	# tutorial.  Its old 28m depth nearly touched the hub and created a real
+	# ground shortcut around the authored entrance wall.  Keep the visible stone
+	# landing, but leave the route gap open so the wall is required.
+	# The bidirectional wall exits at the near edge in either direction. The
+	# extra four metres are a real stone braking lane and keep the capsule from
+	# falling just outside the deck when the two wall faces hand off.
+	_platform(Vector3(0,1,-39),Vector2(8,18))
 	_wall(Vector3(-8,3,-6),Vector3(.8,7,27))
 	_wall(Vector3(9,3,-24),Vector3(.8,7,18))
 	_mechanism(Vector3(-6,2.1,-20),&"seal")
@@ -443,6 +658,7 @@ func _checkpoint_body_entered(body:Node3D,area:Area3D)->void:
 	if not enabled or not body is ParkourPlayer:return
 	var altar_device:=area.get_parent() as RunAltar
 	if not is_instance_valid(altar_device):return
+	if not preload("res://scripts/run/timeline_collision.gd").active(altar_device):return
 	# Reaching an unclaimed altar is not enough to create a recovery snapshot;
 	# the checkpoint is committed when its rune choice is completed.
 	if not altar_device.used:return
@@ -501,18 +717,24 @@ func _spawn_configured_encounters() -> void:
 		# The first route's high sentinel belongs to the remnant timeline. Keeping
 		# this authored phase tag in the same data entry as its spawn position
 		# prevents a second hand-built enemy from diverging during room rebuilds.
-		if stage == 1 and entry.id == &"stage_1_spawn_05":
-			enemy.set_meta("timeline_phase", &"remnant")
-			enemy.set_meta("phase_route_node", true)
+		if entry.timeline_phase in ["present","remnant"]:
+			enemy.set_meta("timeline_phase",StringName(entry.timeline_phase))
+			enemy.set_meta("phase_route_node",true)
+		if entry.route_contract != "shared":
+			enemy.set_meta("route_contract",StringName(entry.route_contract))
 
 func _enemy(point: Vector3, kind: StringName, role: StringName = &"crossbow", required: bool = false, entry: LevelEncounterEntry = null) -> LanternAcolyte:
 	var enemy := LanternAcolyte.new()
 	enemy.archetype = kind
 	enemy.position = point
+	enemy.gameplay_role = role
+	enemy.required_guardian = required
 	# Set the authored role before _ready; the gameplay adapter consumes it.
 	enemy.set_meta("gameplay_role",role)
 	enemy.set_meta("required_guardian",required)
 	if entry!=null:
+		enemy.encounter_id = entry.id
+		enemy.initial_delay_seconds = entry.initial_delay_seconds
 		enemy.set_meta("encounter_id",entry.id)
 		enemy.set_meta("initial_delay_seconds",entry.initial_delay_seconds)
 		enemy.attack_range=entry.attack_range_m
@@ -526,6 +748,17 @@ func _enemy(point: Vector3, kind: StringName, role: StringName = &"crossbow", re
 	enemy.seal_requested.connect(_rearm_seals)
 	enemy.guard_opened.connect(func(): guard_broken.emit())
 	return enemy
+
+func register_timeline_contract(id: StringName, phases: Array[StringName], nodes: Array[Vector3], mechanics: Array[StringName]) -> void:
+	var contract := {
+		"id": id,
+		"phases": phases.duplicate(),
+		"nodes": nodes.duplicate(),
+		"mechanics": mechanics.duplicate(),
+		"requires_air_shift": phases.size() > 1 and phases[0] != phases[1],
+	}
+	timeline_contracts.append(contract)
+	signature_sections[id] = contract
 
 func _rearm_seals() -> void:
 	for device in mechanisms:
@@ -613,17 +846,19 @@ func reset_room(player: ParkourPlayer, number: int = 1) -> bool:
 	set_enabled(true)
 	for enemy in enemies:
 		enemy.player = player
-		enemy.cooldown = float(enemy.get_meta("initial_delay_seconds",1.1))
+		enemy.cooldown = enemy.initial_delay_seconds
 	for device in mechanisms:
 		device.player = player
 	for device in altars:device.player=player
 	for device in terrain_devices:device.player=player
-	for anchor in static_anchors:anchor.player=player
+	for construct: Node in geometry.find_children("*","StaticBody3D",true,false):
+		if construct is RiftConstruct: construct.player=player
 	return true
 
 func _extra_altar(point: Vector3) -> void:
 	var device := RunAltar.new()
-	device.position=point
+	device.position=_grounded_platform_point(point)
+	device.set_meta("grounded_checkpoint",true)
 	geometry.add_child(device)
 	device.requested.connect(func(a: RunAltar):altar_requested.emit(a))
 	altars.append(device)
@@ -672,11 +907,11 @@ func _has_core_build() -> bool:
 
 func objective_text() -> String:
 	if not altar.used:
-		return "起点祭坛 · E 选择职业循环"
+		return "E · 祭坛"
 	if not _has_core_build():
-		return "回到祭坛选择一枚职业核心构筑"
+		return "祭坛 · 核心"
 	if exit_unlocked:
-		return "封印已解 · 前往出口"
+		return "出口已开"
 	var discovered: int=0
 	for device in altars:
 		if device.used:discovered+=1
@@ -687,16 +922,16 @@ func objective_text() -> String:
 	if stage == 1:
 		if is_instance_valid(altar.player):
 			var z := to_local(altar.player.global_position).z
-			if z> -45:return "沿右墙前进 · 时限将尽时 SHIFT 续接同墙"
-			if z> -73:return "蹬离右墙，接向另一侧墙面"
-			if z> -88:return "绕开盾面，击破庭院守卫"
-			if z> -108:return "滑过低拱，起跳越过断桥"
-			if z> -150:return "瞄准悬锚按 E · 牵引后自动松开，飞向对岸"
-			if z> -205:return "沿断桥残壁冲刺 · 抓住高处锚点"
-			if z> -240:return "牵引后对准右墙 · 蹬墙接上层平台"
-			if z> -272:return "换向左墙 · 钩锁后继续墙跑"
-		return "抵达钟塔，处决契印守卫"+progress
-	return ("执刑官 · 封印锚" if stage == 2 else "守门者 · 双封印锚")+progress
+			if z> -45:return "右墙 · Shift"
+			if z> -73:return "蹬墙 · 换侧"
+			if z> -88:return "绕盾 · 破核"
+			if z> -108:return "滑铲 → 跳"
+			if z> -150:return "E · 牵引"
+			if z> -205:return "断桥 · 高锚"
+			if z> -240:return "牵引 · 上墙"
+			if z> -272:return "换向 · 牵引"
+		return "钟塔 · 破核"+progress
+	return ("执刑官 · 破炉" if stage == 2 else "祭祀 · 破链")+progress
 
 func interaction_target() -> Node3D:
 	if not enabled or not is_instance_valid(altar.player) or not altar.player.control_enabled:

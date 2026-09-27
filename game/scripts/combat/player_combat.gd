@@ -14,6 +14,7 @@ signal temporal_reset_requested
 signal rune_applied(id: StringName)
 signal runes_reset
 signal flow_changed(value: float, capacity: float)
+signal echo_sweep_launched(origin: Vector3, forward: Vector3)
 
 @export var maximum_health: int = 2
 @export var reach: float = 2.7
@@ -65,6 +66,11 @@ var _primary_element: StringName = &"arcane"
 @export_range(0.0, 100.0, 1.0) var flow_decay_per_second: float = 28.0
 var flow: float = 0.0
 var echo_cuts: Array[Dictionary] = []
+@export_group("Shade echo combat")
+@export_range(0.2, 2.0, 0.05) var shade_echo_trigger_window: float = 0.85
+@export_range(2.7, 8.0, 0.1) var shade_echo_reach: float = 3.6
+@export_range(0.25, 2.0, 0.05) var shade_echo_damage_scale: float = 1.0
+var _shade_echo_pending: Dictionary = {}
 var _confirmed_defeats: Dictionary = {}
 var riposte_ready: bool = false
 var _sweep_kills: int = 0
@@ -97,6 +103,7 @@ func _ready() -> void:
 	player.wall_run_started.connect(func(_side: int): add_flow(18.0))
 	player.slide_jumped.connect(func(): add_flow(22.0))
 	player.dashed.connect(func(): add_flow(12.0))
+	player.dashed.connect(_record_shade_echo)
 	player.landed.connect(func(_impact: float): flow = maxf(0.0, flow - 8.0); _emit_flow())
 	hit_confirmed.connect(func(_target: Node3D, _point: Vector3, defeated: bool): add_flow(25.0 if defeated else 12.0))
 
@@ -122,6 +129,7 @@ func reset_state() -> void:
 	flow = 0.0
 	_emit_flow()
 	echo_cuts.clear()
+	_shade_echo_pending.clear()
 	riposte_ready=false
 	last_parried_enemy = null
 	_airtime_serial = player.airtime_serial
@@ -138,6 +146,7 @@ func reset_run() -> void:
 	runes.clear()
 	_primary_element = &"arcane"
 	_confirmed_defeats.clear()
+	_shade_echo_pending.clear()
 	flow = 0.0
 	_emit_flow()
 	damage_multiplier = 1.0
@@ -225,9 +234,11 @@ func cancel_attack() -> void:
 func try_attack() -> bool:
 	if not enabled or not player.control_enabled or health <= 0 or attacking or get_tree().paused or player.blade_approach_active:
 		return false
+	if is_instance_valid(arts) and arts.blocks_primary_attack():return false
 	var definition: HeldItemDefinition = arms.get_item_definition(&"right")
 	if definition == null or (definition.melee_damage <= 0 and not definition.ranged):
 		return false
+	arts.execution_recovering=false
 	if not definition.ranged:
 		swing_return = _blade_sequence%2==1
 		_blade_sequence += 1
@@ -264,10 +275,16 @@ func try_attack() -> bool:
 
 
 func _physics_process(delta: float) -> void:
+	# Projectile/echo/execution contacts can happen without a primary attack.
+	# Their finite hit stop must advance on the same clock even while idle.
+	var holding_impact := impact_hold > 0.0
+	impact_hold = maxf(0.0, impact_hold - delta)
 	if player.is_on_floor() and flow > 0.0:
 		flow = move_toward(flow, 0.0, flow_decay_per_second * delta)
 		_emit_flow()
 	ability_cooldown = maxf(0.0,ability_cooldown-delta)
+	if not _shade_echo_pending.is_empty() and float(Time.get_ticks_usec() - int(_shade_echo_pending.get("time", 0))) / 1000000.0 > shade_echo_trigger_window:
+		_shade_echo_pending.clear()
 	parry_left = maxf(0.0,parry_left-delta)
 	_slide_buff_left = maxf(0.0,_slide_buff_left-delta)
 	attack_buffer = maxf(0.0,attack_buffer-delta)
@@ -293,7 +310,10 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("ability"):
 		try_ability()
 	if Input.is_action_just_pressed("attack"):
-		attack_buffer = .18
+		# Preserve a click during pursuit until its short contact commitment ends.
+		# It starts exactly one follow-up; it cannot replace the skill's cut.
+		attack_buffer = arts.pursuit_profile.attack_buffer_seconds
+		if arts.execution_active:attack_buffer+=maxf(0.,arts.execution_seconds-arts.execution_age)+arts.pursuit_profile.attack_unlock_seconds
 	var held_cast: bool = arms.get_item_definition(&"right") != null and arms.get_item_definition(&"right").ranged
 	if not _wait_release and (attack_buffer>0.0 or (held_cast and Input.is_action_pressed("attack"))):
 		if try_attack():
@@ -303,8 +323,7 @@ func _physics_process(delta: float) -> void:
 	if not is_instance_valid(_weapon) or arms.get_equipped_item(&"right") != _weapon:
 		cancel_attack()
 		return
-	if impact_hold > 0.0:
-		impact_hold = maxf(0.0, impact_hold - delta)
+	if holding_impact:
 		return
 	attack_age += delta
 	if attack_age >= windup and not _swing_emitted:
@@ -312,6 +331,7 @@ func _physics_process(delta: float) -> void:
 		if not arms.get_item_definition(&"right").ranged:
 			echo_cuts.append({"time":Time.get_ticks_usec(), "origin":player.camera.global_position, "forward":-player.camera.global_basis.z, "reach":reach, "wide":_attack_slide})
 			while echo_cuts.size() > 8: echo_cuts.pop_front()
+			_launch_shade_echo()
 		swing_started.emit()
 		if arms.get_item_definition(&"right").ranged and not _projectile_fired:
 			_fire_arcane_bolt(arms.get_item_definition(&"right"))
@@ -389,6 +409,39 @@ func _shade_traversal_strike() -> bool:
 	# player is dashing or has a live airborne traversal receipt, and it keeps
 	# the normal 14 m reach and collision rules of the existing blade bolt.
 	return player.parkour_profile.id == &"shade" and (player.is_dashing() or (not player.is_on_floor() and player.has_recent_traversal_action()))
+
+
+func _record_shade_echo() -> void:
+	# The core records the instant a real dash starts. The next committed blade
+	# swing can replay this contact point; it never moves the player or spawns a
+	# free attack without a real follow-up swing.
+	if player.parkour_profile.id != &"shade" or &"shade_echo" not in runes:
+		return
+	_shade_echo_pending = {
+		"time": Time.get_ticks_usec(),
+		"origin": player.camera.global_position,
+		"forward": -player.camera.global_basis.z,
+		"reach": shade_echo_reach,
+		"wide": &"shade_cleave" in runes,
+	}
+
+
+func _launch_shade_echo() -> void:
+	if _shade_echo_pending.is_empty():
+		return
+	var age := float(Time.get_ticks_usec() - int(_shade_echo_pending.get("time", 0))) / 1000000.0
+	if age > shade_echo_trigger_window:
+		_shade_echo_pending.clear()
+		return
+	var sweep := _shade_echo_pending.duplicate(true)
+	_shade_echo_pending.clear()
+	sweep["damage"] = maxi(1, roundi(float(_damage) * shade_echo_damage_scale))
+	sweep["echo"] = true
+	var echo := EchoSlash.new()
+	echo.owner_combat = self
+	echo.sweeps.append(sweep)
+	get_tree().current_scene.add_child(echo)
+	echo_sweep_launched.emit(sweep.origin, sweep.forward)
 
 
 func confirm_hit(target: LanternAcolyte, point: Vector3, defeated: bool, can_chain: bool = false, charged: bool = false, shot_airtime: int = -1) -> void:
@@ -518,6 +571,8 @@ func try_ability() -> bool:
 	if ability_cooldown>0.0 or not enabled or not player.control_enabled or get_tree().paused:
 		return false
 	if player.parkour_profile.id == &"shade":
+		arts.cancel_execution(&"guard")
+		cancel_attack()
 		parry_left = .34 if &"shade_parry" in runes else .22
 		ability_cooldown = .7
 	else:

@@ -66,12 +66,15 @@ func record(kind:String,data:Dictionary)->void:
 func hide_original(node:Node3D)->void:
 	if not is_instance_valid(node):return
 	if not hidden.has(node.get_instance_id()):hidden[node.get_instance_id()]={"source":weakref(node),"visible":node.visible}
+	node.set_meta("presentation_replaced",true)
 	node.hide()
 
 func restore_originals()->void:
 	for row in hidden.values():
 		var node=row.source.get_ref()
-		if is_instance_valid(node):node.visible=row.visible
+		if is_instance_valid(node):
+			node.remove_meta("presentation_replaced")
+			node.visible=row.visible and preload("res://scripts/run/timeline_collision.gd").active(node)
 	hidden.clear()
 
 func reset_visuals()->void:
@@ -319,9 +322,11 @@ func _process(delta:float)->void:
 	for id in objectives.keys():
 		var row:Dictionary=objectives[id];var node=row.source.get_ref()
 		if is_instance_valid(node):
+			row.visual.visible=preload("res://scripts/run/timeline_collision.gd").active(node)
 			row.visual.global_position=node.global_position;row.visual.global_basis=node.global_basis.scaled(Vector3.ONE*(.72 if node is BellAnchor else 1.));row.visual.tick(delta)
 			var owner_enemy:LanternAcolyte=node.owner_enemy if node is BellAnchor else node.controller.actor if is_instance_valid(node.controller) else null
 			if row.has("chain") and is_instance_valid(owner_enemy):
+				row.chain.visible=row.visual.visible
 				row.chain.tick(delta);row.chain.update_endpoints(node.global_position,owner_enemy.get_hit_point(),{"phase":"pull","elapsed":0.})
 	for row in missiles.values():
 		var node=row.source.get_ref()
@@ -329,19 +334,29 @@ func _process(delta:float)->void:
 	recent_contacts=recent_contacts.filter(func(row):return Engine.get_process_frames()-row.frame<=1)
 	for id in surfaces.keys():
 		var row:Dictionary=surfaces[id];var node=row.source.get_ref()
-		if is_instance_valid(node):row.visual.global_transform=node.global_transform;row.visual.tick(delta)
+		if is_instance_valid(node):
+			row.visual.global_transform=node.global_transform
+			row.visual.visible=preload("res://scripts/run/timeline_collision.gd").active(node)
+			if row.visual.visible: row.visual.tick(delta)
 	for id in enemies.keys():
 		var row:Dictionary=enemies[id];var node=row.source.get_ref()
 		if not is_instance_valid(node):continue
 		var core:Vector3=node.get_hit_point()+node._visual.global_basis.z*.35
-		if is_instance_valid(row.model):row.model.tick(delta);core=row.model.core_point(core)
+		var phase_active: bool=preload("res://scripts/run/timeline_collision.gd").active(node)
+		if is_instance_valid(row.model):
+			row.model.tick(delta)
+			row.model.visible=row.model.visible and phase_active
+			core=row.model.core_point(core)
+		row.visual.visible=phase_active
 		var emitter:Vector3=Vector3.INF
 		if row.has("core_marker") and is_instance_valid(row.core_marker.get_ref()):core=row.core_marker.get_ref().global_position
 		if row.has("emitter_marker") and is_instance_valid(row.emitter_marker.get_ref()):emitter=row.emitter_marker.get_ref().global_position
 		row.visual.tick(delta,core,emitter)
 	for id in hazards.keys():
 		var row:Dictionary=hazards[id];var node=row.source.get_ref()
-		if is_instance_valid(node):row.visual.global_transform=node.global_transform;row.visual.tick(delta,node.radius if row.get("wave",false) else node.delay)
+		if is_instance_valid(node):
+			row.visual.visible=preload("res://scripts/run/timeline_collision.gd").active(node)
+			row.visual.global_transform=node.global_transform;row.visual.tick(delta,node.radius if row.get("wave",false) else node.delay)
 	for id in wards.keys():
 		var row:Dictionary=wards[id];var controller=row.source.get_ref()
 		if not is_instance_valid(controller):continue

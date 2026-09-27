@@ -119,6 +119,7 @@ func warn_collapse(seconds: float) -> void:
 func collapse() -> bool:
 	if not is_instance_valid(floor_body) or surfaces.size() < 6: return false
 	floor_body.collision_layer = 0
+	floor_body.set_meta("gameplay_hidden",true)
 	floor_body.hide()
 	collapsed = true
 	# These are evacuation aids, not permanent ground islands for the aerial
@@ -133,6 +134,7 @@ func collapse() -> bool:
 func restore_floor() -> void:
 	if is_instance_valid(floor_body):
 		floor_body.collision_layer = floor_layer
+		floor_body.set_meta("gameplay_hidden",false)
 		floor_body.visible = floor_visible
 	if collapsed: terrain_changed.emit(false)
 	collapsed = false

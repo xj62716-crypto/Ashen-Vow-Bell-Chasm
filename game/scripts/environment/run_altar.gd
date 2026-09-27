@@ -36,6 +36,7 @@ func _ready() -> void:
 	_inscription = DemoGeometry.label(self, Vector3(0,2.25,0), "契印祭坛", 27)
 
 func request() -> bool:
+	if not preload("res://scripts/run/timeline_collision.gd").active(self):return false
 	if used or not is_instance_valid(player) or not player.control_enabled or get_tree().paused:
 		return false
 	if player.global_position.distance_to(global_position) > 3.5:

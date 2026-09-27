@@ -64,12 +64,15 @@ func _connect(source:Object,signal_name:StringName,callable:Callable) -> void:
 func _hide(node:Node3D) -> void:
 	if not is_instance_valid(node):return
 	if not hidden.has(node.get_instance_id()):hidden[node.get_instance_id()]={"node":weakref(node),"visible":node.visible}
+	node.set_meta("presentation_replaced",true)
 	node.hide()
 
 func _restore() -> void:
 	for row in hidden.values():
 		var node=row.node.get_ref()
-		if is_instance_valid(node):node.visible=row.visible
+		if is_instance_valid(node):
+			node.remove_meta("presentation_replaced")
+			node.visible=row.visible and preload("res://scripts/run/timeline_collision.gd").active(node)
 	hidden.clear()
 
 func detach() -> void:
@@ -293,7 +296,10 @@ func _process(delta:float) -> void:
 			finishes.remove_at(index)
 	for row in surfaces.values():
 		var node=row.source.get_ref()
-		if is_instance_valid(node):row.visual.global_transform=node.global_transform;row.visual.tick(delta)
+		if is_instance_valid(node):
+			row.visual.global_transform=node.global_transform
+			row.visual.visible=preload("res://scripts/run/timeline_collision.gd").active(node)
+			if row.visual.visible: row.visual.tick(delta)
 	for id in seals.keys():
 		var source=seals[id].source.get_ref()
 		var visual=seals[id].visual
@@ -301,6 +307,7 @@ func _process(delta:float) -> void:
 			if is_instance_valid(visual):visual.release();seal_fades.append(visual)
 			seals.erase(id);continue
 		visual.global_position=source.get_hit_point();
+		visual.visible=preload("res://scripts/run/timeline_collision.gd").active(source)
 		if not visual.tick(delta,trial.player.camera):visual.queue_free();seals.erase(id)
 		if trial.combat.arts._icons.has(source):_hide(trial.combat.arts._icons[source])
 	for index in range(seal_fades.size()-1,-1,-1):

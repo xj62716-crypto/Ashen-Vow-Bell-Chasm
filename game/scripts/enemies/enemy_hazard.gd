@@ -10,6 +10,7 @@ var _ring: MeshInstance3D
 
 func _ready() -> void:
 	process_mode = PROCESS_MODE_PAUSABLE
+	preload("res://scripts/run/timeline_collision.gd").capture_phase(self)
 	add_to_group("hostile_projectiles")
 	var mesh := TorusMesh.new()
 	mesh.inner_radius = radius-.07
@@ -17,6 +18,7 @@ func _ready() -> void:
 	_ring = DemoGeometry.mesh(self, mesh, Vector3.UP*.06, DemoGeometry.material(Color("#d99664"), .8))
 
 func _physics_process(delta: float) -> void:
+	if preload("res://scripts/run/timeline_collision.gd").cancel_if_inactive(self):return
 	delay -= delta
 	if delay > 0: return
 	var candidates: Array[Node3D] = []

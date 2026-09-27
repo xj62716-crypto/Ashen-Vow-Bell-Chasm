@@ -10,6 +10,7 @@ var _marker: MeshInstance3D
 
 func _ready() -> void:
 	process_mode = PROCESS_MODE_PAUSABLE
+	preload("res://scripts/run/timeline_collision.gd").capture_phase(self,controller.actor if is_instance_valid(controller) else null)
 	add_to_group("hostile_projectiles")
 	var ring := TorusMesh.new()
 	ring.inner_radius = radius-.08
@@ -28,6 +29,7 @@ func threatens(body: Node3D) -> bool:
 	return closest.distance_to(global_position) <= radius+.25
 
 func _physics_process(delta: float) -> void:
+	if preload("res://scripts/run/timeline_collision.gd").cancel_if_inactive(self):return
 	if not is_instance_valid(controller) or not controller.is_running():
 		queue_free()
 		return
