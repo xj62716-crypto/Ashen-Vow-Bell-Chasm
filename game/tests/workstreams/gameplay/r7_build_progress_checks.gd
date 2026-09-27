@@ -13,6 +13,12 @@ func _run() -> void:
 	rng.seed=44
 	var opening:=RuneCatalog.offer(&"shade",[],rng)
 	check(opening.size()==3 and opening.all(func(r): return int(r.get("build_stage",0))==1 and not str(r.get("build_stage_title","")).is_empty()),"first altar marks every core as an immediately playable stage-one choice")
+	for profile_id in [&"shade", &"arcanist"]:
+		for core_id in RuneCatalog.core_ids(profile_id):
+			await fresh(profile_id)
+			check(combat.apply_rune(core_id),"every R7 core applies for its owning profession: %s" % core_id)
+			var core_state := combat.build_state()
+			check(int(core_state.get("stage",0)) == 1 and core_id in core_state.get("cores",[]) and int(core_state.get("core_count",0)) == 1,"every R7 core exposes a live stage-one contract: %s" % core_id)
 	await fresh("shade")
 	check(combat.apply_rune(&"shade_echo"),"echo core applies")
 	check(combat.build_stage==1 and combat.build_synergies.is_empty(),"one core enters the loop-building stage")

@@ -236,6 +236,16 @@ func _refresh_build_progress() -> void:
 func has_synergy(id: StringName) -> bool:
 	return id in build_synergies
 
+## Public R7 contract used by presentation and altar tooling.  Consumers must
+## read this snapshot instead of deriving stages from rune names themselves.
+func build_state() -> Dictionary:
+	var state := RuneCatalog.build_state(player.parkour_profile.id, runes)
+	state["flow"] = flow
+	state["flow_capacity"] = flow_capacity
+	state["profession_resource"] = arts.mana if player.parkour_profile.id == &"arcanist" else arts.edge
+	state["selected_ability"] = arts.selected()
+	return state
+
 
 func cancel_attack() -> void:
 	attacking = false

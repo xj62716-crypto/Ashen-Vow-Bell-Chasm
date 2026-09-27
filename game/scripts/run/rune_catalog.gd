@@ -207,6 +207,36 @@ static func build_stage(profile_id: StringName, acquired: Array[StringName]) -> 
 		return 2
 	return 1
 
+## Single read-only contract for HUD, altar previews and telemetry.  Keeping
+## the counts and missing cores beside build_stage prevents each consumer from
+## inventing a different definition of "formed".
+static func build_state(profile_id: StringName, acquired: Array[StringName]) -> Dictionary:
+	var cores: Array[StringName] = []
+	var extensions: Array[StringName] = []
+	for id in acquired:
+		var rune := definition(id)
+		if rune.is_empty() or rune.get("class", &"") != profile_id:
+			continue
+		if bool(rune.get("core", false)):
+			cores.append(id)
+		else:
+			extensions.append(id)
+	var missing_cores: Array[StringName] = []
+	for core_id in core_ids(profile_id):
+		if core_id not in cores:
+			missing_cores.append(core_id)
+	return {
+		"profile": profile_id,
+		"stage": build_stage(profile_id, acquired),
+		"title": build_stage_title(build_stage(profile_id, acquired)),
+		"cores": cores,
+		"extensions": extensions,
+		"core_count": cores.size(),
+		"extension_count": extensions.size(),
+		"synergies": active_synergies(profile_id, acquired),
+		"missing_core_ids": missing_cores,
+	}
+
 static func build_stage_title(stage: int) -> String:
 	return ["原始构式", "循环成形", "超常成型"][clampi(stage, 0, 2)]
 
