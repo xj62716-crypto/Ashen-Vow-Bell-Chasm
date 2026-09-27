@@ -67,6 +67,13 @@ var last_parried_enemy: LanternAcolyte
 var _primary_element: StringName = &"arcane"
 @export_range(20.0, 100.0, 1.0) var flow_capacity: float = 100.0
 @export_range(0.0, 100.0, 1.0) var flow_decay_per_second: float = 28.0
+@export_group("R7 ground flow")
+## Fast ground movement and a slide are part of the build loop.  A landing
+## should not erase that loop; only a quiet/slow landing starts the normal
+## out-of-combat decay.
+@export_range(2.0, 20.0, 0.5) var flow_ground_speed_threshold: float = 7.0
+@export_range(0.0, 50.0, 1.0) var flow_ground_decay_per_second: float = 0.0
+@export_range(0.0, 20.0, 0.5) var flow_landing_cost: float = 2.0
 var flow: float = 0.0
 var echo_cuts: Array[Dictionary] = []
 @export_group("Shade echo combat")
@@ -107,7 +114,13 @@ func _ready() -> void:
 	player.slide_jumped.connect(func(): add_flow(22.0))
 	player.dashed.connect(func(): add_flow(12.0))
 	player.dashed.connect(_record_shade_echo)
-	player.landed.connect(func(_impact: float): flow = maxf(0.0, flow - 8.0); _emit_flow())
+	player.landed.connect(func(_impact: float):
+		# Keep a high-speed landing and slide-jump inside the current loop.  A
+		# quiet landing only trims a small, configurable amount before the normal
+		# stationary decay takes over.
+		if not _ground_flow_active():
+			flow = maxf(0.0, flow - flow_landing_cost)
+		_emit_flow())
 	hit_confirmed.connect(func(_target: Node3D, _point: Vector3, defeated: bool): add_flow(25.0 if defeated else 12.0))
 
 
@@ -242,9 +255,15 @@ func build_state() -> Dictionary:
 	var state := RuneCatalog.build_state(player.parkour_profile.id, runes)
 	state["flow"] = flow
 	state["flow_capacity"] = flow_capacity
+	state["flow_ground_active"] = _ground_flow_active()
+	state["flow_ground_threshold"] = flow_ground_speed_threshold
 	state["profession_resource"] = arts.mana if player.parkour_profile.id == &"arcanist" else arts.edge
 	state["selected_ability"] = arts.selected()
 	return state
+
+
+func _ground_flow_active() -> bool:
+	return player.is_on_floor() and (player.horizontal_speed() >= flow_ground_speed_threshold or player.sliding or player.crouched)
 
 
 func cancel_attack() -> void:
@@ -308,8 +327,12 @@ func _physics_process(delta: float) -> void:
 	var holding_impact := impact_hold > 0.0
 	impact_hold = maxf(0.0, impact_hold - delta)
 	if player.is_on_floor() and flow > 0.0:
-		flow = move_toward(flow, 0.0, flow_decay_per_second * delta)
-		_emit_flow()
+		# R7 keeps momentum meaningful through a fast landing.  Standing still
+		# remains the intentional way to let the resource wind down.
+		var decay := flow_ground_decay_per_second if _ground_flow_active() else flow_decay_per_second
+		if decay > 0.0:
+			flow = move_toward(flow, 0.0, decay * delta)
+			_emit_flow()
 	ability_cooldown = maxf(0.0,ability_cooldown-delta)
 	if not _shade_echo_pending.is_empty() and float(Time.get_ticks_usec() - int(_shade_echo_pending.get("time", 0))) / 1000000.0 > shade_echo_trigger_window:
 		_shade_echo_pending.clear()
@@ -684,6 +707,8 @@ func build_status() -> String:
 		return phase_text + synergy_text + " · " + ("火 · 范围爆裂" if &"arcane_fire" in runes else "冰 · 冻结破盾")
 	if &"shade_arc" in runes: return phase_text + synergy_text + " · 离刃 · 远程剑气"
 	if &"shade_cleave" in runes: return phase_text + synergy_text + " · 断月 · 宽幅横扫"
+	if _ground_flow_active() and flow > 0.5:
+		return phase_text + synergy_text + " · 疾行 · 流势维持"
 	return phase_text + synergy_text + ((" · " + flow_text) if not flow_text.is_empty() else "")
 
 func charge_duration() -> float:
