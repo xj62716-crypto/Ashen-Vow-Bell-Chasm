@@ -15,6 +15,7 @@ var surfaces: Array[BossOrbitSurface] = []
 var anchors: Array[RiftConstruct] = []
 var wells: Array[RiftConstruct] = []
 var _foundation_parts: Array[Node3D] = []
+var _route_dressing: Node3D
 
 # The boss route alternates low broken decks and higher wall faces. Keeping the
 # recipe here makes both boss types consume the same parkour language instead
@@ -24,6 +25,15 @@ var _foundation_parts: Array[Node3D] = []
 ## not six overlapping pieces at the actor's feet.
 const ROUTE_ELEVATIONS := [0.35, 3.2, 0.95, 4.35, 0.65, 3.7]
 const ROUTE_RADIUS := 10.5
+const FORGE_ROUTE_POINTS := [
+	Vector3(-8.0, 1.55, -4.0),
+	Vector3(-2.0, 4.35, -10.0),
+	Vector3(7.2, 2.25, -7.0),
+	Vector3(9.0, 5.15, 1.5),
+	Vector3(2.0, 3.15, 9.0),
+	Vector3(-8.2, 1.9, 7.0),
+]
+const FORGE_ROUTE_YAWS := [0.0, 0.35, 1.25, 2.1, 2.9, -2.4]
 
 func _ready() -> void:
 	process_mode = PROCESS_MODE_PAUSABLE
@@ -76,13 +86,23 @@ func unbind_floor() -> void:
 
 func prepare_air_route() -> void:
 	if not surfaces.is_empty(): return
+	_route_dressing=Node3D.new()
+	_route_dressing.name="BossRouteDressing"
+	add_child(_route_dressing)
+	if controller.kind == &"forge": _build_forge_dressing()
+	else: _build_priest_dressing()
 	for index in range(6):
 		var wall := BossOrbitSurface.new()
 		wall.controller = controller
-		wall.center = origin+Vector3.UP*1.6
+		wall.center = origin+Vector3.UP*1.6 if controller.kind != &"forge" else origin
 		wall.angle = TAU*index/6.0
 		wall.vertical_offset = ROUTE_ELEVATIONS[index]
 		wall.radius = ROUTE_RADIUS
+		if controller.kind == &"forge":
+			wall.route_mode = &"forge"
+			wall.route_point = FORGE_ROUTE_POINTS[index]
+			wall.route_yaw = FORGE_ROUTE_YAWS[index]
+			wall.sync_to_physics = true
 		wall.route_role = &"broken_deck" if index%2==0 else &"wall_face"
 		wall.route_index = index
 		wall.player = controller.actor.player
@@ -156,6 +176,45 @@ func clear_route() -> void:
 	surfaces.clear()
 	anchors.clear()
 	wells.clear()
+	if is_instance_valid(_route_dressing):
+		_route_dressing.queue_free()
+		_route_dressing=null
 
 func _exit_tree() -> void:
 	restore_floor()
+
+func _build_forge_dressing() -> void:
+	if not is_instance_valid(_route_dressing): return
+	var iron := load("res://assets/materials/pbr/iron.tres") as Material
+	var heat := DemoGeometry.material(Color("#b95f35"),1.25)
+	var points: Array[Vector3]=[]
+	for point in FORGE_ROUTE_POINTS: points.append(origin+point)
+	# Non-colliding beams make the six service positions read as one supported
+	# furnace maintenance chain instead of six unrelated floating platforms.
+	for index in range(points.size()):
+		var a:=points[index]
+		var b:=points[(index+1)%points.size()]
+		var delta:=b-a
+		var beam:=DemoGeometry.box(_route_dressing,to_local(a.lerp(b,.5)),Vector3(.34,.34,delta.length()),iron)
+		beam.basis=Basis.looking_at(delta.normalized())
+		DemoGeometry.box(_route_dressing,to_local(a+Vector3.UP*.4),Vector3(.16,1.2,.16),iron)
+		DemoGeometry.box(_route_dressing,to_local(a+Vector3.UP*.98),Vector3(.5,.08,.5),heat)
+	# A low furnace spindle gives the boss a stable visual centre without adding a
+	# standing floor or a hidden collision shortcut.
+	DemoGeometry.cylinder(_route_dressing,to_local(origin+Vector3.UP*1.2),1.25,2.4,iron)
+	DemoGeometry.cylinder(_route_dressing,to_local(origin+Vector3.UP*2.45),.42,.25,heat)
+
+func _build_priest_dressing() -> void:
+	if not is_instance_valid(_route_dressing): return
+	var bone := DemoGeometry.material(Color("#6d5b67"),.15)
+	var silver := DemoGeometry.material(Color("#b8a5b0"),.65)
+	# The priest route is a broken sanctuary ring: chain pillars and suspended
+	# sigils frame the orbit, while the floor remains the collapsible element.
+	for index in range(6):
+		var angle:=TAU*index/6.0
+		var point:=origin+Vector3(sin(angle)*12.8,1.1,cos(angle)*12.8)
+		DemoGeometry.cylinder(_route_dressing,to_local(point),.42,4.8,bone)
+		var ring:=TorusMesh.new()
+		ring.inner_radius=.62
+		ring.outer_radius=.7
+		DemoGeometry.mesh(_route_dressing,ring,to_local(point+Vector3.UP*2.1),silver)

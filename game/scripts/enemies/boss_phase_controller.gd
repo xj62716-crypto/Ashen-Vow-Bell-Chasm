@@ -240,7 +240,10 @@ func _enter_shield() -> void:
 		# just outside the route surface so a travelling spell or blade wave hits
 		# the objective before the supporting wall, while the player still has a
 		# real wall face to run and kick from.
-		objective.position = Vector3(0,route_heights[index%route_heights.size()],.42)
+		# The objective is a separate collision body attached to the route surface.
+		# Keep its breakable sphere outside the wall's 0.45 m slab plus capsule
+		# radius; the old .42 offset left the core physically embedded in the face.
+		objective.position = Vector3(0,route_heights[index%route_heights.size()],.95)
 		objective.set_meta("route_role",wall.route_role)
 		objective.set_meta("route_index",wall.route_index)
 		objectives.append(objective)
