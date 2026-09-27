@@ -184,6 +184,16 @@ static func build(room: CombatRoom) -> void:
 		# readable without making the player overshoot the next platform.
 		anchor.grapple_release_distance=2.0
 		anchor.permanent=true
+		# Keep the authored branch identity with the physical anchor.  Long links
+		# also create relay anchors; without an explicit identity, route probes and
+		# the interaction fallback can confuse a relay with the branch landing.
+		anchor.set_meta("route_branch_index",index)
+		anchor.set_meta("route_source",hub if index==0 else branch[index-1])
+		anchor.set_meta("route_landing",branch[index])
+		var exit_direction := branch[index]-point
+		exit_direction.y=0.0
+		if exit_direction.length_squared()>.25:
+			anchor.set_meta("grapple_exit",{"direction":exit_direction.normalized()})
 		room.geometry.add_child(anchor)
 		anchor.position=point
 		room.static_anchors.append(anchor)
@@ -511,8 +521,15 @@ static func _link(room: CombatRoom,a: Vector3,b: Vector3,gap: bool,include_gap_w
 			relay.grapple_exit_lift=1.5
 			relay.grapple_release_distance=2.0
 			relay.permanent=true
+			relay.set_meta("route_relay",true)
+			relay.set_meta("route_source",a)
+			relay.set_meta("route_landing",b)
 			room.geometry.add_child(relay)
 			relay.position=middle+Vector3.UP*2.3
+			var relay_direction := b-relay.position
+			relay_direction.y=0.0
+			if relay_direction.length_squared()>.25:
+				relay.set_meta("grapple_exit",{"direction":relay_direction.normalized()})
 			room.static_anchors.append(relay)
 		_link(room,a,middle,false,include_gap_wall)
 		_link(room,middle,b,gap,include_gap_wall)
