@@ -16,10 +16,12 @@ R7 构筑阶段已接入正式运行时：核心→循环→成型由实际获�
 
 - 文件：`release/AshenVow-Demo.exe`
 - 来源：Godot Windows Desktop release export from the current integration worktree
-- SHA-256：`E4CDE79E312292D63C85A5632E8F480DC2CA9C8EDF4E2E0CBE36ACEB04B16345`
+- SHA-256：`0EA11C49C663C68C515F56BF71D1839E942201753E9B5EFBE164D9D44C024B5A`
 - PCK 内嵌标记：GDPC
 - 冷启动烟测：`--headless --audio-driver Dummy --quit-after 180`，进程正常退出，stderr 为空；EXE 尾部包含 `GDPC`
 
-R7 非路线自动回归：新增构筑检查 13/13；构筑与敌人 57/57；构筑联动 18/18；封印事件 18/18；回溯 12/12；Boss 72/72；敌人模式 34/34；AI 安全 8/8；生命周期 24/24；整合房间 16/16；时间线运行时 14/14。详细记录见 `docs/workstreams/results/gameplay/R7-BUILDS-20260927.md`。
+R7 非路线自动回归：构筑阶段与供给检查 16/16；构筑与敌人 57/57；构筑联动 18/18；封印事件 18/18；回溯 12/12；Boss 72/72；敌人模式 34/34；AI 安全 8/8；生命周期 24/24；整合房间 16/16；时间线运行时 14/14。详细记录见 `docs/workstreams/results/gameplay/R7-BUILDS-20260927.md`。
+
+本次 R7 收口还验证了祭坛供给：已有核心后优先提供未取得的联动伙伴，同时保留未取得核心和当前分支扩展，候选带有路线/战斗/风险角色标记。新增供给回归为 16/16。
 
 当前自动回归中，生命周期、路线合同、课程和配置套件通过；连续路线、网络路线和两项战斗绕行距离约束仍有失败，不能视为全部 QA 已关闭。自动回归结果不替代人工验收。详见 `docs/workstreams/results/integration/R6-IMPLEMENTATION.md`。
