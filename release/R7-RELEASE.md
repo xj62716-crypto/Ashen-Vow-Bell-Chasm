@@ -42,3 +42,11 @@ PCK 内嵌标记：`GDPC`。导出期间唯一错误日志为已运行编辑器�
 - `RuneCatalog.build_state()` 与 `PlayerCombat.build_state()` 统一暴露核心/扩展数量、构筑阶段、联动、缺失核心和职业资源，供 HUD、祭坛和调参读取。
 - 两职业四核心的独立 stage-one 契约回归 32/32；联动 18/18、构筑与敌人 57/57、处决生命周期 10/10。
 - 本次未改路线拓扑；路线仍按用户要求保留给实机跑通，发布记录不把自动契约当成人工通行证明。
+
+## 当前发布包
+
+- 文件：`release/AshenVow-Demo.exe`
+- 源码提交：`9e06893`
+- 文件大小：`1,509,667,912` bytes
+- SHA-256：`1FBADF93B94EE6ABBCD99B3E4A15F34B8E7FA85A4BCBDF0D9D558C722351DDE3`
+- PCK 内嵌尾标记：`GDPC`

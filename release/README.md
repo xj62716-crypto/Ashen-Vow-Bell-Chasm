@@ -1,6 +1,6 @@
 # Ashen Vow Demo · R7 build progression
 
-这是 Windows 单文件 R9 发布包。PCK 已内嵌在 `AshenVow-Demo.exe`，不需要额外的 `.pck` 文件。
+这是 Windows 单文件 R7 构筑收口发布包。PCK 已内嵌在 `AshenVow-Demo.exe`，不需要额外的 `.pck` 文件。
 
 运行方式：双击 `AshenVow-Demo.exe`。首次启动可能需要几秒加载资源。
 
@@ -16,11 +16,12 @@ R7 构筑阶段已接入正式运行时：核心→循环→成型由实际获�
 
 - 文件：`release/AshenVow-Demo.exe`
 - 来源：Godot Windows Desktop release export from the current integration worktree
-- SHA-256：`0EA11C49C663C68C515F56BF71D1839E942201753E9B5EFBE164D9D44C024B5A`
+- SHA-256：`1FBADF93B94EE6ABBCD99B3E4A15F34B8E7FA85A4BCBDF0D9D558C722351DDE3`
+- 文件大小：`1,509,667,912` bytes
 - PCK 内嵌标记：GDPC
 - 冷启动烟测：`--headless --audio-driver Dummy --quit-after 180`，进程正常退出，stderr 为空；EXE 尾部包含 `GDPC`
 
-R7 非路线自动回归：构筑阶段与供给检查 16/16；构筑与敌人 57/57；构筑联动 18/18；封印事件 18/18；回溯 12/12；Boss 72/72；敌人模式 34/34；AI 安全 8/8；生命周期 24/24；整合房间 16/16；时间线运行时 14/14。详细记录见 `docs/workstreams/results/gameplay/R7-BUILDS-20260927.md`。
+R7 非路线自动回归：构筑阶段与供给检查 32/32；构筑与敌人 57/57；构筑联动 18/18；封印事件 18/18；回溯 12/12；Boss 72/72；敌人模式 34/34；AI 安全 8/8；生命周期 24/24；整合房间 16/16；时间线运行时 14/14。详细记录见 `docs/workstreams/results/gameplay/R7-BUILDS-20260927.md`。
 
 本次 R7 收口还验证了祭坛供给：已有核心后优先提供未取得的联动伙伴，同时保留未取得核心和当前分支扩展，候选带有路线/战斗/风险角色标记。新增供给回归为 16/16。
 
