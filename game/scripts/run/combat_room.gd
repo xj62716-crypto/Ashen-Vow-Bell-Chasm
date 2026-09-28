@@ -46,6 +46,11 @@ var timeline_phase: StringName = &"present"
 var route_links: Array[Dictionary]=[]
 var _timeline_nodes: Array[Node] = []
 var _timeline_shapes: Array[CollisionShape3D] = []
+var _timeline_collision_owners: Array[CollisionObject3D] = []
+var _timeline_owner_shapes: Dictionary = {}
+var _presentation_collision_owners: Array[CollisionObject3D] = []
+var _presentation_collision_shapes: Array[CollisionShape3D] = []
+var _timeline_graph_dirty: bool = false
 var exit_unlocked: bool = false
 var _required_enemies: Array[LanternAcolyte] = []
 var _bridge_open: bool = false
@@ -62,6 +67,8 @@ var _accent: Material
 
 func _ready() -> void:
 	process_mode = PROCESS_MODE_PAUSABLE
+	get_tree().node_added.connect(_mark_timeline_graph_dirty)
+	get_tree().node_removed.connect(_timeline_collision_removed)
 	if not _build(1):push_error("CombatRoom configuration: "+str(last_configuration_errors))
 	set_enabled(false)
 	if not InputMap.has_action("interact"):
@@ -71,9 +78,10 @@ func _ready() -> void:
 		InputMap.action_add_event("interact", key)
 
 func _physics_process(_delta: float) -> void:
-	# Dynamic encounter rebuilds can hide or reparent a phase-owned body after
-	# the shift transaction. Reconcile the owner/shape pair every physics tick so
-	# a stale invisible collider cannot survive into the next traversal frame.
+	# Reconcile cached collision owners. A full recursive scene scan here costs
+	# several milliseconds on every one of the 120 physics ticks per second.
+	if _timeline_graph_dirty:
+		_cache_timeline_graph()
 	_sync_timeline_collision_owners()
 	# A player can complete an altar choice while already inside its trigger.
 	# In that case body_entered fired before the altar became used, so relying on
@@ -136,6 +144,10 @@ func _build(number: int) -> bool:
 	timeline_contracts.clear()
 	_timeline_nodes.clear()
 	_timeline_shapes.clear()
+	_timeline_collision_owners.clear()
+	_timeline_owner_shapes.clear()
+	_presentation_collision_owners.clear()
+	_presentation_collision_shapes.clear()
 	_bridge = null
 	geometry = Node3D.new()
 	geometry.name = "StageGeometry"
@@ -204,6 +216,8 @@ func apply_timeline_phase(next_phase: StringName) -> void:
 	## disables its collision shapes as well as its visible mesh, so the player
 	## never receives an invisible wall or a visual-only shortcut.
 	timeline_phase = next_phase if next_phase in [&"present", &"remnant"] else &"present"
+	if _timeline_graph_dirty:
+		_cache_timeline_graph()
 	# Remove attacks from the departed world in the same transaction. Waiting
 	# for their physics callbacks leaves one-frame invisible/visible threats.
 	for group in ["friendly_projectiles","hostile_projectiles"]:
@@ -314,6 +328,8 @@ func prepare_timeline_phase(next_phase: StringName) -> void:
 	var target := next_phase if next_phase in [&"present", &"remnant"] else &"present"
 	if not is_instance_valid(geometry) or target == timeline_phase:
 		return
+	if _timeline_graph_dirty:
+		_cache_timeline_graph()
 	var tagged_nodes: Array[Node] = _timeline_nodes if not _timeline_nodes.is_empty() else geometry.find_children("*", "Node", true, false)
 	for node: Node in tagged_nodes:
 		if not node.has_meta("timeline_phase"):
@@ -436,19 +452,31 @@ func _sync_grounded_installation_phases() -> void:
 			node.set_meta("timeline_phase", phase)
 
 func _cache_timeline_graph() -> void:
+	_timeline_graph_dirty = false
 	_timeline_nodes.clear()
 	_timeline_shapes.clear()
+	_timeline_collision_owners.clear()
+	_timeline_owner_shapes.clear()
+	_presentation_collision_owners.clear()
+	_presentation_collision_shapes.clear()
 	if not is_instance_valid(geometry):
 		return
 	for node: Node in geometry.find_children("*", "Node", true, false):
 		if node.has_meta("timeline_phase"):
 			_timeline_nodes.append(node)
+		if node is CollisionObject3D:
+			var owner := node as CollisionObject3D
+			if owner.get_meta("presentation_only", false):
+				_presentation_collision_owners.append(owner)
+			elif preload("res://scripts/run/timeline_collision.gd").phase_of(owner) in [&"present", &"remnant"]:
+				_timeline_collision_owners.append(owner)
 	for shape: CollisionShape3D in geometry.find_children("*", "CollisionShape3D", true, false):
 		var phase := preload("res://scripts/run/timeline_collision.gd").phase_of(shape)
+		var shape_owner := _collision_owner(shape)
+		if shape.get_meta("presentation_only", false) or (shape_owner != null and shape_owner.get_meta("presentation_only", false)):
+			_presentation_collision_shapes.append(shape)
+			continue
 		if phase in [&"present", &"remnant"]:
-			var shape_owner := _collision_owner(shape)
-			if shape.get_meta("presentation_only", false) or (shape_owner != null and shape_owner.get_meta("presentation_only", false)):
-				continue
 			_timeline_shapes.append(shape)
 			shape.set_meta("timeline_phase", phase)
 			var owner := shape_owner
@@ -456,6 +484,27 @@ func _cache_timeline_graph() -> void:
 				owner.set_meta("timeline_phase", phase)
 				if not _timeline_nodes.has(owner):
 					_timeline_nodes.append(owner)
+				if not _timeline_collision_owners.has(owner):
+					_timeline_collision_owners.append(owner)
+				var records: Array = _timeline_owner_shapes.get(owner, [])
+				records.append({"shape": shape, "phase": phase})
+				_timeline_owner_shapes[owner] = records
+
+func _mark_timeline_graph_dirty(node: Node) -> void:
+	if (node is CollisionObject3D or node is CollisionShape3D) and is_instance_valid(geometry) and geometry.is_ancestor_of(node):
+		_timeline_graph_dirty = true
+
+func _timeline_collision_removed(node: Node) -> void:
+	if node is CollisionObject3D and (_timeline_owner_shapes.has(node) or _presentation_collision_owners.has(node)):
+		_timeline_graph_dirty = true
+	elif node is CollisionShape3D and (_timeline_shapes.has(node) or _presentation_collision_shapes.has(node)):
+		_timeline_graph_dirty = true
+
+func _exit_tree() -> void:
+	if get_tree().node_added.is_connected(_mark_timeline_graph_dirty):
+		get_tree().node_added.disconnect(_mark_timeline_graph_dirty)
+	if get_tree().node_removed.is_connected(_timeline_collision_removed):
+		get_tree().node_removed.disconnect(_timeline_collision_removed)
 
 func _collision_owner(node: Node) -> CollisionObject3D:
 	var cursor := node.get_parent()
@@ -466,83 +515,43 @@ func _collision_owner(node: Node) -> CollisionObject3D:
 func _sync_timeline_collision_owners() -> void:
 	if not is_instance_valid(geometry):
 		return
-	# Phase ownership can live on a parent while the actual StaticBody3D is
-	# nested below an imported or dressed node. Reconcile that ancestry first so
-	# a hidden world's body cannot remain in the broadphase as an air wall.
-	for owner: CollisionObject3D in geometry.find_children("*", "CollisionObject3D", true, false):
-		var owner_phase := preload("res://scripts/run/timeline_collision.gd").phase_of(owner)
-		if owner_phase not in [&"present", &"remnant"]:
+	for presentation: CollisionObject3D in _presentation_collision_owners:
+		if not is_instance_valid(presentation):
 			continue
-		if not owner.has_meta("timeline_base_layer"):
-			owner.set_meta("timeline_base_layer", owner.collision_layer)
-			owner.set_meta("timeline_base_mask", owner.collision_mask)
-		var owner_active := false
-		for shape: CollisionShape3D in owner.find_children("*", "CollisionShape3D", true, false):
-			var shape_phase := preload("res://scripts/run/timeline_collision.gd").phase_of(shape)
-			if shape_phase not in [&"present", &"remnant"]:
-				continue
-			var active: bool = enabled and shape_phase == timeline_phase and not bool(owner.get_meta("presentation_only", false)) and not bool(owner.get_meta("gameplay_hidden", false)) and not bool(shape.get_meta("gameplay_disabled", false))
-			shape.disabled = not active
-			shape.set_deferred("disabled", shape.disabled)
-			owner_active = owner_active or active
-		owner.collision_layer = int(owner.get_meta("timeline_base_layer")) if owner_active else 0
-		owner.collision_mask = int(owner.get_meta("timeline_base_mask")) if owner_active else 0
-		if not owner.get_meta("presentation_only", false):
-			owner.visible = owner_active
-	# Imported presentation scenes may contain authoring colliders several nodes
-	# below their visible holder. They are never gameplay geometry; force them out
-	# of the broadphase every tick so a hidden prop cannot become an air wall.
-	for presentation: CollisionObject3D in geometry.find_children("*", "CollisionObject3D", true, false):
-		if not presentation.get_meta("presentation_only", false):
-			continue
-		presentation.collision_layer = 0
-		presentation.collision_mask = 0
-		for shape: CollisionShape3D in presentation.find_children("*", "CollisionShape3D", true, false):
+		if presentation.collision_layer != 0:
+			presentation.collision_layer = 0
+		if presentation.collision_mask != 0:
+			presentation.collision_mask = 0
+	for shape: CollisionShape3D in _presentation_collision_shapes:
+		if is_instance_valid(shape) and not shape.disabled:
 			shape.disabled = true
 			shape.set_deferred("disabled", true)
-	# Imported modules can put more than one CollisionShape3D under the same
-	# CollisionObject3D.  A body layer must stay active when any of its shapes
-	# belongs to the current phase; writing it once per shape made the last
-	# shape in traversal order decide the whole body's state and could leave an
-	# inactive timeline wall in the broadphase.
-	var owner_shapes: Dictionary = {}
-	for shape: CollisionShape3D in geometry.find_children("*", "CollisionShape3D", true, false):
-		var phase := preload("res://scripts/run/timeline_collision.gd").phase_of(shape)
-		if phase not in [&"present", &"remnant"]:
-			continue
-		var owner := _collision_owner(shape)
-		if owner == null:
-			continue
-		if shape.get_meta("presentation_only", false) or owner.get_meta("presentation_only", false):
-			continue
-		var records: Array = owner_shapes.get(owner, [])
-		records.append({"shape": shape, "phase": phase})
-		owner_shapes[owner] = records
-	for owner_key in owner_shapes.keys():
-		var owner := owner_key as CollisionObject3D
-		if owner == null:
+	for owner: CollisionObject3D in _timeline_collision_owners:
+		if not is_instance_valid(owner):
 			continue
 		if not owner.has_meta("timeline_base_layer"):
 			owner.set_meta("timeline_base_layer", owner.collision_layer)
 			owner.set_meta("timeline_base_mask", owner.collision_mask)
 		var owner_active := false
-		for record: Dictionary in owner_shapes[owner]:
+		var records: Array = _timeline_owner_shapes.get(owner, [])
+		for record: Dictionary in records:
 			var shape := record["shape"] as CollisionShape3D
-			if shape == null:
+			if not is_instance_valid(shape):
 				continue
-			var active: bool = StringName(record["phase"]) == timeline_phase and enabled and not bool(shape.get_meta("gameplay_disabled", false))
+			var active: bool = StringName(record["phase"]) == timeline_phase and enabled and not bool(owner.get_meta("gameplay_hidden", false)) and not bool(shape.get_meta("gameplay_disabled", false))
 			owner_active = owner_active or active
-			shape.disabled = not active
-			shape.set_deferred("disabled", shape.disabled)
-		owner.collision_layer = int(owner.get_meta("timeline_base_layer")) if owner_active else 0
-		owner.collision_mask = int(owner.get_meta("timeline_base_mask")) if owner_active else 0
-		# CollisionObject3D.visible is part of the gameplay contract here. A
-		# nested owner can outlive its phase holder's visibility, which leaves an
-		# active invisible wall/anchor in the broadphase. Force the owner to follow
-		# the same result as its shapes; the parent phase holder still controls the
-		# final inherited visibility.
-		if not owner.get_meta("presentation_only", false):
-			owner.visible = owner_active and not owner.get_meta("gameplay_hidden", false)
+			var should_disable := not active
+			if shape.disabled != should_disable:
+				shape.disabled = should_disable
+				shape.set_deferred("disabled", should_disable)
+		var layer := int(owner.get_meta("timeline_base_layer")) if owner_active else 0
+		var mask := int(owner.get_meta("timeline_base_mask")) if owner_active else 0
+		if owner.collision_layer != layer:
+			owner.collision_layer = layer
+		if owner.collision_mask != mask:
+			owner.collision_mask = mask
+		if owner.visible != owner_active:
+			owner.visible = owner_active
 
 func _wall(center: Vector3, size: Vector3, solid: bool = true) -> void:
 	var body:=DemoGeometry.box(geometry,center,size,_stone,solid)
