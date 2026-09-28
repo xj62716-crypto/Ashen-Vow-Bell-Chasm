@@ -46,6 +46,16 @@ static func _module(parent: Node3D, kind: StringName, point: Vector3, scale_valu
 	holder.add_child(model)
 	holder.set_meta("asset_id",String(MODULES[kind]).get_basename())
 	holder.position=point;holder.scale=scale_value;holder.rotation.y=yaw
+	# Imported Blender modules are art dressing. Their authoring colliders must
+	# never become an untagged gameplay wall or floor in the formal scene. The
+	# room's authored StaticBody3D remains the only traversal collision owner.
+	for collider: CollisionObject3D in model.find_children("*", "CollisionObject3D", true, false):
+		collider.set_meta("presentation_only", true)
+		collider.collision_layer=0
+		collider.collision_mask=0
+		for shape: CollisionShape3D in collider.find_children("*", "CollisionShape3D", true, false):
+			shape.set_meta("presentation_only", true)
+			shape.disabled=true
 	return holder
 
 static func _box_collision(parent:Node3D,point:Vector3,size:Vector3)->CollisionShape3D:
@@ -53,12 +63,13 @@ static func _box_collision(parent:Node3D,point:Vector3,size:Vector3)->CollisionS
 	shape.shape=bounds;shape.position=point;parent.add_child(shape);return shape
 
 static func platform_skin(parent: Node3D, center: Vector3, size: Vector2, stage: int) -> void:
-	if OS.has_feature("headless"):
-		return
-	var template := _scene(&"floor").instantiate() as Node3D
 	var holder := _root(parent,&"platform_skin")
 	holder.set_meta("asset_id","C03_flagstone")
 	holder.position=center+Vector3.UP*.022
+	# Headless validation still needs the authored dressing node and its phase
+	# ownership. Skip only the render-heavy MultiMesh construction.
+	if OS.has_feature("headless"):return
+	var template := _scene(&"floor").instantiate() as Node3D
 	var nx := maxi(1,ceili(size.x/4.0));var nz := maxi(1,ceili(size.y/4.0))
 	var cell := Vector2(size.x/nx,size.y/nz)
 	for source: MeshInstance3D in template.find_children("*","MeshInstance3D",true,false):
@@ -117,7 +128,16 @@ static func _edge_landmark(room: CombatRoom, point: Vector3, size: Vector2, inde
 	var edge:=point
 	var rotation:=atan2(-travel.x,-travel.z)
 	var arch:=_module(room.geometry,&"arch",edge,Vector3(1.1,1.25,1.1),rotation)
+	var owner := room.platform_at(point)
+	var phase:StringName = preload("res://scripts/run/timeline_collision.gd").phase_of(owner) if owner != null else &""
+	if phase in [&"present",&"remnant"]: arch.set_meta("timeline_phase",phase)
 	var body:=StaticBody3D.new();body.name="ArchPiers";body.collision_layer=1;body.collision_mask=0;arch.add_child(body)
+	# Visual supports beside a landing are not route geometry. The authored
+	# platform/wall owns collision; pier boxes must not become air walls.
+	body.set_meta("presentation_only",true)
+	body.collision_layer=0
+	body.collision_mask=0
+	if phase in [&"present",&"remnant"]: body.set_meta("timeline_phase",phase)
 	# Keep the piers on the actual slab edges.  The old fixed 2.13 m offset put
 	# both supports in the authored landing lane on the wider expansion decks,
 	# trapping a player who had already completed the wall transfer.
@@ -125,6 +145,9 @@ static func _edge_landmark(room: CombatRoom, point: Vector3, size: Vector2, inde
 	_box_collision(body,Vector3(-pier_offset,2.1,0),Vector3(.62,4.2,.72))
 	_box_collision(body,Vector3(pier_offset,2.1,0),Vector3(.62,4.2,.72))
 	body.add_to_group("integrated_environment_collision")
+	for shape: CollisionShape3D in body.find_children("*","CollisionShape3D",true,false):
+		shape.set_meta("presentation_only",true)
+		shape.disabled=true
 	arch.set_meta("support_points",[Vector3(-pier_offset,.08,0),Vector3(pier_offset,.08,0)])
 	# A visible forged crossbar is the banner attachment, rather than an implied
 	# floating pivot. Holder scaling places this at roughly 5.15 m world height.
@@ -133,10 +156,13 @@ static func _edge_landmark(room: CombatRoom, point: Vector3, size: Vector2, inde
 	# into the already-authored platform foundation.
 	var buttress:=_module(room.geometry,&"buttress",edge+Vector3(0,-5.3,0),Vector3(.72,1.0,.72),rotation)
 	buttress.set_meta("attached_to",arch.get_path())
-	var owner := room.platform_at(point)
 	if owner != null:
 		arch.reparent(owner,true)
 		buttress.reparent(owner,true)
+		# Reparenting keeps world pose but the platform is the phase owner. Write
+		# the phase on the visual holder as well so apply_timeline_phase can hide
+		# the prop itself, not only its nested collision shapes.
+		if phase in [&"present",&"remnant"]: arch.set_meta("timeline_phase",phase)
 	if room.stage!=2 or index%2==0:
 		# Baked banner origin is at cloth bottom; its rod is 2.857 m above.
 		var banner:=_module(room.geometry,&"banner",edge+Vector3(0,2.12,0),Vector3(1.05,1.05,1.05),rotation)
@@ -147,14 +173,25 @@ static func _edge_landmark(room: CombatRoom, point: Vector3, size: Vector2, inde
 
 static func _route_lantern(room: CombatRoom, point: Vector3, tint: Color, support: Node3D = null) -> void:
 	var lantern:=_module(room.geometry,&"lantern",point,Vector3(1.15,1.15,1.15))
+	var phase:StringName = preload("res://scripts/run/timeline_collision.gd").phase_of(support) if support != null else &""
+	if phase in [&"present",&"remnant"]: lantern.set_meta("timeline_phase",phase)
 	var body:=StaticBody3D.new();body.name="LanternBody";body.collision_layer=1;body.collision_mask=0;lantern.add_child(body)
+	body.set_meta("presentation_only",true)
+	body.collision_layer=0
+	body.collision_mask=0
+	if phase in [&"present",&"remnant"]: body.set_meta("timeline_phase",phase)
 	_box_collision(body,Vector3(0,.52,0),Vector3(.56,1.04,.56));body.add_to_group("integrated_environment_collision")
+	for shape: CollisionShape3D in body.find_children("*","CollisionShape3D",true,false):
+		shape.set_meta("presentation_only",true)
+		shape.disabled=true
 	lantern.set_meta("support_points",[Vector3(0,.05,0)])
 	var light:=OmniLight3D.new();light.position=Vector3(0,.55,0);light.light_color=tint
 	light.light_energy=1.8;light.omni_range=7.5;light.shadow_enabled=true
 	light.distance_fade_enabled=true;light.distance_fade_begin=22;light.distance_fade_length=7
 	lantern.add_child(light)
-	if support != null: lantern.reparent(support,true)
+	if support != null:
+		lantern.reparent(support,true)
+		if phase in [&"present",&"remnant"]: lantern.set_meta("timeline_phase",phase)
 
 static func decorate(room: CombatRoom) -> void:
 	_ensure_foundations(room)
@@ -191,11 +228,10 @@ static func _wall_skin(body:Node3D,room:CombatRoom)->void:
 		for y in ny:
 			var tile:=_module(body,&"wall",Vector3(0,-size.y*.5+y*size.y/ny,(x+.5)*size.z/nx-size.z*.5),Vector3(size.z/nx/4.16,size.y/ny/4.01,size.x/.62),PI/2)
 			tile.set_meta("static_dressing",true)
-	var lower:float=body.position.y-size.y*.5
-	if lower> -24:
-		var height:float=lower+24
-		var support:=DemoGeometry.box(body,Vector3(0,-size.y*.5-height*.5,0),Vector3(size.x,height,size.z),room._stone)
-		support.set_meta("static_dressing",true)
+	# Route walls are traversal surfaces, not automatic towers. They may begin
+	# and end in open air, so never fabricate a shaft down to the lower city.
+	# The former fallback made every wall appear grounded and caused the dressing
+	# to intersect unrelated buildings while hiding the actual playable surface.
 
 static func _selected_route_assets(room:CombatRoom)->void:
 	for node in room.geometry.get_children():
@@ -203,7 +239,8 @@ static func _selected_route_assets(room:CombatRoom)->void:
 	for device:TerrainDevice in room.terrain_devices:
 		if device.kind==&"breakable" and is_instance_valid(device._barrier):
 			_hide_direct_meshes(device._barrier)
-			_module(device._barrier,&"oak",Vector3(0,-1.5,-.08),Vector3(3.2/2.6,3./2.4,.7))
+			var oak:=_module(device._barrier,&"oak",Vector3(0,-1.5,-.08),Vector3(3.2/2.6,3./2.4,.7))
+			oak.set_meta("attached_to",device._barrier.get_path())
 		if device.kind in [&"lift",&"bridge"]:
 			_hide_direct_meshes(device)
 			_module(device,&"winch",Vector3(0,-1.05,0),Vector3.ONE*.7)
@@ -222,18 +259,23 @@ static func _selected_route_assets(room:CombatRoom)->void:
 	# Beam, yoke and bell are physically overlapping. Two wall bays carry roof.
 	for side:float in [-1,1]:
 		var bay:=court+Vector3(side*(extent.x*.5-.45),0,extent.y*.28)
-		_module(room.geometry,&"window",bay,Vector3(1,1,1),PI/2)
-		_module(room.geometry,&"roof",bay+Vector3(0,3.82,0),Vector3(.9,.55,.9),PI/2)
+		var bay_node:=_module(room.geometry,&"window",bay,Vector3(1,1,1),PI/2)
+		# Keep the roof in the bay's local support hierarchy. A world-space roof
+		# offset survived route edits as a detached floating slab; parenting it to
+		# the masonry bay preserves the authored load path when the court moves.
+		var roof:=_module(bay_node,&"roof",Vector3(0,3.82,0),Vector3(.9,.55,.9),PI/2)
+		roof.set_meta("attached_to",bay_node.get_path())
 	if room.stage==1:
-		# The overhead traction beam is carried into the lower city at both ends.
-		for side:float in [-1,1]:
-			var pier:=Vector3(-3+side*13,-24,-132)
-			_module(room.geometry,&"buttress",pier,Vector3(1.2,44./5.34,1.2))
+		# The overhead traction beam hangs in the void. Do not add ground-to-beam
+		# buttresses: they were visual-only, intersected the lower city and made a
+		# wall-run look like a walkable ground route.
 		# Arch crown wraps the solid roof of the real slide duct; no collision added.
-		_module(room.geometry,&"low_arch",Vector3(-3,1.78,-89),Vector3(1.35,.70,1))
+		var low_arch:=_module(room.geometry,&"low_arch",Vector3(-3,1.78,-89),Vector3(1.35,.70,1))
+		low_arch.set_meta("attached_to_route",true)
 		for p:Vector3 in [Vector3(0,0,-1),Vector3(0,0,-45)]:
 			# Broken masonry projects downward from a real takeoff/landing lip.
-			_module(room.geometry,&"broken_end",p+Vector3(0,-3.1,0),Vector3(1.1,1,1),PI if p.z < -20 else 0.)
+			var broken:=_module(room.geometry,&"broken_end",p+Vector3(0,-3.1,0),Vector3(1.1,1,1),PI if p.z < -20 else 0.)
+			broken.set_meta("hanging",true)
 	# Wooden suspended decking is attached only to already-solid link segments.
 	for link:Dictionary in room.route_links:
 		if link.get("mechanic",&"")==&"wall_run":continue

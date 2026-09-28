@@ -44,7 +44,9 @@ func _run() -> void:
 	await step(28)
 	var resolved:=combat.arts.execution_status()
 	check(resolved.phase==&"recovery" or resolved.phase==&"idle","successful pursuit reaches contact and bounded recovery")
-	await step(24)
+	# The project runs at 120 Hz; wait in seconds so this assertion remains
+	# valid when the fixed timestep changes.
+	await step(ceili(.4*Engine.physics_ticks_per_second))
 	var recovered:=combat.arts.execution_status()
 	check(recovered.phase==&"idle" and not combat.arts.blocks_primary_attack(),"pursuit recovery unlocks primary input on its own clock")
 

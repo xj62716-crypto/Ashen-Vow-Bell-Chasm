@@ -36,7 +36,7 @@ func receive_hit(amount: int, _direction: Vector3) -> bool:
 
 func activate() -> bool:
 	if not preload("res://scripts/run/timeline_collision.gd").active(self):return false
-	if _tuning==null or used or not is_inside_tree() or not is_instance_valid(player):
+	if _tuning==null or used or not is_inside_tree() or get_tree().paused or not is_instance_valid(player) or not player.control_enabled:
 		return false
 	if kind == &"launch":
 		if _cooldown>0.0 or player.global_position.distance_to(global_position)>_tuning.launch_interact_range_m:

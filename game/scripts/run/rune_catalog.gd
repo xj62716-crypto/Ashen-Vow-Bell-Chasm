@@ -128,6 +128,15 @@ static func offer(profile_id: StringName, acquired: Array[StringName], rng: Rand
 	# unowned cores/branches. Every returned option is executable immediately.
 	if acquired.is_empty():
 		var opening := cores.duplicate()
+		# R7's signature arcanist loop must be available in the opening room.
+		# Without this guarantee the route-building build could be absent from an
+		# otherwise valid run, leaving the authored construct crossing invisible.
+		if profile_id == &"arcanist":
+			for opening_index in range(opening.size() - 1, -1, -1):
+				if opening[opening_index].get("id", &"") == &"arcane_shape":
+					result.append(opening[opening_index])
+					opening.remove_at(opening_index)
+					break
 		while not opening.is_empty() and result.size() < 3:
 			result.append(opening.pop_at(rng.randi_range(0, opening.size()-1)))
 		return _annotate_offer(result, profile_id, acquired)

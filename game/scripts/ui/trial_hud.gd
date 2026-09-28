@@ -342,8 +342,9 @@ func _build_menu() -> void:
 	course_choice = _choice(column, "进入路线", ["断桥穿越 · 练习", "侧墙练习", "破界 · 三域主线"])
 	course_choice.select(2)
 	course_choice.get_parent().hide()
-	class_choice = _choice(column, "职业机动", ["影刃 · 长刀疾行", "咒行者 · 法杖借势"])
-	class_hint = _label(MovementTrial.PROFILES[0].description, 13, GOLD)
+	class_choice = _choice(column, "职业", ["影刃", "咒行者"])
+	class_hint = _label("", 13, GOLD)
+	class_hint.visible = false
 	column.add_child(class_hint)
 	class_choice.item_selected.connect(_on_class_selected)
 	item_choice = _choice(column, "练习持物", ["空手", "长刀", "法杖"])
@@ -485,7 +486,7 @@ func _primary_pressed() -> void:
 
 
 func _on_class_selected(index: int) -> void:
-	class_hint.text = MovementTrial.PROFILES[index].description
+	class_hint.text = ""
 
 
 func hide_rewards() -> void:

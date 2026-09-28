@@ -79,13 +79,30 @@ func try_shift() -> bool:
 		return false
 	var previous := phase
 	var next_phase := REMNANT if phase == PRESENT else PRESENT
+	# Respawn, grapple release and same-frame scripted movement can update the
+	# CharacterBody3D before the child collision shape has flushed its transform.
+	# Sync both owners before checking destination solids so a phase switch never
+	# accepts a capsule that is already inside a wall.
+	player.force_update_transform()
+	player.body_shape.force_update_transform()
 	if not CollisionSafety.can_enter(player,room.geometry,next_phase):
 		blocked.emit(&"occupied")
 		return false
 	phase = next_phase
 	charges -= 1
 	cooldown_left = cooldown_seconds
+	# Input is sampled in the idle tick while wall contact is updated in the
+	# physics tick. A wall kick can therefore clear _wall_active one frame before
+	# the shift request is consumed. Keep the phase armed through that airborne
+	# handoff instead of applying it immediately and deleting the source wall
+	# under the runner.
+	var wall_handoff := player.is_wall_running() or (not player.is_on_floor() and player.wall_chain_count > 0 and player._wall_normal.length_squared() > .5)
 	if player.is_wall_running():
+		room.prepare_timeline_phase(phase)
+		player.prepare_timeline_wall_handoff()
+		room.apply_timeline_phase(phase)
+		_pending_wall_phase = &""
+	elif wall_handoff:
 		room.prepare_timeline_phase(phase)
 		_pending_wall_phase = phase
 	else:

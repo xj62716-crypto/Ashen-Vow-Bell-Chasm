@@ -158,7 +158,10 @@ func _physics_process(delta: float) -> void:
 		return
 	if execution_recovering and combat.impact_hold<=0:
 		execution_recovery_age+=delta
-		if execution_recovery_age>=pursuit_profile.recovery_seconds:
+		# A recovery is sampled on the fixed clock.  Allow the half-frame
+		# boundary tolerance so a nominal .24 s recovery cannot remain latched
+		# for an extra physics tick when the accumulated age is .2333 s.
+		if execution_recovery_age+delta*.5>=pursuit_profile.recovery_seconds:
 			execution_recovering=false
 			execution_phase=&"idle"
 	if execution_active:

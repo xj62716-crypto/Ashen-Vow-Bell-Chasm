@@ -32,6 +32,10 @@ static func dimensions(type: StringName) -> Vector3:
 
 func _ready() -> void:
 	process_mode=Node.PROCESS_MODE_PAUSABLE
+	# A construct is a real gameplay object, so its local visibility must never
+	# inherit a stale hidden state from the room's menu/suspension pass. Timeline
+	# ownership may hide it later through CombatRoom.apply_timeline_phase().
+	visible = true
 	add_to_group("parkour_constructs")
 	timer=lifetime
 	_surface=ShaderMaterial.new()
@@ -121,7 +125,16 @@ func _physics_process(delta: float) -> void:
 			queue_free()
 			return
 	_launch_lock=maxf(0,_launch_lock-delta)
-	if not preload("res://scripts/run/timeline_collision.gd").active(self): return
+	var timeline_active := preload("res://scripts/run/timeline_collision.gd").active(self)
+	if has_meta("timeline_phase"):
+		# Phase ownership is authoritative for both render and collision. This
+		# self-heals a stale local visible flag after a room rebuild.
+		visible = timeline_active
+	elif permanent:
+		# Permanent route anchors are never allowed to become invisible while their
+		# gameplay body remains in the grapple query set.
+		visible = true
+	if not timeline_active: return
 	if kind==&"wall" and not _used and is_instance_valid(player) and player.is_wall_running() and supporting_player():
 		if not _ice_shattered and is_instance_valid(owner_arts) and owner_arts.has(&"arcane_ice"):
 			_ice_shattered=true

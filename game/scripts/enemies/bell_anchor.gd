@@ -7,6 +7,7 @@ var health: int = 1
 
 func _ready() -> void:
 	process_mode = PROCESS_MODE_PAUSABLE
+	visible = true
 	# Persistent mechanism belongs to its enemy's authored world, not a transient
 	# shot's launch world. A shared enemy's anchor remains shared as well.
 	var phase := preload("res://scripts/run/timeline_collision.gd").phase_of(owner_enemy)
@@ -19,6 +20,13 @@ func _ready() -> void:
 	shape.shape = sphere
 	add_child(shape)
 	DemoGeometry.sphere(self, Vector3.ZERO, .32, DemoGeometry.material(Color("#c4a276"), .5))
+
+func _physics_process(_delta: float) -> void:
+	if health <= 0:
+		return
+	# The anchor is both a visible weak point and a collider. Keep those states
+	# synchronized after a room rebuild or timeline handoff.
+	visible = preload("res://scripts/run/timeline_collision.gd").active(self)
 
 func get_hit_point() -> Vector3:
 	return global_position

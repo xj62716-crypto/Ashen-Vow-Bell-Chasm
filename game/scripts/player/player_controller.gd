@@ -34,7 +34,8 @@ signal slide_jumped
 @export var parkour_profile: ParkourProfile = preload("res://data/classes/shade.tres")
 @export_range(0.4, 2.4, 0.05) var wall_probe_reach: float = 2.2
 @export var wall_minimum_speed: float = 4.0
-@export_range(0.0, 1.5, 0.05) var wall_surface_gap_grace: float = 1.1
+@export_range(0.0, 1.5, 0.05) var wall_surface_gap_grace: float = 0.22
+@export_range(-1.2, 0.0, 0.05) var wall_descent_speed: float = -0.25
 @export var wall_jump_grace: float = 0.12
 @export_range(0.12, 0.6, 0.01) var wall_jump_transfer_window: float = 0.5
 @export_range(2, 4, 1) var wall_chain_limit: int = 2
@@ -270,7 +271,14 @@ func _physics_process(delta: float) -> void:
 	elif _wall_active:
 		var along_speed: float = maxf(wall_minimum_speed, velocity.dot(_wall_tangent))
 		along_speed = move_toward(along_speed, parkour_profile.wall_speed, parkour_profile.wall_acceleration * delta)
-		var vertical: float = maxf(-1.3, velocity.y - gravity * parkour_profile.wall_gravity_scale * delta)
+		# A wall face is a horizontal traversal surface.  Carrying the jump's
+		# positive Y velocity into this branch made every wall-run climb higher
+		# than its authored exit and let the player bypass the route vertically.
+		# Clamp entry to a controlled, small descent and let only wall-jump restore
+		# a positive vertical impulse.
+		var vertical_target := minf(wall_descent_speed, 0.0)
+		var vertical: float = move_toward(minf(velocity.y, 0.0), vertical_target, maxf(6.0, gravity * maxf(parkour_profile.wall_gravity_scale, .25)) * delta)
+		vertical = clampf(vertical, -1.3, 0.0)
 		velocity = _wall_tangent * along_speed - _wall_normal * 1.8
 		velocity.y = vertical
 	else:
@@ -453,6 +461,17 @@ func is_wall_running() -> bool:
 	return _wall_active
 
 
+func prepare_timeline_wall_handoff() -> void:
+	## Release the old phase wall without cancelling horizontal momentum.  The
+	## destination phase is enabled by TimelineRuntime in the same transaction;
+	## the next physics tick can therefore reacquire it as a new wall segment
+	## while the player is still airborne.
+	if _wall_active:
+		_stop_wall(false)
+	_wall_capture_left = maxf(_wall_capture_left, .16)
+	_wall_jump_transfer_left = maxf(_wall_jump_transfer_left, .18)
+
+
 func wall_time_remaining() -> float:
 	return maxf(0.0, parkour_profile.wall_duration - _wall_time_used)
 
@@ -593,12 +612,9 @@ func _update_wall_contact(wish: Vector3, stick: Vector2, delta: float) -> void:
 			_wall_capture_left = 0.0
 			_coyote_left = 0.0
 			_wall_coyote_left = 0.0
-			var wall_collider := hit.get("collider") as Node
-			var entry_wall := wall_collider != null and bool(wall_collider.get_meta("entry_wall", false))
-			# The short entrance wall teaches capture and handoff; it should not
-			# turn the jump arc into a high launch that sails past its receiving
-			# deck. Authored high-line transfers keep the normal vertical carry.
-			velocity.y = clampf(velocity.y, -0.8, 1.8 if entry_wall else 5.0)
+			# Capture always settles onto the authored wall plane. Vertical launch is
+			# reserved for the explicit wall-jump action below.
+			velocity.y = clampf(velocity.y, -0.8, 0.0)
 			wall_run_count += 1
 			mark_traversal_action(&"wall_run")
 			wall_run_started.emit(side)
@@ -623,6 +639,10 @@ func _update_wall_contact(wish: Vector3, stick: Vector2, delta: float) -> void:
 			velocity -= _wall_tangent * maxf(0.0, carry - 4.0)
 			_stop_wall()
 			return
+		# A missing probe is a short seam, not permission to keep the jump arc.
+		# Preserve only the authored horizontal carry while the next real wall is
+		# reacquired.
+		velocity.y = minf(velocity.y, 0.0)
 		# Authored wall modules can have a short masonry seam at a transfer. Keep
 		# the latched tangent for that physical gap so a player can carry the same
 		# wall-run into the next face without touching the ground.
@@ -647,6 +667,9 @@ func _stop_wall(allow_grace: bool = true) -> void:
 	_blocked_wall_plane_offset = _wall_plane_offset
 	_wall_coyote_left = wall_jump_grace if allow_grace else 0.0
 	_momentum_left = 0.4
+	# Do not leak an upward jump through a wall-run exit.  _perform_wall_jump()
+	# writes its deliberate launch velocity immediately after this helper.
+	velocity.y = minf(velocity.y, 0.0)
 	wall_side = 0
 	wall_run_ended.emit()
 

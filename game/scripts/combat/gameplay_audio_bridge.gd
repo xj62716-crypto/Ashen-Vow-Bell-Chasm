@@ -66,6 +66,13 @@ func bind_room(room: CombatRoom) -> void:
 		if not is_instance_valid(enemy): continue
 		var shot:=_enemy_fired.bind(enemy)
 		if not enemy.fired.is_connected(shot):enemy.fired.connect(shot)
+		# Guarded contacts are resolved by the enemy after its damage gate.  The
+		# player combat signal only reports accepted damage, so without this
+		# listener a blade striking a shield or boss phase is completely silent.
+		# Keep the event spatial and keyed to the enemy instance so several guards
+		# can be hit in the same frame without sharing a cooldown.
+		if not enemy.hit_resolved.is_connected(_enemy_hit_resolved):
+			enemy.hit_resolved.connect(_enemy_hit_resolved)
 		var tell := _enemy_windup.bind(enemy)
 		if is_instance_valid(enemy.brain) and not enemy.brain.attack_committed.is_connected(tell):
 			enemy.brain.attack_committed.connect(tell)
@@ -80,6 +87,21 @@ func bind_room(room: CombatRoom) -> void:
 func _enemy_fired(enemy:LanternAcolyte)->void:
 	if not is_instance_valid(enemy) or not enemy.active or enemy.health<=0 or not player.control_enabled:return
 	audio.play_at("hostile_bolt",enemy.get_hit_point(),.45,str(enemy.get_instance_id()))
+
+func _enemy_hit_resolved(enemy: LanternAcolyte, point: Vector3, accepted: bool, reason: StringName) -> void:
+	if not is_instance_valid(enemy) or not enemy.active or reason in [&"inactive", &"dead", &"invalid_amount"]:
+		return
+	# A rejected guard/phase hit is still a real contact.  Use the authored
+	# armour transient instead of dropping the event. Accepted contacts are
+	# resolved here as well so formal rooms have one authoritative, spatial hit
+	# voice rather than a local fallback racing the enemy result signal.
+	if not accepted:
+		if reason not in [&"guard", &"boss_shield", &"boss_phase", &"movement_required"]:
+			return
+		audio.play_at("hit_armor",point,.9,str(enemy.get_instance_id()))
+		return
+	var key := "execution" if enemy.health <= 0 else ("hit_armor" if enemy.has_guard() or enemy.threat_rank in [&"elite", &"miniboss", &"boss"] else "hit_flesh")
+	audio.play_at(key,point,1.0 if enemy.health <= 0 else .9,str(enemy.get_instance_id()))
 
 func _enemy_windup(kind: StringName, _point: Vector3, _seconds: float, enemy: LanternAcolyte) -> void:
 	if not is_instance_valid(enemy) or not enemy.active or enemy.health <= 0 or not player.control_enabled: return

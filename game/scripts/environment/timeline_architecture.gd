@@ -97,8 +97,22 @@ static func _asset(parent: Node3D, kind: StringName, point: Vector3, scale_value
 	holder.rotation.y = yaw
 	holder.set_meta("environment_role", kind)
 	holder.set_meta("asset_id", MODULES[kind].get_basename())
+	if kind in [&"arch", &"window", &"buttress"]:
+		holder.set_meta("attached_to_route", true)
 	parent.add_child(holder)
-	holder.add_child(scene.instantiate())
+	var instance := scene.instantiate() as Node3D
+	holder.add_child(instance)
+	# These modules are presentation-only. A Blender export may contain a
+	# convenience collider for authoring, but formal route geometry owns gameplay
+	# collision. Leaving that collider live creates an invisible blocker when the
+	# phase holder is hidden and makes a decorative arch behave like a wall.
+	for collider: CollisionObject3D in instance.find_children("*", "CollisionObject3D", true, false):
+		collider.set_meta("presentation_only", true)
+		collider.collision_layer = 0
+		collider.collision_mask = 0
+		for shape: CollisionShape3D in collider.find_children("*", "CollisionShape3D", true, false):
+			shape.set_meta("presentation_only", true)
+			shape.disabled = true
 	_phase(holder, phase)
 	return holder
 
@@ -279,8 +293,18 @@ static func _build_remnant(room: CombatRoom, root: Node3D) -> void:
 		var extent: Vector2 = room.platform_extents.get(center,Vector2(10,10))
 		var recovery := center+Vector3(side*(extent.x*.5+3.4),-4.2,2.0)
 		var recovery_body := room._platform(recovery,Vector2(5.0,6.0))
+		# Recovery stations belong to the remnant world. They used to be added as
+		# ordinary platforms after the phase build, leaving their floor active in
+		# the present and their wind-well collision detached from visibility.
+		_phase(recovery_body, REMNANT)
 		CitadelExpansion._foundation(room,recovery,Vector2(5.0,6.0))
 		IntegratedEnvironmentDressing.platform_skin(recovery_body,Vector3.UP*.6,Vector2(5.0,6.0),room.stage)
+		for foundation: Node in room.get_tree().get_nodes_in_group("structural_foundation"):
+			if foundation is Node3D and Vector3(foundation.get_meta("platform_center",Vector3.INF)).distance_to(recovery) < .08:
+				_phase(foundation as Node3D, REMNANT)
+		for child: Node in recovery_body.get_children():
+			if child is Node3D and child.get_meta("environment_role", &"") == &"platform_skin":
+				_phase(child as Node3D, REMNANT)
 		var well := RiftConstruct.new()
 		well.name = "TimelineRecoveryWell_%d" % deck_index
 		well.kind = &"well"
@@ -288,6 +312,7 @@ static func _build_remnant(room: CombatRoom, root: Node3D) -> void:
 		room.geometry.add_child(well)
 		well.position = recovery+Vector3.UP*.16
 		well.set_meta("timeline_recovery",true)
+		_phase(well, REMNANT)
 		room.signature_sections[&"phase_recovery_%d" %deck_index]={"floor":recovery,"well":well.position,"returns_to":high}
 	# A deep split in the remnant route is a visible and physical alternative
 	# to the present bridge. It is made from three offset plates, not a flat
@@ -315,6 +340,19 @@ static func _lock_selected_decks(room: CombatRoom) -> void:
 			continue
 		var target: Vector3 = room.route_nodes[deck_index]
 		var extent: Vector2 = room.platform_extents.get(target,Vector2.ZERO)
+		# Ramps, landing lips and wall bodies are authored as independent
+		# StaticBody3D nodes. If they overlap a deck that is removed in the remnant,
+		# leaving them untagged produces the exact failure users see: a visible void
+		# with an invisible floor/wall, or a solid body left behind the old world.
+		for body: CollisionObject3D in room.geometry.find_children("*", "CollisionObject3D", true, false):
+			if body.has_meta("timeline_phase") or body.get_meta("presentation_only", false):
+				continue
+			if not (body.has_meta("route_connector") or body.has_meta("route_wall_size") or body.has_meta("floating_route_surface")):
+				continue
+			var local := room.to_local(body.global_position) - target
+			var horizontal := absf(local.x) <= extent.x*.5 + 1.2 and absf(local.z) <= extent.y*.5 + 1.2
+			if horizontal and absf(local.y) <= 4.5:
+				_phase(body, PRESENT)
 		# Gameplay installations and grounded decoration use the same deck. An
 		# altar/checkpoint cannot survive visually or interact over its removed floor.
 		for device:Node3D in room.altars+room.terrain_devices+room.mechanisms:
@@ -393,14 +431,35 @@ static func _author_phase_contracts(room: CombatRoom) -> void:
 		nodes.append(point)
 		_set_route_node_phase(room,point,phases[nodes.size()-1],contract_id)
 	if nodes.size() < 2: return
+	_phase_chain_supports(room,nodes,phases,contract_id)
 	for index in range(nodes.size()-1):
 		var authored_wall := false
+		var authored_link: Dictionary = {}
 		for link: Dictionary in room.route_links:
 			if link.get("mechanic",&"") != &"wall_run": continue
 			if Vector3(link.get("from",Vector3.INF)).distance_to(nodes[index]) < .1 and Vector3(link.get("to",Vector3.INF)).distance_to(nodes[index+1]) < .1:
 				authored_wall = true
+				authored_link = link
 				break
-		if authored_wall: continue
+		if authored_wall:
+			# The authored route wall is the source surface. Keep its two physical
+			# faces together, then create only one clearly placed destination face.
+			# The previous implementation added a second pair of long walls here;
+			# their overlapping end caps were the invisible air walls players hit
+			# while switching worlds.
+			for wall: Node in room.geometry.find_children("*", "StaticBody3D", true, false):
+				if not wall.has_meta("wall_link_from") or not wall.has_meta("wall_link_to"): continue
+				var wall_from: Vector3 = wall.get_meta("wall_link_from")
+				var wall_to: Vector3 = wall.get_meta("wall_link_to")
+				if wall_from.distance_to(nodes[index]) < .1 and wall_to.distance_to(nodes[index+1]) < .1:
+					_phase(wall, phases[index])
+					wall.set_meta("timeline_crossing", true)
+			var authored_segments: Array = authored_link.get("segments", [])
+			var target_from: Vector3 = authored_segments[0] if authored_segments.size() >= 4 else nodes[index]
+			var target_to: Vector3 = authored_segments[2] if authored_segments.size() >= 4 else nodes[index+1]
+			var target_offset := .72 if index%2==0 else -.72
+			_phase_wall(room.geometry,target_from,target_to,room._stone,phases[index+1],target_offset,false)
+			continue
 		var side_offset := .72 if index%2==0 else -.72
 		# Expansion splits long links with a real midpoint landing.  Start the
 		# phase wall at that landing so the first half remains a grounded approach
@@ -440,6 +499,74 @@ static func _author_phase_contracts(room: CombatRoom) -> void:
 	room.signature_sections[contract_id]["required"] = true
 	room.signature_sections[contract_id]["route_role"] = &"critical"
 
+static func _phase_chain_supports(room: CombatRoom, nodes: Array[Vector3], phases: Array[StringName], contract_id: StringName) -> void:
+	# Every landing and connector on the critical chain must belong to the same
+	# world as the half of the link it serves. Leaving the small aprons untagged
+	# created a continuous ground shortcut around an otherwise phase-gated wall.
+	for candidate_variant in room.platform_extents.keys():
+		var center := Vector3(candidate_variant)
+		var best_distance := INF
+		var best_index := -1
+		var best_t := 0.0
+		for index in range(nodes.size()-1):
+			var flat := (nodes[index+1]-nodes[index]) * Vector3(1,0,1)
+			if flat.length_squared() < .25:
+				continue
+			var t := clampf(((center-nodes[index]) * Vector3(1,0,1)).dot(flat) / flat.length_squared(), 0.0, 1.0)
+			var closest := nodes[index].lerp(nodes[index+1], t)
+			var distance := center.distance_to(closest)
+			if distance < best_distance:
+				best_distance = distance
+				best_index = index
+				best_t = t
+		if best_index < 0 or best_distance > 7.0:
+			continue
+		var owner := room.platform_at(center)
+		if owner == null or owner.get_meta("timeline_shared_support", false):
+			continue
+		# Explicit remnant high decks and selected present decks already carry an
+		# authored phase. Never overwrite that declaration with a nearest-segment
+		# guess.
+		var existing := preload("res://scripts/run/timeline_collision.gd").phase_of(owner)
+		if existing in [PRESENT, REMNANT]:
+			continue
+		var phase := phases[best_index] if best_t < .5 else phases[best_index+1]
+		_phase(owner,phase)
+		owner.set_meta("timeline_contract",contract_id)
+		for foundation: Node in room.get_tree().get_nodes_in_group("structural_foundation"):
+			if foundation is Node3D and Vector3(foundation.get_meta("platform_center",Vector3.INF)).distance_to(center) < .08:
+				_phase(foundation as Node3D,phase)
+		for skin: Node in room.geometry.find_children("*","Node",true,false):
+			if skin.get_meta("environment_role",&"") != &"platform_skin":
+				continue
+			if (skin as Node3D).global_position.distance_to(room.to_global(center+Vector3.UP*.022)) < .12:
+				_phase(skin as Node3D,phase)
+	# Connector slabs are separate StaticBody3D nodes, so apply the same phase
+	# contract to their visible collision owner. This closes the common case where
+	# a ramp remained solid after its landing deck disappeared.
+	for body: CollisionObject3D in room.geometry.find_children("*","CollisionObject3D",true,false):
+		if not body.has_meta("route_connector") or body.has_meta("timeline_phase"):
+			continue
+		var local := room.to_local(body.global_position)
+		var best_distance := INF
+		var best_index := -1
+		var best_t := 0.0
+		for index in range(nodes.size()-1):
+			var flat := (nodes[index+1]-nodes[index]) * Vector3(1,0,1)
+			if flat.length_squared() < .25:
+				continue
+			var t := clampf(((local-nodes[index]) * Vector3(1,0,1)).dot(flat) / flat.length_squared(), 0.0, 1.0)
+			var closest := nodes[index].lerp(nodes[index+1],t)
+			var distance := local.distance_to(closest)
+			if distance < best_distance:
+				best_distance=distance
+				best_index=index
+				best_t=t
+		if best_index >= 0 and best_distance <= 6.0:
+			var phase := phases[best_index] if best_t < .5 else phases[best_index+1]
+			_phase(body,phase)
+			body.set_meta("timeline_contract",contract_id)
+
 static func _phase_node_index(point: Vector3, nodes: Array[Vector3]) -> int:
 	for index in nodes.size():
 		if point.distance_to(nodes[index]) < .08: return index
@@ -478,8 +605,9 @@ static func _phase_wall(parent: Node3D, from_point: Vector3, to_point: Vector3, 
 	var direction := flat.normalized()
 	var basis := Basis.looking_at(direction)
 	var length := flat.length()
-	var center := from_point.lerp(to_point,.5) + basis.x*side_offset + Vector3.UP*3.4
-	var height := 7.2+absf(to_point.y-from_point.y)
+	var center := from_point.lerp(to_point,.5) + basis.x*side_offset
+	var height := clampf(5.8+absf(to_point.y-from_point.y),5.8,8.0)
+	center.y = minf(from_point.y,to_point.y) + height*.5 - .08
 	var wall := _masonry_wall(parent,center,Vector3(.46,height,length+1.2),surface,phase,basis)
 	wall.set_meta("phase_chain_wall",true)
 	if not surface_probe:

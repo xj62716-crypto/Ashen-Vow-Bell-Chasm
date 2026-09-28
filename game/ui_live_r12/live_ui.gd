@@ -323,13 +323,28 @@ func navigate(page: String) -> void:
 
 func _classes() -> void:
 	_text(page_layer,"class_title","缔结契约",Rect2(150,95,1000,85),58,true)
-	for index in range(2):
-		var x: float = 280+index*815
-		var icon := TextureRect.new(); icon.texture = load("res://ui_live_r12/icons/"+("flow_blade" if index==0 else "elementalist")+".svg")
-		icon.position = Vector2(x+135,298); icon.size = Vector2(210,210); icon.mouse_filter = Control.MOUSE_FILTER_IGNORE; page_layer.add_child(icon)
-		_button("class_%d"%index,"影刃" if index==0 else "咒行者",Vector2(x+50,545),func(): start_class(index),410)
-		_text(page_layer,"class_detail_%d"%index,"长刀 · 弹反 · 残影回返" if index==0 else "法杖 · 元素 · 塑形造路",Rect2(x-35,650,565,65),25,true,HORIZONTAL_ALIGNMENT_CENTER)
-		_text(page_layer,"class_builds_%d"%index,"流刃决斗    飞檐猎杀\n掠地破阵    残影行者" if index==0 else "风暴行者    裂隙塑形\n封印术士    元素塑能者",Rect2(x-45,745,600,100),22,false,HORIZONTAL_ALIGNMENT_CENTER).modulate = _muted
+	_text(page_layer,"class_subtitle","择一契印",Rect2(154,174,920,42),22).modulate = _muted
+	var class_data := [
+		{"title":"影刃","eyebrow":"锋契","description":"","synergy":"","icon":"flow_blade"},
+		{"title":"咒行者","eyebrow":"咒契","description":"","synergy":"","icon":"elementalist"}
+	]
+	for index in range(class_data.size()):
+		var data: Dictionary = class_data[index]
+		var card := CHOICE.new()
+		card.name = "class_%d" % index
+		card.kind = "class"
+		card.number = index + 1
+		card.position = Vector2(350.0 + index * 740.0, 270.0)
+		card.size = Vector2(480.0, 500.0)
+		card.crest = load("res://ui_live_r12/icons/%s.svg" % data.icon)
+		card.eyebrow = data.eyebrow
+		card.title = data.title
+		card.description = data.description
+		card.synergy = data.synergy
+		card.set_meta("reduced_motion",profile.reduced_motion)
+		page_layer.add_child(card)
+		card.pressed.connect(start_class.bind(index))
+		buttons[card.name] = card
 	_button("back","返回",Vector2(125,955),back,320)
 	_focus_first()
 

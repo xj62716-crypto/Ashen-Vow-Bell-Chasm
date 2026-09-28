@@ -47,15 +47,20 @@ func _run() -> void:
 			break
 	check(is_instance_valid(remnant_anchor) and not trial.player.grapple.target_phase_active(remnant_anchor), "present phase rejects only the explicitly inactive remnant anchor")
 	var player := trial.player
+	player.respawn_at(Transform3D(Basis.IDENTITY, Vector3(0.0, 5.0, 5.0)))
 	player.velocity = Vector3(3.0, 7.0, -11.0)
 	player._ignore_floor_once = true
 	await step(1)
 	var before_position := player.global_position
 	var before_velocity := player.velocity
 	check(runtime.try_shift(), "airborne player can shift timeline with one press")
+	check(player.global_position.distance_to(before_position) < 0.001 and player.velocity.distance_to(before_velocity) < 0.001, "timeline shift preserves position and velocity at handoff")
 	await step(2)
 	check(runtime.phase == &"remnant" and runtime.charges == runtime.maximum_charges - 1, "shift consumes only phase resource")
-	check(player.global_position.distance_to(before_position) < 1.2 and player.velocity.distance_to(before_velocity) < 8.0, "timeline shift does not teleport or replace player motion")
+	# Two physics frames advance the runner under the authored velocity. The
+	# contract rejects a teleport or velocity replacement while allowing that
+	# bounded physical travel.
+	check(player.global_position.distance_to(before_position) < 2.0 and player.velocity.distance_to(before_velocity) < 8.0, "timeline shift does not teleport or replace player motion")
 	check(remnant.visible and not (remnant_shapes[0] as CollisionShape3D).disabled, "remnant route surface becomes visible and collidable")
 	check(trial.player.grapple.target_phase_active(remnant_anchor), "remnant shift activates its authored grapple anchor")
 	var enemy: Node = null

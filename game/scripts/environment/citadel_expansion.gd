@@ -100,16 +100,18 @@ static func build(room: CombatRoom) -> void:
 		# framing wall on the opposite flank so its body and sightline never
 		# occlude the authored grapple from the hub to branch[0].
 		var flank := Vector3(-9 if i==0 and stage==3 else (9 if i%2==0 else -9),3.4,0)
-		room._wall(point+flank,Vector3(.65,7,8))
+		# Framing masonry is visual composition only. Route walls are authored by
+		# _wall_link/_pressure_wall; this bay must not become an air-wall gate.
+		room._wall(point+flank,Vector3(.65,7,8),false)
 		if i in [0,2] or i==main.size()-1:CitadelDressing.asset(room.geometry,"gothic_bay",point+Vector3(0,0,-7),Vector3(1.6,1.6,1))
 		CitadelDressing.brazier(room.geometry,point+Vector3(-4,0,3))
 		# Main platforms are traversal beats. Only the middle of a route is an
 		# encounter; the entry/exit platforms stay readable for wall-run planning.
 		if i>0 and i<main.size()-1:
 			# Interrupt distant firing lines while keeping both flanks passable.
-			room._wall(point+Vector3(5.5,1.8,0),Vector3(1.1,3.6,4.5))
+			# Combat cover stays readable while leaving the traversal lane open.
+			room._wall(point+Vector3(5.5,1.8,0),Vector3(1.1,3.6,4.5),false)
 	room._extra_altar(hub+Vector3(-5,0,-3))
-	room._extra_altar(main[2]+Vector3(-3,0,3))
 	# Wide outer route: an optional exploration circuit reconnects at the arena.
 	var side: float=-1.0 if stage==2 else 1.0
 	var outer_width: float=49.0 if stage==3 else 39.0
@@ -142,6 +144,14 @@ static func build(room: CombatRoom) -> void:
 		if i>0:_link(room,branch[i-1],branch[i],true,false)
 		room._wall(branch[i]+Vector3(side*4.5,3,0),Vector3(.6,6.5,6))
 		# The outer loop is an exploration reward, not a second combat corridor.
+	# The mid-route checkpoint lives on the first outer landing.  The main
+	# high-line deck is intentionally retired in one timeline, so mounting an
+	# altar there would create a visible prop over a phase-dependent void.
+	# Keep the checkpoint readable without putting its physical plinth in the
+	# centre of the next traversal lane. The first outer landing continues
+	# straight into the following rise, so mount it on the inner shoulder of the
+	# same real platform.
+	room._extra_altar(branch[1]+Vector3(4.0,0,3.0))
 	# After the outer loop's traversal tests, a continuous return ramp gives a
 	# reliable recovery route into the arena without requiring another upgrade.
 	_link(room,branch[-1],main[-1],false)
@@ -301,10 +311,17 @@ static func _wall_link(room: CombatRoom,a: Vector3,b: Vector3) -> void:
 	elif room.stage == 3 and a.distance_to(Vector3(0,11,-170)) < .1:
 		# The previous wall must end before the next wall-run's departure deck.
 		wall_length=gap.length()+8.0
-	elif room.stage == 3 and a.distance_to(Vector3(26,13,-208)) < .1:
-		# The final tower wall hands into the arena from a lower return deck. A
-		# full-length decorative overrun keeps the runner on the wall past the
-		# authored kick window, so stop it near the receiving platform.
+	elif room.stage == 3 and b.distance_to(Vector3(13,11,-244)) < .1:
+		# This is the deliberate descending exit from the forge-side wall.  The
+		# generic run-out carries the parallel wall faces past the receiving deck;
+		# a runner then stays pressed to the end cap and meets the platform side
+		# below its top surface.  End the stone face inside the airborne handoff so
+		# gravity, rather than a hidden curb, settles onto the real lower deck.
+		wall_length=maxf(10.0,gap.length()-10.0)
+	elif room.stage == 3 and b.distance_to(Vector3(0,9,-279)) < .1:
+		# The final tower wall hands into the arena from the lower return deck. A
+		# full-length decorative overrun reaches the guardian's final platform,
+		# so stop it near the authored wall-kick window.
 		wall_length=maxf(10.0,gap.length()-4.0)
 	# Entry walls are the first committed vertical beat. Start them at the deck
 	# and give both professions enough readable face above the jump arc; later
@@ -356,7 +373,7 @@ static func _wall_link(room: CombatRoom,a: Vector3,b: Vector3) -> void:
 		# The final tower wall is approached from its lower end on the return
 		# circuit. Lower that face into the player's wall-probe band so the reverse
 		# transfer can latch before the capsule loses its floor contact.
-		if room.stage == 3 and a.distance_to(Vector3(26,13,-208)) < .1:
+		if room.stage == 3 and b.distance_to(Vector3(0,9,-279)) < .1:
 			wall_offset=Vector3.UP*.8
 		var wall_center:=takeoff.lerp(landing,.5)+entry_center_shift+basis.x*(side*side_offset)+wall_offset
 		var hub_exit_side: float = 1.0 if room.stage == 2 else -1.0
@@ -391,6 +408,8 @@ static func _wall_link(room: CombatRoom,a: Vector3,b: Vector3) -> void:
 		var wall:=DemoGeometry.box(room.geometry,wall_center,actual_size,room._stone,true)
 		wall.basis=basis
 		wall.set_meta("route_wall_size",actual_size)
+		wall.set_meta("wall_link_from",a)
+		wall.set_meta("wall_link_to",b)
 		wall.set_meta("entry_wall",entry_transfer)
 		if phase_crossing:
 			wall.set_meta("timeline_phase",&"present" if side>0 else &"remnant")
@@ -409,7 +428,11 @@ static func _wall_link(room: CombatRoom,a: Vector3,b: Vector3) -> void:
 	# Put the lip wholly on the receiving side of the wall exit. A centred lip
 	# still projected its near edge back into the wall and became the first
 	# collider hit during the final metres of a wall run.
-	var apron := wall_exit + direction * 4.0
+	# Descending exits need the threshold fully on the receiving side.  The
+	# runner is already below the source deck when the wall timer ends, so a
+	# centred apron presents its near end cap before the lower ramp can catch.
+	var apron_offset := 6.0 if b.y < a.y-.75 else 4.0
+	var apron := wall_exit + direction * apron_offset
 	# A full square here reaches several metres back into the wall-run and
 	# presents an axis-aligned vertical face before the player can kick toward
 	# the receiving deck.  Keep a real landing lip, but limit its depth to the
@@ -434,8 +457,21 @@ static func _wall_link(room: CombatRoom,a: Vector3,b: Vector3) -> void:
 		# under it, while leaving the long approach from the departure deck open.
 		var ramp_start := wall_exit - direction.normalized()*8.0
 		var ramp_end := wall_exit - direction.normalized()*4.0
-		ramp_start.y = b.y-signf(rise)*minf(2.5,absf(rise)+.5)
-		ramp_end.y = b.y
+		if rise < -0.75:
+			# On a descending wall the runner naturally loses more height than the
+			# authored node delta during the wall-duration window. Start the receiving
+			# ramp at that lower, real approach height and climb back onto the deck;
+			# beginning above the runner left an apparent ramp with no catch surface.
+			ramp_start = wall_exit - direction.normalized()*1.0
+			ramp_end = b + direction.normalized()*6.0
+			# The lower end follows the actual wall-run descent. The long receiving
+			# end carries the runner's forward impulse past the node before returning
+			# to deck height, so the catch surface is real even at full speed.
+			ramp_start.y = b.y-3.0
+			ramp_end.y = b.y
+		else:
+			ramp_start.y = b.y-signf(rise)*minf(2.5,absf(rise)+.5)
+			ramp_end.y = b.y
 		var ramp_delta := ramp_end-ramp_start
 		var ramp_basis := Basis.looking_at(ramp_delta.normalized())
 		var ramp := DemoGeometry.box(room.geometry,ramp_start.lerp(ramp_end,.5)-ramp_basis.y*.225,Vector3(9.0,.45,ramp_delta.length()),room._floor,true)
@@ -644,20 +680,19 @@ static func _link(room: CombatRoom,a: Vector3,b: Vector3,gap: bool,include_gap_w
 			var threshold := DemoGeometry.box(room.geometry,finish.lerp(threshold_end,.5)-Vector3.UP*.225,Vector3(5.8,.45,finish.distance_to(threshold_end)),room._floor,true)
 			threshold.basis=Basis.looking_at(flat)
 			threshold.set_meta("route_connector",true)
-	# A narrow real lip overlaps the receiving platform edge.  It is only a
-	# landing/departure apron, never a bridge across the authored gap, and keeps
-	# the capsule from meeting the platform's vertical side at the seam.
-	var landing_direction := flat
-	var landing_basis := Basis.looking_at(landing_direction)
-	var landing_width := 11.0 if ((room.stage == 2 and to_center.distance_to(Vector3(-3,11,-166)) < .1) or (room.stage == 3 and to_center.distance_to(Vector3(0,11,-170)) < .1)) else minf(5.8,maxf(2.8,b_size.x))
-	# The landing lip is a real threshold over the receiving edge. Keep it as a
-	# short buffer on the destination side of the seam; a deep strip reaches back
-	# into the gap and becomes a vertical face in the jump's landing arc.
-	var landing_size := Vector3(landing_width,.45,2.2)
-	var landing_center := to_center - landing_direction * maxf(0.0,to_edge-1.5)
-	var landing_lip := DemoGeometry.box(room.geometry,landing_center-Vector3.UP*.225,landing_size,room._floor,true)
-	landing_lip.basis=landing_basis
-	landing_lip.set_meta("route_connector",true)
+	# Broken links receive a short physical threshold over the destination edge.
+	# Continuous ramps already meet the authored platform and must not add a
+	# second coplanar body at shared nodes: that duplicate end cap traps reverse
+	# traversal against the platform while looking like ordinary floor.
+	if gap:
+		var landing_direction := flat
+		var landing_basis := Basis.looking_at(landing_direction)
+		var landing_width := 11.0 if ((room.stage == 2 and to_center.distance_to(Vector3(-3,11,-166)) < .1) or (room.stage == 3 and to_center.distance_to(Vector3(0,11,-170)) < .1)) else minf(5.8,maxf(2.8,b_size.x))
+		var landing_size := Vector3(landing_width,.45,0.2)
+		var landing_center := to_center - landing_direction * maxf(0.0,to_edge-1.5)
+		var landing_lip := DemoGeometry.box(room.geometry,landing_center-Vector3.UP*.225,landing_size,room._floor,true)
+		landing_lip.basis=landing_basis
+		landing_lip.set_meta("route_connector",true)
 	if gap:
 		var point := a.lerp(b,.5)+basis.x*2.1+Vector3.UP*2
 		if include_gap_wall and not (room.stage == 2 and to_center.distance_to(Vector3(-3,11,-166)) < .1):

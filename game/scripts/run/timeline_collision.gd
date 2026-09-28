@@ -58,7 +58,19 @@ static func can_enter(player: ParkourPlayer, geometry: Node3D, target: StringNam
 	for shape: CollisionShape3D in geometry.find_children("*","CollisionShape3D",true,false):
 		if shape.shape == null or phase_of(shape) != target: continue
 		var body := shape.get_parent() as CollisionObject3D
-		if body == null or body is Area3D or not (body.collision_layer & player.collision_mask): continue
+		if body == null or body is Area3D: continue
+		# A phase-chain wall is deliberately authored alongside the current wall
+		# so a runner can arm the next world without dropping to the floor. Its
+		# contact volume is expected to be within capsule radius while wall-running;
+		# it becomes the receiving surface after the kick. Other destination solids
+		# still go through the conservative occupancy test below.
+		if player.is_wall_running() and body.has_meta("phase_chain_wall"):
+			continue
+		# Timeline owners drop their live layer while inactive.  The destination
+		# query still needs to consider that disabled shape, using the preserved
+		# authored layer instead of filtering it out as non-collidable.
+		var authored_layer := int(body.get_meta("timeline_base_layer",body.collision_layer))
+		if not (authored_layer & player.collision_mask): continue
 		# Already active collision is handled by ordinary movement. Only reject
 		# a solid which this transaction would introduce around the capsule.
 		if not shape.disabled: continue

@@ -70,6 +70,25 @@ func _ready() -> void:
 		key.physical_keycode = KEY_E
 		InputMap.action_add_event("interact", key)
 
+func _physics_process(_delta: float) -> void:
+	# Dynamic encounter rebuilds can hide or reparent a phase-owned body after
+	# the shift transaction. Reconcile the owner/shape pair every physics tick so
+	# a stale invisible collider cannot survive into the next traversal frame.
+	_sync_timeline_collision_owners()
+	# A player can complete an altar choice while already inside its trigger.
+	# In that case body_entered fired before the altar became used, so relying on
+	# the signal alone would silently skip the checkpoint.  Poll only the small
+	# set of real altar areas and feed the same authoritative callback; the
+	# reached-checkpoint guard keeps this idempotent.
+	if not enabled:
+		return
+	for area: Area3D in checkpoint_areas:
+		if not is_instance_valid(area) or not area.monitoring:
+			continue
+		for body: Node3D in area.get_overlapping_bodies():
+			if body is ParkourPlayer:
+				_checkpoint_body_entered(body,area)
+
 func set_next_configuration(candidate: LevelRunConfiguration) -> PackedStringArray:
 	var errors := candidate.validation_errors() if candidate!=null else PackedStringArray(["configuration: required resource is missing"])
 	if errors.is_empty():run_configuration=candidate
@@ -140,6 +159,7 @@ func _build(number: int) -> bool:
 	# change or a route extension from leaving the checkpoint over the void.
 	altar.position = _grounded_platform_point(Vector3(2.4,0,5.0) if stage == 1 else Vector3(-1.6,0,4.5))
 	geometry.add_child(altar)
+	_add_shared_altar_support(altar)
 	altar.requested.connect(func(device: RunAltar): altar_requested.emit(device))
 	altars.push_front(altar)
 	# Formal recovery is owned by the same altar objects that award runes. The
@@ -151,6 +171,7 @@ func _build(number: int) -> bool:
 	# Phase ownership must exist BEFORE static batching. Otherwise a hidden
 	# platform leaves its baked paving visible after its collision is removed.
 	TimelineArchitecture.build(self)
+	_sync_grounded_installation_phases()
 	_cache_timeline_graph()
 	# Headless physics suites repeatedly rebuild all three dressed rooms. Keep
 	# their authored meshes and collision intact while avoiding a costly render
@@ -317,7 +338,7 @@ func prepare_timeline_phase(next_phase: StringName) -> void:
 			# so the receiving wall looks present but cannot be touched during the
 			# wall-run handoff.  Arm the owner and the shape together; apply_phase()
 			# will atomically retire the old phase after the player leaves the wall.
-			var owner := shape.get_parent() as CollisionObject3D
+			var owner := _collision_owner(shape)
 			if owner != null:
 				if not owner.has_meta("timeline_base_layer"):
 					owner.set_meta("timeline_base_layer",owner.collision_layer)
@@ -368,6 +389,52 @@ func platform_at(center: Vector3) -> Node3D:
 			return node as Node3D
 	return null
 
+func _platform_phase_at(point: Vector3) -> StringName:
+	# Timeline ownership comes from the authored support footprint, never from a
+	# decorative prop's stale world-space position.
+	var best := Vector3.INF
+	var best_distance := INF
+	for candidate_variant in platform_extents.keys():
+		var candidate := Vector3(candidate_variant)
+		var size: Vector2 = platform_extents[candidate_variant]
+		var inside := absf(point.x-candidate.x) <= size.x*.5 and absf(point.z-candidate.z) <= size.y*.5
+		var distance := point.distance_squared_to(candidate)
+		if inside:
+			distance -= 10000.0
+		if distance < best_distance:
+			best_distance = distance
+			best = candidate
+	if not best.is_finite():
+		return &""
+	var owner := platform_at(best)
+	return preload("res://scripts/run/timeline_collision.gd").phase_of(owner) if owner != null else &""
+
+func _sync_grounded_installation_phases() -> void:
+	# TimelineArchitecture assigns phase tags after rooms and props are built.
+	# Apply that owner phase to every grounded gameplay installation so an
+	# inactive world cannot leave an altar, checkpoint, mechanism or route shell.
+	for device: Node3D in altars + terrain_devices + mechanisms:
+		if not is_instance_valid(device):
+			continue
+		# Altars are shared save/reward nodes.  They must survive a phase shift at
+		# the same world coordinate; their small untagged support is the only floor
+		# they rely on.  A phase tag here was the source of respawns over a hidden
+		# deck in the remnant.
+		if device is RunAltar or device.get_meta("timeline_shared", false):
+			device.remove_meta("timeline_phase")
+			continue
+		var phase := _platform_phase_at(to_local(device.global_position))
+		if phase in [&"present", &"remnant"]:
+			device.set_meta("timeline_phase", phase)
+	for node: Node in geometry.find_children("*", "Node3D", true, false):
+		if not node.get_meta("static_dressing", false) or node.get_meta("hanging", false) or node.get_meta("visual_only", false):
+			continue
+		if not node.get_meta("attached_to_route", false):
+			continue
+		var phase := _platform_phase_at(to_local((node as Node3D).global_position))
+		if phase in [&"present", &"remnant"]:
+			node.set_meta("timeline_phase", phase)
+
 func _cache_timeline_graph() -> void:
 	_timeline_nodes.clear()
 	_timeline_shapes.clear()
@@ -379,15 +446,60 @@ func _cache_timeline_graph() -> void:
 	for shape: CollisionShape3D in geometry.find_children("*", "CollisionShape3D", true, false):
 		var phase := preload("res://scripts/run/timeline_collision.gd").phase_of(shape)
 		if phase in [&"present", &"remnant"]:
+			var shape_owner := _collision_owner(shape)
+			if shape.get_meta("presentation_only", false) or (shape_owner != null and shape_owner.get_meta("presentation_only", false)):
+				continue
 			_timeline_shapes.append(shape)
 			shape.set_meta("timeline_phase", phase)
-			var owner := shape.get_parent() as CollisionObject3D
+			var owner := shape_owner
 			if owner != null:
 				owner.set_meta("timeline_phase", phase)
+				if not _timeline_nodes.has(owner):
+					_timeline_nodes.append(owner)
+
+func _collision_owner(node: Node) -> CollisionObject3D:
+	var cursor := node.get_parent()
+	while cursor != null and not cursor is CollisionObject3D:
+		cursor = cursor.get_parent()
+	return cursor as CollisionObject3D
 
 func _sync_timeline_collision_owners() -> void:
 	if not is_instance_valid(geometry):
 		return
+	# Phase ownership can live on a parent while the actual StaticBody3D is
+	# nested below an imported or dressed node. Reconcile that ancestry first so
+	# a hidden world's body cannot remain in the broadphase as an air wall.
+	for owner: CollisionObject3D in geometry.find_children("*", "CollisionObject3D", true, false):
+		var owner_phase := preload("res://scripts/run/timeline_collision.gd").phase_of(owner)
+		if owner_phase not in [&"present", &"remnant"]:
+			continue
+		if not owner.has_meta("timeline_base_layer"):
+			owner.set_meta("timeline_base_layer", owner.collision_layer)
+			owner.set_meta("timeline_base_mask", owner.collision_mask)
+		var owner_active := false
+		for shape: CollisionShape3D in owner.find_children("*", "CollisionShape3D", true, false):
+			var shape_phase := preload("res://scripts/run/timeline_collision.gd").phase_of(shape)
+			if shape_phase not in [&"present", &"remnant"]:
+				continue
+			var active: bool = enabled and shape_phase == timeline_phase and not bool(owner.get_meta("presentation_only", false)) and not bool(owner.get_meta("gameplay_hidden", false)) and not bool(shape.get_meta("gameplay_disabled", false))
+			shape.disabled = not active
+			shape.set_deferred("disabled", shape.disabled)
+			owner_active = owner_active or active
+		owner.collision_layer = int(owner.get_meta("timeline_base_layer")) if owner_active else 0
+		owner.collision_mask = int(owner.get_meta("timeline_base_mask")) if owner_active else 0
+		if not owner.get_meta("presentation_only", false):
+			owner.visible = owner_active
+	# Imported presentation scenes may contain authoring colliders several nodes
+	# below their visible holder. They are never gameplay geometry; force them out
+	# of the broadphase every tick so a hidden prop cannot become an air wall.
+	for presentation: CollisionObject3D in geometry.find_children("*", "CollisionObject3D", true, false):
+		if not presentation.get_meta("presentation_only", false):
+			continue
+		presentation.collision_layer = 0
+		presentation.collision_mask = 0
+		for shape: CollisionShape3D in presentation.find_children("*", "CollisionShape3D", true, false):
+			shape.disabled = true
+			shape.set_deferred("disabled", true)
 	# Imported modules can put more than one CollisionShape3D under the same
 	# CollisionObject3D.  A body layer must stay active when any of its shapes
 	# belongs to the current phase; writing it once per shape made the last
@@ -398,8 +510,10 @@ func _sync_timeline_collision_owners() -> void:
 		var phase := preload("res://scripts/run/timeline_collision.gd").phase_of(shape)
 		if phase not in [&"present", &"remnant"]:
 			continue
-		var owner := shape.get_parent() as CollisionObject3D
+		var owner := _collision_owner(shape)
 		if owner == null:
+			continue
+		if shape.get_meta("presentation_only", false) or owner.get_meta("presentation_only", false):
 			continue
 		var records: Array = owner_shapes.get(owner, [])
 		records.append({"shape": shape, "phase": phase})
@@ -422,10 +536,19 @@ func _sync_timeline_collision_owners() -> void:
 			shape.set_deferred("disabled", shape.disabled)
 		owner.collision_layer = int(owner.get_meta("timeline_base_layer")) if owner_active else 0
 		owner.collision_mask = int(owner.get_meta("timeline_base_mask")) if owner_active else 0
+		# CollisionObject3D.visible is part of the gameplay contract here. A
+		# nested owner can outlive its phase holder's visibility, which leaves an
+		# active invisible wall/anchor in the broadphase. Force the owner to follow
+		# the same result as its shapes; the parent phase holder still controls the
+		# final inherited visibility.
+		if not owner.get_meta("presentation_only", false):
+			owner.visible = owner_active and not owner.get_meta("gameplay_hidden", false)
 
-func _wall(center: Vector3, size: Vector3) -> void:
-	var body:=DemoGeometry.box(geometry,center,size,_stone,true)
+func _wall(center: Vector3, size: Vector3, solid: bool = true) -> void:
+	var body:=DemoGeometry.box(geometry,center,size,_stone,solid)
 	body.set_meta("route_wall_size",size)
+	if not solid:
+		body.set_meta("presentation_only",true)
 	var side: float = -1.0 if center.x>0 else 1.0
 	for z in range(int(center.z-size.z/2)+1,int(center.z+size.z/2),2):
 		DemoGeometry.box(geometry,Vector3(center.x+side*(size.x/2+.015),1.3,z),Vector3(.025,.035,.45),_accent)
@@ -461,6 +584,16 @@ func _outer_wall() -> void:
 	# Raised landings reward stronger wall kicks and sustained airborne movement.
 	_platform(Vector3(2,4.4,-13),Vector2(3.8,5))
 	_platform(Vector3(1,2.4,-27),Vector2(4,6))
+	# R7 arcanist crossing: the lower lane remains readable, while this high
+	# landing and its sentinel are intentionally separated from the opening
+	# deck. A temporary wall/well created in the first altar segment gives the
+	# arcanist a real combat-and-route payoff instead of a decorative construct.
+	_platform(Vector3(3.2,3.2,-6.0),Vector2(3.2,3.6))
+	_enemy(Vector3(3.2,3.28,-6.0),&"normal",&"caster")
+	_route_marker(Vector3(3.2,3.28,-5.2),Color("#78dfbf"),&"rift")
+	signature_sections[&"rift_crossing"]={
+		"from":Vector3(2.4,0,5),"gap":Vector3(0,0,-1),
+		"landing":Vector3(3.2,3.2,-6),"mechanics":[&"arcane_shape",&"wall_run",&"wind_well"]}
 	_route_marker(Vector3(-9,.08,2),Color("#e3bd72"),&"slide")
 	_route_marker(Vector3(4.5,.08,0),Color("#dd987d"),&"wall")
 	_route_marker(Vector3(2,4.48,-13),Color("#75c5de"),&"air")
@@ -675,8 +808,42 @@ func altar_checkpoint_pose(device:RunAltar,from_position:Vector3=Vector3.ZERO)->
 	if away.length_squared()<.04:away=Vector3.FORWARD
 	away=away.normalized()
 	# Respawn just outside the altar collision footprint so the player never
-	# reappears inside the brazier or clips through the offering mesh.
-	return Transform3D(Basis.IDENTITY,device.global_position+away*2.25+Vector3.UP*.08)
+	# reappears inside the brazier or clips through the offering mesh. Clamp the
+	# point to the shared slab rather than trusting a phase-owned platform edge.
+	var target := device.global_position + away * 2.25
+	for support: Node in geometry.find_children("*", "StaticBody3D", true, false):
+		if not support.get_meta("timeline_shared_support", false):
+			continue
+		if support.get_meta("support_for_altar", NodePath()) != device.get_path():
+			continue
+		var support_size: Vector2 = support.get_meta("support_size", Vector2(5.2, 5.2))
+		target.x = clampf(target.x, device.global_position.x - support_size.x * .5 + 1.0, device.global_position.x + support_size.x * .5 - 1.0)
+		target.z = clampf(target.z, device.global_position.z - support_size.y * .5 + 1.0, device.global_position.z + support_size.y * .5 - 1.0)
+		target.y = support.global_position.y + .55 + .08
+		break
+	return Transform3D(Basis.IDENTITY,target)
+
+func safe_respawn_pose(pose: Transform3D) -> Transform3D:
+	# Validate the saved point against the currently active world. If a stale
+	# checkpoint points into a retired deck, use a real upward-facing surface
+	# under it, then fall back to the room spawn instead of spawning in air.
+	var target := pose.origin
+	if is_inside_tree():
+		var query := PhysicsRayQueryParameters3D.create(target + Vector3.UP * 2.5, target - Vector3.UP * 8.0, 1)
+		var hit := get_world_3d().direct_space_state.intersect_ray(query)
+		if not hit.is_empty() and Vector3(hit.normal).y > .72:
+			return Transform3D(pose.basis, Vector3(hit.position) + Vector3.UP * .08)
+	for candidate_variant in platform_extents.keys():
+		var center := Vector3(candidate_variant)
+		var owner := platform_at(center)
+		var owner_phase := preload("res://scripts/run/timeline_collision.gd").phase_of(owner) if owner != null else &""
+		if owner_phase not in [&"", timeline_phase]:
+			continue
+		var size: Vector2 = platform_extents[candidate_variant]
+		if absf(target.x - center.x) <= size.x * .5 and absf(target.z - center.z) <= size.y * .5:
+			var safe := Vector3(clampf(target.x, center.x - size.x * .5 + 1.0, center.x + size.x * .5 - 1.0), center.y + .08, clampf(target.z, center.z - size.y * .5 + 1.0, center.z + size.y * .5 - 1.0))
+			return Transform3D(pose.basis, safe)
+	return spawn.global_transform if is_instance_valid(spawn) else pose
 
 func altar_checkpoint_index(device:RunAltar)->int:
 	return altars.find(device)+1 if is_instance_valid(device) else 0
@@ -859,9 +1026,24 @@ func _extra_altar(point: Vector3) -> void:
 	var device := RunAltar.new()
 	device.position=_grounded_platform_point(point)
 	device.set_meta("grounded_checkpoint",true)
+	device.set_meta("timeline_shared",true)
 	geometry.add_child(device)
+	_add_shared_altar_support(device)
 	device.requested.connect(func(a: RunAltar):altar_requested.emit(a))
 	altars.append(device)
+
+func _add_shared_altar_support(device: RunAltar) -> void:
+	# The altar is the same save/reward node in both timelines. Give it a compact,
+	# explicit slab that is never assigned a timeline phase, even when the nearby
+	# route deck is present-only or remnant-only.
+	if not is_instance_valid(device) or not is_instance_valid(geometry):
+		return
+	var support := DemoGeometry.box(geometry, device.position - Vector3.UP * .55, Vector3(5.2, 1.1, 5.2), _floor, true)
+	support.name = "SharedAltarSupport_%d" % altars.size()
+	support.set_meta("timeline_shared_support", true)
+	support.set_meta("support_for_altar", device.get_path())
+	support.set_meta("support_size", Vector2(5.2, 5.2))
+	CitadelDressing.paving(support, Vector3.UP * .55, Vector2(5.2, 5.2))
 
 func clear_effects() -> void:
 	for group in ["friendly_projectiles","hostile_projectiles","transient_effects"]:

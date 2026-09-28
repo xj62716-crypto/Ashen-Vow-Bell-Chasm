@@ -12,6 +12,8 @@ static func asset(parent: Node3D, name: String, position: Vector3, scale_value: 
 		placeholder.scale = scale_value
 		placeholder.rotation.y = yaw
 		placeholder.set_meta("static_dressing", true)
+		placeholder.set_meta("environment_role", StringName(name))
+		placeholder.add_to_group("integrated_environment")
 		parent.add_child(placeholder)
 		return placeholder
 	if not _assets.has(name):
@@ -26,9 +28,21 @@ static func asset(parent: Node3D, name: String, position: Vector3, scale_value: 
 	# room's route bodies; imported arch/roof scenes must not create invisible
 	# blockers or phase-independent shortcuts around those surfaces.
 	for collider: CollisionObject3D in model.find_children("*", "CollisionObject3D", true, false):
+		collider.set_meta("presentation_only", true)
 		collider.collision_layer = 0
 		collider.collision_mask = 0
+		for shape: CollisionShape3D in collider.find_children("*", "CollisionShape3D", true, false):
+			shape.set_meta("presentation_only", true)
+			shape.disabled = true
 	model.set_meta("static_dressing",true)
+	model.set_meta("environment_role",StringName(name))
+	if name in ["hanging_chain", "hanging_standard", "banner"]:
+		model.set_meta("hanging", true)
+	if name in ["citadel_bastion", "skyline_house", "selected_district"]:
+		# These are below-route city silhouettes. They are embedded in the lower
+		# city/background volume rather than gameplay supports.
+		model.set_meta("visual_only", true)
+	model.add_to_group("integrated_environment")
 	return model
 
 static func batch_static(parent: Node3D) -> void:

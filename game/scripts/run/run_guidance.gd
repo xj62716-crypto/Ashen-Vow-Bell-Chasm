@@ -16,6 +16,8 @@ func bind(manager: MovementTrial) -> void:
 	trial.player.grapple.traversed.connect(func(_anchor: Node3D): completed[&"grapple"] = true)
 	trial.timeline_runtime.shifted.connect(func(_before: StringName,_after: StringName): completed[&"phase"] = true)
 	trial.combat.rune_applied.connect(func(_id: StringName): completed[&"altar"] = true)
+	trial.combat.arts.performed.connect(func(kind: StringName):
+		if kind in [&"shape", &"shape_attack", &"storm_shape"]: completed[&"shape"] = true)
 	trial.combat.hit_confirmed.connect(func(_target: Node3D,_point: Vector3,_dead: bool):
 		if trial.player.has_recent_traversal_action(): completed[&"combat"] = true)
 
@@ -59,7 +61,11 @@ func _process(delta: float) -> void:
 		return
 	if room.stage == 1:
 		var z := room.to_local(player.global_position).z
-		if z > -12: _offer(&"wall_chain","贴墙 · Shift")
+		if z > -12:
+			if &"arcane_shape" in trial.combat.runes and not completed.has(&"shape"):
+				_offer(&"shape","Q · 塑形落点")
+			else:
+				_offer(&"wall_chain","贴墙 · Shift")
 		elif z > -73 and z < -50: _offer(&"wall_transfer","蹬墙 · 换侧")
 		elif z > -104 and z < -85: _offer(&"slide","滑铲 → 跳")
 		elif z > -124 and z < -104:

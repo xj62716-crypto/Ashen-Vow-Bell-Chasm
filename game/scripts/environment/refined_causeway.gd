@@ -48,7 +48,10 @@ static func build(room: CombatRoom) -> void:
 	room._route_marker(Vector3(4.4,.08,.8),Color("#b49c71"),&"wall")
 	# Combat begins only after the transfer's safe landing.
 	room._wall(Vector3(-3,3.8,-79),Vector3(2,3.6,2))
-	room._extra_altar(Vector3(-9,2,-71))
+	# Keep the checkpoint on the real first high landing.  The former x=-9
+	# coordinate sat beyond the ten-metre deck edge and left a visible altar
+	# over the void after the route was widened.
+	room._extra_altar(Vector3(-3,2,-70))
 	# A vaulted service duct asks for a slide; the following gap rewards a slide jump.
 	room._platform(Vector3(-3,2,-94),Vector2(5,14))
 	room._wall(Vector3(-6,4,-94),Vector3(1,5,14))
@@ -118,7 +121,8 @@ static func build(room: CombatRoom) -> void:
 	# floating six metres beyond the deck in the void.
 	room._exit(Vector3(-2,12,-291))
 	for p: Vector3 in [Vector3(-10,2,-86),Vector3(4,4,-188)]:
-		CitadelDressing.asset(room.geometry,"gothic_statue",p,Vector3(1.3,1.3,1.3))
+		var statue := CitadelDressing.asset(room.geometry,"gothic_statue",p,Vector3(1.3,1.3,1.3))
+		statue.set_meta("attached_to_route", true)
 	# The door is the physical destination dressing for this route. Keep its
 	# full depth on the final landing instead of placing it beyond the deck in
 	# the void. The authored GLB's lowest mesh point is y=-0.228; at the 2.2x

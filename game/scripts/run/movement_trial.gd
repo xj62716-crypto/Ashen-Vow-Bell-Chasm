@@ -63,7 +63,8 @@ func _ready() -> void:
 	player.dashed.connect(func(): _play("dash"))
 	player.landed.connect(func(impact: float): _play("land", clampf(impact / 14.0, 0.25, 1.0)))
 	player.fell_out.connect(_fell)
-	player.wall_run_started.connect(func(_side: int): _play("footstep", 0.65))
+	# Footsteps are distance-sampled by TrialAudio.  Starting a wall run must not
+	# inject a generic stone step before the first real wall contact.
 	player.wall_jumped.connect(func(_normal: Vector3): _practice_jump_done = true)
 	player.wall_bonus_triggered.connect(func(_bonus: StringName): hud.toast("借势 · 空中冲刺已恢复"))
 	combat.swing_started.connect(func(): _play("cast_"+str(combat.spell_element()) if player.parkour_profile.id==&"arcanist" else ("cut_return" if combat.swing_return else "cut_outward")))
@@ -332,6 +333,8 @@ func _recover() -> void:
 	if combat_mode and not _load_combat_room(stage_number): return
 	if is_instance_valid(timeline_runtime): timeline_runtime.reset_state()
 	_practice_jump_done = false
+	if combat_mode:
+		_checkpoint = combat_room.safe_respawn_pose(_checkpoint)
 	player.respawn_at(_checkpoint)
 	if combat_mode:
 		_configure_encounter()
@@ -377,7 +380,11 @@ func _record_key() -> String:
 
 func _combat_hit(target: Node3D, point: Vector3, defeated: bool) -> void:
 	var melee: bool=player.parkour_profile.id==&"shade"
-	if melee:_play("kill" if defeated else "hit")
+	# Formal rooms receive accepted contact audio from the gameplay bridge's
+	# material-aware enemy signal.  Keep the legacy local cue only for isolated
+	# practice scenes and older fixtures without that bridge.
+	if melee and (gameplay_audio == null or not gameplay_audio.supported()):
+		_play("kill" if defeated else "hit")
 	hud.show_hit(defeated)
 	if melee and not player.get_node("FirstPersonArms").has_method("blade_contact_accent"):
 		ImpactBurst.spawn(target.get_parent(), point, Color("#f2c590"),1.15 if defeated else .8,&"blade",player.camera.global_basis.x+Vector3.UP*.4)
@@ -508,6 +515,8 @@ func _retry_combat_checkpoint()->void:
 	combat.reset_state()
 	combat.kills=_combat_checkpoint_kills
 	combat.shield=false
+	if is_instance_valid(timeline_runtime): timeline_runtime.reset_state()
+	_checkpoint = combat_room.safe_respawn_pose(_checkpoint)
 	player.respawn_at(_checkpoint)
 	player.control_enabled=true
 	phase=Phase.RUNNING

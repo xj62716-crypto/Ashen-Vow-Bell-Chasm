@@ -35,9 +35,11 @@ func _ready() -> void:
 	focus_exited.connect(animate_attention)
 	if kind!="menu":
 		add_text(eyebrow,Vector2(30,36),Vector2(size.x-60,28),16,false,Color("665139"))
-		add_text(title,Vector2(22,228),Vector2(size.x-44,60),29,true,Color("302923"))
-		add_text(description,Vector2(38,324),Vector2(size.x-76,144),20,false,Color("3d382d"))
-		add_text(synergy,Vector2(38,483),Vector2(size.x-76,63),18,false,Color("67543b"))
+		var title_y := 207.0 if kind=="class" else 228.0
+		add_text(title,Vector2(22,title_y),Vector2(size.x-44,60),29,true,Color("302923"))
+		if kind!="class":
+			add_text(description,Vector2(38,324),Vector2(size.x-76,144),20,false,Color("3d382d"))
+			add_text(synergy,Vector2(38,483),Vector2(size.x-76,63),18,false,Color("67543b"))
 	queue_redraw()
 
 func add_text(value: String,point: Vector2,extent: Vector2,font_size: int,use_serif: bool,tint: Color) -> void:
@@ -100,16 +102,21 @@ func _draw() -> void:
 	for x in [23.0,size.x-23.0]:
 		draw_circle(Vector2(x,17),4,Color("251d17"))
 		draw_arc(Vector2(x,17),3,PI,TAU,12,Color("bca576"),1,true)
-	var center:=Vector2(size.x*.5,154)
-	draw_circle(center,69,Color("422d21"))
-	draw_arc(center,67,0,TAU,80,Color("98713f"),3,true)
-	draw_arc(center,58,0,TAU,80,Color("654830"),1,true)
+	var center_y := 136.0 if kind=="class" else 154.0
+	var center_radius := 64.0 if kind=="class" else 69.0
+	var center:=Vector2(size.x*.5,center_y)
+	draw_circle(center,center_radius,Color("422d21"))
+	draw_arc(center,center_radius-2,0,TAU,80,Color("98713f"),3,true)
+	draw_arc(center,center_radius-11,0,TAU,80,Color("654830"),1,true)
 	if crest:
-		draw_texture_rect(crest,Rect2(center-Vector2(51,51),Vector2(102,102)),false,Color("e8ce93"))
-	draw_line(Vector2(42,302),Vector2(size.x-42,302),Color("6f5435"),1,true)
+		var crest_size := 116.0 if kind=="class" else 102.0
+		draw_texture_rect(crest,Rect2(center-Vector2.ONE*crest_size*.5,Vector2.ONE*crest_size),false,Color("e8ce93"))
+	var divider_y := 292.0 if kind=="class" else 302.0
+	draw_line(Vector2(42,divider_y),Vector2(size.x-42,divider_y),Color("6f5435"),1,true)
 	for side in [-1,1]:
-		draw_polyline(PackedVector2Array([Vector2(size.x/2+side*9,296),Vector2(size.x/2+side*16,302),Vector2(size.x/2+side*9,308)]),Color("6f5435"),1,true)
-	draw_line(Vector2(40,477),Vector2(size.x-40,477),Color(.3,.23,.15,.3),1,true)
+		draw_polyline(PackedVector2Array([Vector2(size.x/2+side*9,divider_y-6),Vector2(size.x/2+side*16,divider_y),Vector2(size.x/2+side*9,divider_y+6)]),Color("6f5435"),1,true)
+	if kind!="class":
+		draw_line(Vector2(40,477),Vector2(size.x-40,477),Color(.3,.23,.15,.3),1,true)
 	draw_circle(Vector2(size.x*.5,size.y-50),23,Color("642d29") if not chosen else Color("a3783c"))
 	draw_arc(Vector2(size.x*.5,size.y-50),18,0,TAU,40,Color("ac7c50"),1,true)
 	draw_string(serif,Vector2(size.x*.5-9,size.y-41),"印" if chosen else str(number),HORIZONTAL_ALIGNMENT_CENTER,18,20,Color("e6c594"))
