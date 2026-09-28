@@ -386,7 +386,11 @@ func _physics_process(delta: float) -> void:
 		swing_started.emit()
 		if arms.get_item_definition(&"right").ranged and not _projectile_fired:
 			_fire_arcane_bolt(arms.get_item_definition(&"right"))
-		elif &"shade_arc" in runes or riposte_ready or (_attack_slide and &"shade_slide_wind" in runes) or _shade_traversal_strike():
+		# A normal blade swing is always melee.  Traversal by itself must not
+		# silently turn a slash into a projectile: only an explicit sword-wave
+		# build, a successful riposte, or the authored slide-wind follow-up may
+		# create a blade bolt.
+		elif &"shade_arc" in runes or riposte_ready or (_attack_slide and &"shade_slide_wind" in runes):
 			_fire_blade_arc()
 			riposte_ready=false
 	if attack_age >= windup and attack_age < windup + active_time:
@@ -453,14 +457,6 @@ func _fire_blade_arc() -> void:
 		if _attack_slide and &"shade_slide_wind" in runes:
 			bolt.global_position.y = player.global_position.y+.5
 			bolt.direction.y=0
-
-func _shade_traversal_strike() -> bool:
-	# A high-speed departure turns the physical slash into a short travelling
-	# blade wave.  It is still a melee action: the wave is only armed while the
-	# player is dashing or has a live airborne traversal receipt, and it keeps
-	# the normal 14 m reach and collision rules of the existing blade bolt.
-	return player.parkour_profile.id == &"shade" and (player.is_dashing() or (not player.is_on_floor() and player.has_recent_traversal_action()))
-
 
 func _record_shade_echo() -> void:
 	# The core records the instant a real dash starts. The next committed blade
