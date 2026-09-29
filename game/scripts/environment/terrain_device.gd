@@ -44,9 +44,9 @@ func _ready() -> void:
 	DemoGeometry.sphere(self,Vector3.ZERO,.26,DemoGeometry.material(Color("#7ae3d1"),.65))
 	_label=DemoGeometry.label(self,Vector3.UP*.8,{&"bridge":"E / 攻击 · 转动栈桥",&"lift":"E / 攻击 · 升降机",&"vent":"E / 攻击 · 蒸汽阀",&"breakable":"击碎封板",&"pulse":"高位扫光 · 滑铲穿过"}.get(kind,"机关"),23)
 	if kind==&"breakable":
-		_barrier=DemoGeometry.box(self,Vector3(0,0,-.6),Vector3(3.2,3.0,.18),load("res://assets/materials/pbr/rock.tres"),true)
+		_barrier=_make_route_barrier("BreakableBarrier",Vector3(0,0,-.6),Vector3(3.2,3.0,.18),load("res://assets/materials/pbr/rock.tres"))
 	if kind==&"vent":
-		_barrier=DemoGeometry.box(self,Vector3(0,0,-2),Vector3(3,2.5,.3),DemoGeometry.material(Color("#dfab78"),.8),true)
+		_barrier=_make_route_barrier("VentBarrier",Vector3(0,0,-2),Vector3(3,2.5,.3),DemoGeometry.material(Color("#dfab78"),.8))
 		_barrier.get_child(1).hide()
 		_steam=CPUParticles3D.new()
 		_steam.position=Vector3(0,-1,-2)
@@ -68,6 +68,28 @@ func _ready() -> void:
 		vapor.material=fog
 		_steam.mesh=vapor
 		add_child(_steam)
+
+func _make_route_barrier(node_name: String, local_position: Vector3, size: Vector3, surface: Material) -> StaticBody3D:
+	# A StaticBody3D cannot be nested under the TerrainDevice StaticBody3D and
+	# remain a reliable gameplay collider. Keep the interaction device and the
+	# route blocker as siblings owned by the room geometry instead. The blocker
+	# is therefore visible, ray-queryable and independently toggled on every
+	# timeline/room suspend transition.
+	var barrier := StaticBody3D.new()
+	barrier.name = node_name
+	barrier.position = global_position + local_position
+	barrier.collision_layer = 1
+	barrier.collision_mask = 2
+	get_parent().add_child(barrier)
+	var collision := CollisionShape3D.new()
+	var bounds := BoxShape3D.new()
+	bounds.size = size
+	collision.shape = bounds
+	barrier.add_child(collision)
+	DemoGeometry.mesh(barrier,BoxMesh.new(),Vector3.ZERO,surface)
+	var mesh := barrier.get_child(1) as MeshInstance3D
+	(mesh.mesh as BoxMesh).size = size
+	return barrier
 
 func get_hit_point() -> Vector3:return global_position
 
@@ -104,6 +126,7 @@ func sync_collision_state(room_enabled: bool) -> void:
 		for shape: CollisionShape3D in _barrier.find_children("*","CollisionShape3D",true,false):
 			shape.set_meta("gameplay_disabled",used)
 			shape.set_deferred("disabled",not room_enabled or used or not preload("res://scripts/run/timeline_collision.gd").active(self))
+		_barrier.visible = room_enabled and not used and preload("res://scripts/run/timeline_collision.gd").active(self)
 
 func reset_device() -> void:
 	if is_instance_valid(linked_device):
@@ -125,6 +148,8 @@ func reset_device() -> void:
 
 func _exit_tree() -> void:
 	if moving:travel_cancelled.emit()
+	if is_instance_valid(_barrier) and _barrier.get_parent() != self:
+		_barrier.queue_free()
 
 func _update_label() -> void:
 	if not is_instance_valid(_label):return

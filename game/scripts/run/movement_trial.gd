@@ -68,7 +68,8 @@ func _ready() -> void:
 	player.wall_jumped.connect(func(_normal: Vector3): _practice_jump_done = true)
 	player.wall_bonus_triggered.connect(func(_bonus: StringName): hud.toast("借势 · 空中冲刺已恢复"))
 	combat.swing_started.connect(func(): _play("cast_"+str(combat.spell_element()) if player.parkour_profile.id==&"arcanist" else ("cut_return" if combat.swing_return else "cut_outward")))
-	combat.spell_contact.connect(func(element: StringName): _play("impact_"+str(element),.85))
+	combat.spell_contact.connect(func(element: StringName):
+		if gameplay_audio == null or not gameplay_audio.supported(): _play("impact_"+str(element),.85))
 	combat.hit_confirmed.connect(_combat_hit)
 	combat.hurt.connect(func(_amount: int): hud.show_hurt(); _play("hurt"))
 	combat.died.connect(_combat_died)
@@ -94,16 +95,18 @@ func _ready() -> void:
 	player.wall_run_started.connect(func(_side: int): timeline_runtime.refund(1))
 	player.slide_jumped.connect(func(): timeline_runtime.refund(1))
 	combat.ability_used.connect(func():
-		# Raising the blade to guard is neither a slash nor a contact.
-		# Real parry/contact signals own their sounds.
-		if player.parkour_profile.id!=&"shade":_play("bolt",.9))
+		if player.parkour_profile.id == &"shade":
+			_play("cloth",.3)
+		else:
+			_play("cast_" + str(combat.spell_element()), .9))
 	combat.parried.connect(func(): _play("parry",1.0); hud.show_hit(false))
 	combat.arts.performed.connect(func(kind: StringName):
-		if kind not in [&"execute",&"blink"]:_play(str(kind),.85))
+		if kind not in [&"execute",&"blink",&"detonate",&"mark"]:_play(str(kind),.85))
 	combat.arts.pursuit_started.connect(func(kind:StringName):
 		if kind==&"blink":_play("blink",.45))
 	combat.arts.pursuit_cut_started.connect(func(_kind:StringName):_play("execute",.65))
-	combat.blocked_hit.connect(func(): _play("parry",.55))
+	combat.blocked_hit.connect(func():
+		if gameplay_audio == null or not gameplay_audio.supported(): _play("block",.65))
 	player.slide_started.connect(func(): _play("slide",.9))
 	for child: Node in $Triggers.get_children():
 		if child is Area3D:
@@ -456,12 +459,15 @@ func _next_stage() -> void:
 	if phase != Phase.RUNNING or stage_number >= stage_count:
 		return
 	var completed_time:=stage_elapsed
+	# Capture the carried state before rebuilding the next room. reset_room()
+	# creates a fresh encounter and resets combat health; reading afterwards made
+	# every stage transition silently restore the new room's default health.
+	var carried_health: int = combat.health
 	if not _load_combat_room(stage_number+1): return
 	if is_instance_valid(timeline_runtime): timeline_runtime.reset_state()
 	stage_splits.append(completed_time)
 	stage_elapsed=0.0
 	stage_number += 1
-	var carried_health: int = combat.health
 	_configure_encounter()
 	_checkpoint = combat_room.spawn.global_transform
 	combat_checkpoint_index=0
@@ -574,10 +580,7 @@ func _load_combat_room(number: int) -> bool:
 	return false
 
 func _timeline_shifted(previous: StringName, current: StringName) -> void:
-	if gameplay_audio != null and gameplay_audio.supported():
-		_play("phase_shift", .9)
-	else:
-		_play("rewind_start", .65)
+	_play("phase_shift", .9)
 	hud.toast("残世" if current == &"remnant" else "现世")
 
 func _configure_encounter() -> void:

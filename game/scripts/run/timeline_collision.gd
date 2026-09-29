@@ -66,6 +66,19 @@ static func can_enter(player: ParkourPlayer, geometry: Node3D, target: StringNam
 		# still go through the conservative occupancy test below.
 		if player.is_wall_running() and body.has_meta("phase_chain_wall"):
 			continue
+		# The destination route deck is intentionally beneath the airborne
+		# handoff. Its volume can overlap the capsule while the runner is still on
+		# the source wall, but it is the authored landing surface rather than an
+		# obstruction. Arm it now and let the wall-kick settle onto it after the
+		# phase commit; ordinary destination solids remain conservative.
+		if player.is_wall_running() and body.has_meta("route_platform_center") and body.has_meta("timeline_contract"):
+			continue
+		# The receiving slope/threshold is part of the same authored timeline
+		# contract as its destination deck. During a wall handoff the capsule can
+		# overlap that connector before the kick finishes; it is the landing
+		# surface, not an obstruction that should reject the phase transaction.
+		if player.is_wall_running() and body.has_meta("route_connector") and body.has_meta("timeline_contract"):
+			continue
 		# Timeline owners drop their live layer while inactive.  The destination
 		# query still needs to consider that disabled shape, using the preserved
 		# authored layer instead of filtering it out as non-collidable.

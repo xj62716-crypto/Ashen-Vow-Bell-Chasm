@@ -552,7 +552,7 @@ func _shape_attack(_pose: Transform3D) -> void:
 			continue
 		enemy.break_guard(0.8)
 		enemy.apply_wind(flat_forward * 7.0)
-		var accepted := enemy.receive_hit(1, flat_forward)
+		var accepted := enemy.receive_elemental_hit(1, flat_forward, &"stone")
 		if accepted:
 			enemy.velocity.y = maxf(enemy.velocity.y, 6.0)
 			combat.confirm_hit(enemy, point, enemy.health <= 0)
@@ -658,7 +658,7 @@ func detonate(target: Node3D) -> bool:
 	_remove_mark(target,&"detonated")
 	if target is LanternAcolyte:
 		if target.threat_rank not in [&"boss",&"miniboss"]:target.break_guard(2)
-		if target.receive_hit(1,(point-player.camera.global_position).normalized()):combat.confirm_hit(target,point,target.health<=0)
+		if target.receive_elemental_hit(1,(point-player.camera.global_position).normalized(), &"seal"):combat.confirm_hit(target,point,target.health<=0)
 		if has(&"arcane_fire"):
 			target.apply_burn(3.0)
 		for node: Node in get_tree().get_nodes_in_group("acolytes"):
@@ -668,7 +668,7 @@ func detonate(target: Node3D) -> bool:
 			var exposed: bool = node.vulnerable
 			node.apply_frost(1.2)
 			if has(&"arcane_fire"): node.apply_burn(2.2)
-			if exposed and node.receive_hit(1, (node.get_hit_point()-point).normalized()): combat.confirm_hit(node,node.get_hit_point(),node.health<=0)
+			if exposed and node.receive_elemental_hit(1, (node.get_hit_point()-point).normalized(), &"seal"): combat.confirm_hit(node,node.get_hit_point(),node.health<=0)
 	SkillEffect.spawn(get_tree().current_scene,Transform3D(player.camera.global_basis,point),&"rift",Color("#baa5ef"),2.0)
 	mana=minf(100,mana+8)
 	_play_action("detonate")

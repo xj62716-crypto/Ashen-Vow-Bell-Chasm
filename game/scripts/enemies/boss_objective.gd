@@ -9,6 +9,7 @@ var health: int = 1
 var ordinal: int = 0
 var route_role: StringName = &"wall_face"
 var route_index: int = 0
+var primed_left: float = 0.0
 
 func _ready() -> void:
 	process_mode = PROCESS_MODE_PAUSABLE
@@ -39,3 +40,17 @@ func receive_hit(amount: int, _direction: Vector3) -> bool:
 	hide()
 	queue_free()
 	return true
+
+func receive_player_hit(amount: int, direction: Vector3, player: ParkourPlayer) -> bool:
+	if amount <= 0 or health <= 0 or not is_instance_valid(player) or not is_instance_valid(controller):
+		return false
+	if not controller.player_can_break_objective(self, player):
+		if controller.can_break_objective(self):
+			if primed_left <= 0.0:
+				controller.mechanic_event.emit(&"core_mark", global_position, 4.0)
+			primed_left = 4.0
+		return false
+	return receive_hit(amount, direction)
+
+func _physics_process(delta: float) -> void:
+	primed_left = maxf(0.0, primed_left - delta)

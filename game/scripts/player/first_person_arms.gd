@@ -5,6 +5,8 @@ signal item_equipped(hand: StringName, item: Node3D)
 signal item_unequipped(hand: StringName)
 
 @export var motion_amount: float = 1.0
+@export_range(0.0, 0.25, 0.01) var hidden_left_hand_scale: float = 0.015
+@export_range(0.03, 0.25, 0.01) var left_hand_transition_seconds: float = 0.10
 var viewport: SubViewport
 var model: Node3D
 var camera: Camera3D
@@ -17,6 +19,7 @@ var _wall_jump: float = 0.0
 var _wall_jump_side: int = 0
 var _wall_blend: float = 0.0
 var _running_blend: float = 0.0
+var _left_hand_blend: float = 1.0
 var _last_look := Vector2.ZERO
 var _sway := Vector2.ZERO
 var _custom_arms: Dictionary = {}
@@ -334,6 +337,7 @@ func reset_motion() -> void:
 	_wall_blend = 0.0
 	_wall_jump = 0.0
 	_running_blend = 0.0
+	_left_hand_blend = 1.0
 	_sway = Vector2.ZERO
 	_rig_clip = &""
 	_previous_bones.clear()
@@ -407,6 +411,17 @@ func _process_rig(delta: float) -> void:
 	if combat!=null and combat.arts!=null and combat.arts._held>0 and combat.arts.selected() in [&"wall",&"well",&"anchor"]:
 		state="shape"
 		sample=.14
+	# The left hand is an action hand. During ordinary movement and right-side
+	# wall traversal it leaves the first-person frame; left-side wall runs keep
+	# it available as the bracing hand. The blend is configurable so a later
+	# animation pass can tune the transition without changing gameplay states.
+	var left_hand_active := state in [
+		"attack", "attack_return", "sweep", "execute", "blink", "parry",
+		"cast_fire", "cast_ice", "cast_wind", "shape", "grapple", "wall_left",
+		"kick_left"
+	]
+	var left_target := 1.0 if left_hand_active else 0.0
+	_left_hand_blend = move_toward(_left_hand_blend, left_target, delta / maxf(0.03, left_hand_transition_seconds))
 	var clip := StringName(prefix+state)
 	if not animation_player.has_animation(clip):clip=StringName(prefix+"attack")
 	if clip != _rig_clip:
@@ -424,8 +439,18 @@ func _process_rig(delta: float) -> void:
 		for i in range(motion_skeleton.get_bone_count()):
 			var pose := _previous_bones[i].interpolate_with(motion_skeleton.get_bone_pose(i),smoothstep(0,1,_rig_blend))
 			motion_skeleton.set_bone_pose(i,pose)
+	# The imported rig uses one skinned mesh for both arms. Scaling the left
+	# clavicle after sampling the clip removes the full left branch, including
+	# fingers and cuff, instead of leaving a stray hand at the screen edge.
+	var left_clavicle := motion_skeleton.find_bone("clavicle.L")
+	if left_clavicle >= 0:
+		var left_pose := motion_skeleton.get_bone_pose(left_clavicle)
+		var left_scale := lerpf(hidden_left_hand_scale, 1.0, _left_hand_blend)
+		left_pose.basis = left_pose.basis.scaled(Vector3.ONE * left_scale)
+		motion_skeleton.set_bone_pose(left_clavicle, left_pose)
 	model.position = Vector3(-_sway.x*.30,_sway.y*.22,0)
 	motion_skeleton.force_update_all_bone_transforms()
+	(_custom_arms[&"left"] as Node3D).visible = _left_hand_blend > 0.04
 	for hand: StringName in [&"left",&"right"]:
 		var index := motion_skeleton.find_bone("hand.R" if hand==&"right" else "hand.L")
 		var transform := motion_skeleton.global_transform*motion_skeleton.get_bone_global_pose(index)

@@ -19,6 +19,31 @@ func configure(body: ParkourPlayer, output: Node) -> void:
 	rewind.decoy_created.connect(_decoy_created)
 	player.wall_jumped.connect(_wall_jumped)
 	player.slide_jumped.connect(_slide_jumped)
+	player.wall_run_started.connect(func(_side: int): audio.play_event("wall_enter", {"strength": .65}))
+	var combat := player.get_node("Combat") as PlayerCombat
+	combat.attack_prepared.connect(func(_ranged: bool): audio.play_event("cloth", {"strength": .3}))
+	combat.spell_impacted.connect(_spell_impacted)
+	combat.arts.mark_changed.connect(_mark_changed)
+	combat.arts.seal_detonated.connect(func(target: Node3D, point: Vector3):
+		audio.play_at("detonate", point, .85, str(target.get_instance_id()) if is_instance_valid(target) else "seal"))
+
+func _physics_process(_delta: float) -> void:
+	if not supported() or not is_instance_valid(player): return
+	var combat := player.get_node("Combat") as PlayerCombat
+	var charging := player.control_enabled and combat.enabled and combat.charge_progress > 0.0 and not combat._charge_spent
+	if charging: audio.begin_loop("staff_charge", "staff_charge", {"strength": .45})
+	else: audio.end_loop("staff_charge")
+
+func _spell_impacted(element: StringName, point: Vector3, collider: Node) -> void:
+	if element == &"blade":
+		if not collider is LanternAcolyte and not collider is BossObjective:
+			audio.play_at("hit_stone", point, .45, "blade_wave")
+		return
+	audio.play_at("impact_" + str(element), point, .85, "player_spell")
+
+func _mark_changed(target: Node3D, point: Vector3, marked: bool, _reason: StringName) -> void:
+	if marked and is_instance_valid(target):
+		audio.play_at("mark", point, .65, str(target.get_instance_id()))
 
 func supported() -> bool:
 	return is_instance_valid(audio) and audio.has_method("play_event") and audio.has_method("begin_loop") and audio.has_method("set_focus")
@@ -91,6 +116,11 @@ func _enemy_fired(enemy:LanternAcolyte)->void:
 func _enemy_hit_resolved(enemy: LanternAcolyte, point: Vector3, accepted: bool, reason: StringName) -> void:
 	if not is_instance_valid(enemy) or not enemy.active or reason in [&"inactive", &"dead", &"invalid_amount"]:
 		return
+	# A spell owns its elemental contact. Never layer a steel cut over it.
+	if enemy.last_hit_element != &"blade":
+		if accepted and enemy.health <= 0:
+			audio.play_at("spell_defeat", point, .5, str(enemy.get_instance_id()))
+		return
 	# A rejected guard/phase hit is still a real contact.  Use the authored
 	# armour transient instead of dropping the event. Accepted contacts are
 	# resolved here as well so formal rooms have one authoritative, spatial hit
@@ -126,7 +156,11 @@ func _boss_phase(stage: int, _state: StringName, enemy: LanternAcolyte) -> void:
 
 func _boss_event(event: StringName, point: Vector3, _seconds: float, enemy: LanternAcolyte) -> void:
 	if not is_instance_valid(enemy) or not enemy.active: return
-	if event == &"terrain_warning": audio.play_at("enemy_groundwave_windup",point,1.0,str(enemy.get_instance_id()))
+	var key: String = {
+		&"terrain_warning":"enemy_groundwave_windup", &"core_break":"core_break",
+		&"chain_break":"chain_break", &"shield_broken":"enemy_core_open", &"core_mark":"mark"
+	}.get(event, "")
+	if not key.is_empty(): audio.play_at(key,point,1.0,str(enemy.get_instance_id()))
 
 func update_context(room: CombatRoom) -> void:
 	if not supported(): return

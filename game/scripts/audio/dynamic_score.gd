@@ -111,6 +111,9 @@ func clear_duck() -> void:
 func duck(priority: int) -> void:
 	_duck_depth = minf(_duck_depth if _clock < _duck_until else 1.0, .36 if priority >= 6 else .58)
 	_duck_until = maxf(_duck_until, _clock + (.55 if priority >= 6 else .22))
+	# Apply the attenuation immediately for danger/parry races that arrive in
+	# the same frame as the cue. The smoothing in _process then releases it.
+	_duck_gain = minf(_duck_gain, _duck_depth)
 
 func _process(_delta: float) -> void:
 	var now: int = Time.get_ticks_usec()
@@ -120,6 +123,11 @@ func _process(_delta: float) -> void:
 	var mixed_frames: int = _transport_capture.get_frames_available() + _transport_capture.get_discarded_frames()
 	var mixed_delta: float = maxf(0.0, float(mixed_frames - _last_audio_frames) / AudioServer.get_mix_rate())
 	_last_audio_frames = mixed_frames
+	# Headless/Dummy audio drivers may expose no capture frames. Preserve the
+	# musical beat clock for tests and silent environments without changing the
+	# real-device path, where mixed PCM remains the authority.
+	if mixed_delta <= 0.0 and AudioServer.get_driver_name() == "Dummy":
+		mixed_delta = dt
 	for speaker in players:
 		if speaker.stream_paused != _paused:
 			speaker.stream_paused = _paused

@@ -76,6 +76,7 @@ static func batch_static(parent: Node3D) -> void:
 		var batch := MultiMeshInstance3D.new()
 		batch.multimesh=multi
 		batch.material_override=parts[0].material_override
+		batch.visibility_range_end=110.0
 		parent.add_child(batch)
 
 static func paving(parent: Node3D, center: Vector3, size: Vector2) -> void:
@@ -132,6 +133,7 @@ static func batch_primitives(parent: Node3D) -> void:
 		var batch := MeshInstance3D.new()
 		batch.mesh=surface.commit()
 		batch.material_override=parts[0].material_override
+		batch.visibility_range_end=110.0
 		parent.add_child(batch)
 
 static func build(parent: Node3D, stage: int) -> void:

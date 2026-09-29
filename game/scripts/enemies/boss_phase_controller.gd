@@ -214,6 +214,14 @@ func objective_text() -> String:
 func can_break_objective(objective: BossObjective) -> bool:
 	return is_running() and state == &"shielded" and objective in objectives
 
+func player_can_break_objective(objective: BossObjective, player: ParkourPlayer) -> bool:
+	if not can_break_objective(objective) or actor.player != player:
+		return false
+	var action := player.last_traversal_action
+	var route_action := action in [&"wall_run", &"wall_jump", &"air_dash", &"grapple", &"slide_jump", &"pursuit"]
+	var moving_now := player.is_wall_running() or player.is_dashing() or player.grapple.active or player.floating
+	return moving_now or (not player.is_on_floor() and player.has_recent_traversal_action() and route_action)
+
 func _enter_shield() -> void:
 	_clear_objectives()
 	actor.cooldown = 1.25

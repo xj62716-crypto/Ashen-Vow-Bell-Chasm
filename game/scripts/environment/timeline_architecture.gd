@@ -457,6 +457,30 @@ static func _author_phase_contracts(room: CombatRoom) -> void:
 			var authored_segments: Array = authored_link.get("segments", [])
 			var target_from: Vector3 = authored_segments[0] if authored_segments.size() >= 4 else nodes[index]
 			var target_to: Vector3 = authored_segments[2] if authored_segments.size() >= 4 else nodes[index+1]
+			# The second forge phase handoff climbs from the y=6 service line to
+			# the y=8 receiving deck.  The destination wall is enabled while the
+			# runner is still descending from the source face; starting its lower
+			# edge exactly at the source takeoff height makes the lower wall probe
+			# lose contact before the authored kick window.  Extend only this real
+			# wall face downward into the source-side clearance.  It does not add a
+			# floor or a bypass, and keeps the visible wall continuous through the
+			# airborne handoff.
+			if room.stage == 2 and index == 1:
+				target_from.y -= 1.8
+			# The authored wall link ends at the receiving deck edge so its source
+			# collision cannot become a floor shortcut.  The destination timeline
+			# wall is a separate side surface: carry it through the braking window
+			# to just inside the receiving platform.  Without this run-out the phase
+			# wall disappeared roughly 10 m before the landing, leaving a visible
+			# high-line route with no surface for the required wall kick.
+			var destination_direction := ((nodes[index+1]-nodes[index])*Vector3(1,0,1)).normalized()
+			if destination_direction.length_squared() > .25 and target_to.distance_to(nodes[index+1]) > 4.0:
+				target_to = nodes[index+1] - destination_direction*2.0
+			if room.stage == 2 and index == 1 and destination_direction.length_squared() > .25:
+				# The receiving ramp now carries the second kick into the deck. End
+				# the phase wall at the authored node so it cannot remain active into
+				# the following wall link and steal the next capture.
+				target_to += destination_direction*2.0
 			var target_offset := .72 if index%2==0 else -.72
 			_phase_wall(room.geometry,target_from,target_to,room._stone,phases[index+1],target_offset,false)
 			continue
@@ -545,7 +569,7 @@ static func _phase_chain_supports(room: CombatRoom, nodes: Array[Vector3], phase
 	# contract to their visible collision owner. This closes the common case where
 	# a ramp remained solid after its landing deck disappeared.
 	for body: CollisionObject3D in room.geometry.find_children("*","CollisionObject3D",true,false):
-		if not body.has_meta("route_connector") or body.has_meta("timeline_phase"):
+		if not body.has_meta("route_connector"):
 			continue
 		var local := room.to_local(body.global_position)
 		var best_distance := INF
@@ -564,7 +588,15 @@ static func _phase_chain_supports(room: CombatRoom, nodes: Array[Vector3], phase
 				best_t=t
 		if best_index >= 0 and best_distance <= 6.0:
 			var phase := phases[best_index] if best_t < .5 else phases[best_index+1]
-			_phase(body,phase)
+			var existing_phase := preload("res://scripts/run/timeline_collision.gd").phase_of(body)
+			# Locked decks can pre-tag their receiving lips before the phase chain is
+			# authored. Keep that explicit ownership, but still bind the connector
+			# to this contract so a wall handoff recognises it as a legal landing
+			# surface during occupancy checks.
+			if existing_phase in [PRESENT, REMNANT] and existing_phase != phase:
+				continue
+			if existing_phase != phase:
+				_phase(body,phase)
 			body.set_meta("timeline_contract",contract_id)
 
 static func _phase_node_index(point: Vector3, nodes: Array[Vector3]) -> int:

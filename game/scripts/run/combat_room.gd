@@ -64,6 +64,13 @@ var _stone: Material = preload("res://assets/materials/pbr/stone.tres")
 var _floor: Material = preload("res://assets/materials/pbr/floor.tres")
 var _iron: Material = preload("res://assets/materials/pbr/iron.tres")
 var _accent: Material
+## Imported environment dressing is deliberately dense for close shots. Keep
+## only the nearby authored presentation live during play so the route remains
+## responsive on the target machine; route collision is never part of this set.
+const PRESENTATION_CULL_RADIUS_M := 92.0
+const PRESENTATION_CULL_INTERVAL_S := 0.20
+var _presentation_cull_clock := 0.0
+var _presentation_cull_nodes: Array[Node3D] = []
 
 func _ready() -> void:
 	process_mode = PROCESS_MODE_PAUSABLE
@@ -83,6 +90,10 @@ func _physics_process(_delta: float) -> void:
 	if _timeline_graph_dirty:
 		_cache_timeline_graph()
 	_sync_timeline_collision_owners()
+	_presentation_cull_clock -= _delta
+	if _presentation_cull_clock <= 0.0:
+		_presentation_cull_clock = PRESENTATION_CULL_INTERVAL_S
+		_update_presentation_culling()
 	# A player can complete an altar choice while already inside its trigger.
 	# In that case body_entered fired before the altar became used, so relying on
 	# the signal alone would silently skip the checkpoint.  Poll only the small
@@ -96,6 +107,50 @@ func _physics_process(_delta: float) -> void:
 		for body: Node3D in area.get_overlapping_bodies():
 			if body is ParkourPlayer:
 				_checkpoint_body_entered(body,area)
+
+func _cache_presentation_cull_nodes() -> void:
+	_presentation_cull_nodes.clear()
+	if not is_instance_valid(geometry):
+		return
+	for candidate: Node in geometry.get_tree().get_nodes_in_group("integrated_environment"):
+		if candidate is Node3D and geometry.is_ancestor_of(candidate):
+			var node := candidate as Node3D
+			if not node.has_meta("cull_base_visible"):
+				node.set_meta("cull_base_visible", node.visible)
+			_presentation_cull_nodes.append(node)
+
+func _update_presentation_culling() -> void:
+	if not enabled or not is_instance_valid(geometry):
+		return
+	var scene := get_tree().current_scene
+	var player := scene.get_node_or_null("Player") as Node3D if scene != null else null
+	if player == null:
+		return
+	if _presentation_cull_nodes.is_empty():
+		_cache_presentation_cull_nodes()
+	var radius_sq := PRESENTATION_CULL_RADIUS_M * PRESENTATION_CULL_RADIUS_M
+	for node: Node3D in _presentation_cull_nodes:
+		if not is_instance_valid(node):
+			continue
+		var distance_sq := node.global_position.distance_squared_to(player.global_position)
+		var should_cull := distance_sq > radius_sq
+		if should_cull:
+			if not node.has_meta("distance_culled"):
+				node.set_meta("distance_culled", true)
+				node.set_meta("distance_visible_before", node.visible)
+			if node.visible:
+				node.visible = false
+			continue
+		if not node.has_meta("distance_culled"):
+			continue
+		node.remove_meta("distance_culled")
+		var restore := bool(node.get_meta("cull_base_visible", true))
+		var phase := StringName(node.get_meta("timeline_phase", &""))
+		if phase in [&"present", &"remnant"]:
+			restore = phase == timeline_phase
+		if node.get_meta("gameplay_hidden", false) or node.get_meta("presentation_replaced", false):
+			restore = false
+		node.visible = restore
 
 func set_next_configuration(candidate: LevelRunConfiguration) -> PackedStringArray:
 	var errors := candidate.validation_errors() if candidate!=null else PackedStringArray(["configuration: required resource is missing"])
@@ -227,6 +282,9 @@ func apply_timeline_phase(next_phase: StringName) -> void:
 	if is_instance_valid(geometry):
 		var tagged_nodes: Array[Node] = _timeline_nodes if not _timeline_nodes.is_empty() else geometry.find_children("*", "Node", true, false)
 		for node: Node in tagged_nodes:
+			if not is_instance_valid(node):
+				_timeline_graph_dirty = true
+				continue
 			if not node.has_meta("timeline_phase"):
 				continue
 			var active := StringName(node.get_meta("timeline_phase")) == timeline_phase
@@ -247,6 +305,9 @@ func apply_timeline_phase(next_phase: StringName) -> void:
 				node.active = active and enabled
 		var tagged_shapes: Array[CollisionShape3D] = _timeline_shapes if not _timeline_shapes.is_empty() else geometry.find_children("*", "CollisionShape3D", true, false)
 		for shape: CollisionShape3D in tagged_shapes:
+			if not is_instance_valid(shape):
+				_timeline_graph_dirty = true
+				continue
 			var shape_phase := preload("res://scripts/run/timeline_collision.gd").phase_of(shape)
 			if shape_phase not in [&"present", &"remnant"]:
 				continue
@@ -332,6 +393,9 @@ func prepare_timeline_phase(next_phase: StringName) -> void:
 		_cache_timeline_graph()
 	var tagged_nodes: Array[Node] = _timeline_nodes if not _timeline_nodes.is_empty() else geometry.find_children("*", "Node", true, false)
 	for node: Node in tagged_nodes:
+		if not is_instance_valid(node):
+			_timeline_graph_dirty = true
+			continue
 		if not node.has_meta("timeline_phase"):
 			continue
 		if StringName(node.get_meta("timeline_phase")) != target:
@@ -348,6 +412,9 @@ func prepare_timeline_phase(next_phase: StringName) -> void:
 			node.active = enabled
 	var tagged_shapes: Array[CollisionShape3D] = _timeline_shapes if not _timeline_shapes.is_empty() else geometry.find_children("*", "CollisionShape3D", true, false)
 	for shape: CollisionShape3D in tagged_shapes:
+		if not is_instance_valid(shape):
+			_timeline_graph_dirty = true
+			continue
 		if preload("res://scripts/run/timeline_collision.gd").phase_of(shape) == target:
 			# A phase holder may contain an imported StaticBody3D several levels
 			# below it.  Enabling only the shape leaves that owner on layer zero,
@@ -682,7 +749,10 @@ func _forge() -> void:
 		"start":Vector3(0,.08,6),"slide_exit":Vector3(0,.08,-.5),
 		"wind":Vector3(4.4,1,-20.6),"upper_landing":Vector3(0,3,-32),
 		"standing_clearance_m":1.2,"mechanics":[&"slide",&"slide_jump",&"launch"]}
-	_exit(Vector3(0,3,-37))
+	# The formal expansion appends the full forge route and installs its only
+	# playable exit at the final landing. Do not create an early provisional gate
+	# here; it would sit in the middle of the finished route for one physics frame
+	# during a rebuild and read as a blocked doorway.
 
 func _tower() -> void:
 	spawn.position = Vector3(0,.08,7)
@@ -712,7 +782,9 @@ func _tower() -> void:
 	# This is a visual nave roof, not a hidden recovery floor. Keeping it
 	# visual-only prevents the reverse wall link from landing on the roof and
 	# walking around the authored void, which would defeat the wall-run beat.
-	DemoGeometry.box(geometry,Vector3(0,5.2,-31.5),Vector3(17,.8,25),_stone,false)
+	var nave_roof := DemoGeometry.box(geometry,Vector3(0,5.2,-31.5),Vector3(17,.8,25),_stone,false)
+	nave_roof.set_meta("visual_only",true)
+	nave_roof.set_meta("environment_role",&"archive_roof")
 	for side: float in [-1,1]:
 		DemoGeometry.box(geometry,Vector3(side*8.1,3.1,-31.5),Vector3(.65,4.2,25),_stone,true)
 	signature_sections[&"nave_to_void"]={
@@ -732,7 +804,8 @@ func _tower() -> void:
 		# Keep the cover behind the authored sentries; the previous front edge
 		# intersected both capsule bodies even though their feet had support.
 		DemoGeometry.box(geometry,Vector3(side*3.5,2,-26),Vector3(.8,2,1.6),_stone,true)
-	_exit(Vector3(0,1,-41))
+	# The formal expansion owns the tower's final exit after the vertical route is
+	# assembled. The entry blockout intentionally has no separate gate.
 
 func _scenery() -> void:
 	var key := DirectionalLight3D.new()
@@ -994,6 +1067,14 @@ func set_enabled(value: bool) -> void:
 	enabled = value
 	visible = value
 	process_mode = PROCESS_MODE_PAUSABLE if value else PROCESS_MODE_DISABLED
+	# The exit trigger belongs to this room just like its gate and enemies. Keep
+	# it out of the active physics world while another stage is loaded; otherwise
+	# a player can carry an overlap from the previous room into the next stage.
+	if is_instance_valid(exit_area):
+		exit_area.monitoring = value
+		exit_area.monitorable = value
+		exit_area.collision_layer = 16 if value else 0
+		exit_area.collision_mask = 2 if value else 0
 	if is_instance_valid(geometry):
 		if not value and not _collisions_suspended:
 			for shape: CollisionShape3D in geometry.find_children("*","CollisionShape3D",true,false):
@@ -1116,7 +1197,7 @@ func objective_text() -> String:
 			if z> -45:return "右墙 · Shift"
 			if z> -73:return "蹬墙 · 换侧"
 			if z> -88:return "绕盾 · 破核"
-			if z> -108:return "滑铲 → 跳"
+			if z> -108:return "V 回现世 · 滑铲 → 跳" if timeline_phase == &"remnant" else "滑铲 → 跳"
 			if z> -150:return "E · 牵引"
 			if z> -205:return "断桥 · 高锚"
 			if z> -240:return "牵引 · 上墙"
@@ -1136,6 +1217,21 @@ func interaction_target() -> Node3D:
 		return target if player.grapple.can_begin(target) else null
 	if (target is RunAltar or target is RunMechanism or target is TerrainDevice) and not contact.is_empty() and origin.distance_to(contact.position)<=_configuration.mechanisms.interaction_range_m:
 		return target
+	# The altar mesh can sit behind its visible plinth or a phase-shared floor
+	# edge, so a camera ray is not a reliable sole selector at close range. A
+	# real unused altar within the authored interaction radius remains the
+	# unambiguous nearby target and keeps the prompt actionable.
+	var nearest_altar: RunAltar = null
+	var nearest_distance := 3.5
+	for candidate: RunAltar in altars:
+		if not is_instance_valid(candidate) or candidate.used:
+			continue
+		var distance := player.global_position.distance_to(candidate.global_position)
+		if distance < nearest_distance:
+			nearest_distance = distance
+			nearest_altar = candidate
+	if nearest_altar != null:
+		return nearest_altar
 	return player.grapple.best_anchor()
 
 func _unhandled_input(event: InputEvent) -> void:

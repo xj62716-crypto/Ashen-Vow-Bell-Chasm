@@ -15,6 +15,7 @@ signal control_applied(enemy: LanternAcolyte, point: Vector3, element: StringNam
 var encounter_id: StringName = &""
 var gameplay_role: StringName = &""
 var required_guardian: bool = false
+var last_hit_element: StringName = &"blade"
 var initial_delay_seconds: float = 1.1
 var brain: EnemyBrain
 var boss_controller: BossPhaseController
@@ -153,6 +154,11 @@ func reset_enemy() -> void:
 	_visual.visible = true
 	_visual.scale = Vector3.ONE
 	_beam.visible = false
+	# A defeated actor drops out of layer 4 in _die(). Restore the gameplay
+	# layer when an altar checkpoint rebuilds the encounter; otherwise the
+	# revived model is visible but cannot receive blade or spell hits.
+	collision_layer = 4
+	collision_mask = 1
 	_title.visible = false
 	collision_layer = 4
 	_title.text = _name() + ("  ·  一击处决" if archetype in [&"normal",&"shield"] else "  %d / %d" % [health,maximum_health])
@@ -244,6 +250,13 @@ func break_guard(seconds: float = 4.0) -> void:
 	_flash = .2
 
 func receive_hit(amount: int, direction: Vector3) -> bool:
+	return _resolve_hit(amount, direction, &"blade")
+
+func receive_elemental_hit(amount: int, direction: Vector3, element: StringName) -> bool:
+	return _resolve_hit(amount, direction, element)
+
+func _resolve_hit(amount: int, direction: Vector3, element: StringName) -> bool:
+	last_hit_element = element
 	# This stable enemy feedback point is not a measured surface intersection.
 	# Projectile VFX needing that surface already receive MagicBolt.contacted.
 	var point := get_hit_point()

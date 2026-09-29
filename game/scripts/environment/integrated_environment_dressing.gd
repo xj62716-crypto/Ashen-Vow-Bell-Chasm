@@ -141,7 +141,20 @@ static func _edge_landmark(room: CombatRoom, point: Vector3, size: Vector2, inde
 	# Keep the piers on the actual slab edges.  The old fixed 2.13 m offset put
 	# both supports in the authored landing lane on the wider expansion decks,
 	# trapping a player who had already completed the wall transfer.
-	var pier_offset := maxf(2.13,size.x*.5-1.0)
+	# The arch is rotated across the authored arrival line.  A fixed local-X
+	# spacing can therefore put one pier outside a narrow platform in world Z
+	# (the stage-3 entry exposed this as an apparently floating support).  Keep
+	# the readable minimum, then clamp the spacing by both world projections of
+	# the rotated local-X axis so every pier remains on the real slab.
+	var preferred_pier_offset := maxf(2.13,size.x*.5-1.0)
+	var pier_limit := INF
+	var projected_x := absf(cos(rotation))
+	var projected_z := absf(sin(rotation))
+	if projected_x > .001:
+		pier_limit=minf(pier_limit,(size.x*.5-.9)/projected_x)
+	if projected_z > .001:
+		pier_limit=minf(pier_limit,(size.y*.5-.9)/projected_z)
+	var pier_offset := minf(preferred_pier_offset,maxf(1.65,pier_limit))
 	_box_collision(body,Vector3(-pier_offset,2.1,0),Vector3(.62,4.2,.72))
 	_box_collision(body,Vector3(pier_offset,2.1,0),Vector3(.62,4.2,.72))
 	body.add_to_group("integrated_environment_collision")

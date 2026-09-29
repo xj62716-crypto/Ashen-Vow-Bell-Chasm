@@ -91,7 +91,10 @@ func _physics_process(delta: float) -> void:
 		# or free it. Natural expiry/cancellation never enters this notification.
 		_contact_reported = true
 		contacted.emit(point,body)
-		if friendly and blast_radius>0:
+		if friendly and body is BossObjective:
+			if not body.receive_player_hit(damage, direction, owner_combat.player if is_instance_valid(owner_combat) else null):
+				if is_instance_valid(owner_combat): owner_combat.blocked_hit.emit()
+		elif friendly and blast_radius>0:
 			_explode(point-direction.normalized()*.04,body as LanternAcolyte)
 		elif friendly and body is LanternAcolyte:
 			_strike(body,point)
@@ -117,10 +120,12 @@ func _physics_process(delta: float) -> void:
 				combat.receive_damage(damage)
 		elif not friendly and body is EchoDecoy:
 			body.receive_hit(damage, direction)
-		elif friendly and body != null and body.has_method("receive_hit") and not (body is LanternAcolyte or body is RunMechanism or body is TerrainDevice or body is RiftConstruct):
+		elif friendly and body != null and body.has_method("receive_hit") and not (body is LanternAcolyte or body is BossObjective or body is RunMechanism or body is TerrainDevice or body is RiftConstruct):
 			body.receive_hit(damage, direction)
 		ImpactBurst.spawn(get_parent(),point,_tint,1.0 if blast_radius<=0 else 1.7,element,-direction)
-		if friendly and is_instance_valid(owner_combat):owner_combat.spell_contact.emit(element)
+		if friendly and is_instance_valid(owner_combat):
+			owner_combat.spell_contact.emit(element)
+			owner_combat.spell_impacted.emit(element, point, body)
 		queue_free()
 		return
 	global_position += travel
@@ -138,7 +143,7 @@ func _strike(enemy: LanternAcolyte, point: Vector3) -> void:
 		return
 	if wind_force and not enemy.vulnerable:
 		enemy.apply_wind(direction)
-	var accepted: bool = enemy.receive_hit(damage,direction.normalized())
+	var accepted: bool = enemy.receive_elemental_hit(damage,direction.normalized(),element)
 	if accepted and is_instance_valid(owner_combat):
 		owner_combat.confirm_hit(enemy,point,enemy.health<=0,chain_allowed,charged,airtime_serial)
 		if frozen and frost_nova and enemy.health<=0:

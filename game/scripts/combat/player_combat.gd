@@ -3,6 +3,7 @@ extends Node
 ## Combat advances on physics time; impact hold affects the weapon, never movement.
 signal chain_launched(origin: Vector3, target: Node3D, bolt: MagicBolt)
 signal swing_started
+signal attack_prepared(ranged: bool)
 signal hit_confirmed(target: Node3D, point: Vector3, defeated: bool)
 signal hurt(amount: int)
 signal died
@@ -10,6 +11,7 @@ signal ability_used
 signal parried
 signal blocked_hit
 signal spell_contact(element: StringName)
+signal spell_impacted(element: StringName, point: Vector3, collider: Node)
 signal temporal_reset_requested
 signal rune_applied(id: StringName)
 signal build_progressed(stage: int, title: String, synergies: Array[StringName])
@@ -18,7 +20,7 @@ signal flow_changed(value: float, capacity: float)
 signal echo_sweep_launched(origin: Vector3, forward: Vector3)
 
 @export var maximum_health: int = 2
-@export var reach: float = 2.7
+@export var reach: float = 3.2
 @export var windup: float = 0.09
 @export var active_time: float = 0.12
 @export var recovery_time: float = 0.23
@@ -170,7 +172,7 @@ func reset_run() -> void:
 	damage_multiplier = 1.0
 	shield = false
 	ability_cooldown = 0.0
-	reach = 2.7
+	reach = 3.2
 	_chain_range = 5.0
 	runes_reset.emit()
 
@@ -318,6 +320,7 @@ func try_attack() -> bool:
 		_charge_spent = true
 	attacks += 1
 	player.impact(.25)
+	attack_prepared.emit(definition.ranged)
 	return true
 
 
@@ -585,7 +588,10 @@ func _sample_hit() -> void:
 		var aim: Vector3 = target.get_hit_point()
 		var offset: Vector3 = aim - origin
 		var sweeping: bool=&"shade_cleave" in runes or (&"shade_slide" in runes and arts.slide_window>0)
-		if offset.length() > actual_reach or offset.normalized().dot(forward) < cos(deg_to_rad(85.0 if sweeping else 42.0)):
+		# A first-person cross-body cut covers a broad forward crescent.  Keep the
+		# ray occlusion check below authoritative, but do not make a physically
+		# plausible horizontal cut behave like a needle pointed at the reticle.
+		if offset.length() > actual_reach or offset.normalized().dot(forward) < cos(deg_to_rad(85.0 if sweeping else 55.0)):
 			continue
 		# Environment AND other enemies occlude a hit; never strike through cover.
 		var ray := PhysicsRayQueryParameters3D.create(origin, aim, 5)
@@ -593,6 +599,11 @@ func _sample_hit() -> void:
 		if contact.is_empty() or contact["collider"] != target:
 			continue
 		_hit_ids[target.get_instance_id()] = true
+		if target is BossObjective:
+			if not target.receive_player_hit(_damage, forward, player):
+				blocked_hit.emit()
+				player.impact(.45)
+			continue
 		if target is RunMechanism:
 			target.receive_hit(_damage,forward)
 			continue

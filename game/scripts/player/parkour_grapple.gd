@@ -292,7 +292,11 @@ func advance(delta: float) -> void:
 	# releasing E are movement inputs during the flight; they must not turn a
 	# route traversal into a second timing task. System-level calls to release()
 	# remain available for respawn, room teardown and authored interrupts.
-	if age > MAX_DURATION:
+	# Physics advances in discrete ticks. Let the final commanded step reach an
+	# exit shell that is already within one tick of travel at the 0.5 s bound.
+	var route_remaining := Vector2(offset.x,offset.z).length()
+	var final_step_reaches_shell := route_remaining <= route_exit_distance + speed*delta and absf(offset.y) <= player.parkour_profile.grapple_vertical_exit_gap
+	if age > MAX_DURATION and (age > MAX_DURATION+delta or not final_step_reaches_shell):
 		_finish(&"timeout")
 		return
 	if age >= LAUNCH_TIME:
